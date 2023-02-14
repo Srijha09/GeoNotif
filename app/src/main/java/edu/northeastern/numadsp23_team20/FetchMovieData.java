@@ -2,13 +2,23 @@ package edu.northeastern.numadsp23_team20;
 
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
 
 public class FetchMovieData implements Runnable {
+
+    private volatile JSONArray results;
+
     @Override
     public void run() {
         URL url = null;
@@ -22,15 +32,30 @@ public class FetchMovieData implements Runnable {
             conn.setDoInput(true);
             conn.connect();
             InputStream inputStream = conn.getInputStream();
-            final String resp = convertStreamToString(inputStream);
-            System.out.println(resp);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            StringBuilder stringBuilder = new StringBuilder();
+            JSONObject jsonObject = null;
+
+            String currentLine;
+            try {
+                while ((currentLine = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(currentLine);
+                }
+                JSONTokener jsonTokener = new JSONTokener(stringBuilder.toString());
+                jsonObject = new JSONObject(jsonTokener);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            this.results = (JSONArray) jsonObject.get("results");
+
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next().replace(",", ",\n") : "";
+    public JSONArray getResults() {
+        return this.results;
     }
 }
