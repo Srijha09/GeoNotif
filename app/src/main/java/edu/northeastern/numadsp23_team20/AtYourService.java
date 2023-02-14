@@ -10,5 +10,7 @@ public class AtYourService extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_at_your_service);
+        Thread runnableThread = new Thread(new FetchMovieData());
+        runnableThread.start();
     }
 }
