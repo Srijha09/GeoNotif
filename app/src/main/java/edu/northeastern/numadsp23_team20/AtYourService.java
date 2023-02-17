@@ -1,5 +1,6 @@
 package edu.northeastern.numadsp23_team20;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,8 +36,9 @@ public class AtYourService extends AppCompatActivity {
     private RecyclerView movieRecyclerView;
     private JSONArray movieData;
     private AtomicBoolean searchComplete;
-    private final int VIEW_TYPE_ITEM = 0;
-    private final int VIEW_TYPE_LOADING = 1;
+
+    private boolean isLoading = false;
+    private String next = "titles";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,45 @@ public class AtYourService extends AppCompatActivity {
         this.movieRecyclerView.setHasFixedSize(true);
         this.movieRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         this.movieRecyclerView.setAdapter(this.movieAdapter);
+
+        initScrollListener();
+    }
+
+    private void initScrollListener() {
+        this.movieRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (!isLoading) {
+                    if (linearLayoutManager != null
+                            && linearLayoutManager.findLastCompletelyVisibleItemPosition()
+                            == movieList.size() - 1) {
+                        loadMore();
+                        isLoading = true;
+                    }
+                }
+            }
+        });
+    }
+
+    private void loadMore() {
+        this.movieList.add(null);
+        this.movieAdapter.notifyItemInserted(this.movieList.size() - 1);
+        handler.postDelayed(() -> {
+            movieList.remove(movieList.size() - 1);
+            int scrollPosition = movieList.size();
+            movieAdapter.notifyItemRemoved(scrollPosition);
+            this.searchComplete = new AtomicBoolean(false);
+            FetchMovieData fetchMovieData = new FetchMovieData(this.next);
+            Thread runnableThread = new Thread(fetchMovieData);
+            runnableThread.start();
+        }, 2000);
     }
 
     public void onSearchButtonClick(View view) {
@@ -58,12 +99,20 @@ public class AtYourService extends AppCompatActivity {
         this.searchingSpinner.setVisibility(View.VISIBLE);
         this.movieData = new JSONArray();
         this.searchComplete = new AtomicBoolean(false);
-        FetchMovieData fetchMovieData = new FetchMovieData();
+        FetchMovieData fetchMovieData = new FetchMovieData(this.next);
         Thread runnableThread = new Thread(fetchMovieData);
         runnableThread.start();
     }
 
     class FetchMovieData implements Runnable {
+
+        String searchString = "";
+        String nextSearchString = "";
+
+        public FetchMovieData(String searchString) {
+            this.searchString = searchString;
+        }
+
         @Override
         public void run() {
             try {
@@ -72,7 +121,7 @@ public class AtYourService extends AppCompatActivity {
                 e.printStackTrace();
             }
             try {
-                URL url = new URL("https://moviesdatabase.p.rapidapi.com/titles");
+                URL url = new URL("https://moviesdatabase.p.rapidapi.com/" + this.searchString);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("X-RapidAPI-Key", "36c780a7bamshbd41900545a1fffp1579a1jsn8e009bed63f1");
@@ -95,6 +144,7 @@ public class AtYourService extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 System.out.println(jsonObject);
+                nextSearchString = jsonObject.get("next").toString().substring(1);
                 movieData = (JSONArray) jsonObject.get("results");
                 searchComplete.set(true);
                 JSONObject objects;
@@ -114,13 +164,16 @@ public class AtYourService extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                movieAdapter.notifyItemRangeInserted(0, movieData.length());
+                // movieAdapter.notifyItemRangeInserted(0, movieData.length());
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
             handler.post(() -> {
+                movieAdapter.notifyDataSetChanged();
                 searchButton.setVisibility(View.VISIBLE);
                 searchingSpinner.setVisibility(View.INVISIBLE);
+                next = this.nextSearchString;
+                isLoading = false;
             });
         }
     }
