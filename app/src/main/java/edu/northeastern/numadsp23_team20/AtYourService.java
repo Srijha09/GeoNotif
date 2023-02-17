@@ -38,7 +38,7 @@ public class AtYourService extends AppCompatActivity {
     private AtomicBoolean searchComplete;
 
     private boolean isLoading = false;
-    private String next = "titles";
+    private String next = "titles?startYear=1995";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,23 +143,32 @@ public class AtYourService extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                System.out.println(jsonObject);
+                //System.out.println(jsonObject);
                 nextSearchString = jsonObject.get("next").toString().substring(1);
                 movieData = (JSONArray) jsonObject.get("results");
                 searchComplete.set(true);
                 JSONObject objects;
                 JSONObject titleText;
                 JSONObject releaseYear;
+                JSONObject movieUrl;
                 for (int i = 0; i < movieData.length(); i++) {
                     try {
                         objects = movieData.getJSONObject(i);
-                        System.out.println(objects);
+                        //System.out.println(objects);
                         titleText = (JSONObject) objects.get("titleText");
                         releaseYear = (JSONObject) objects.get("releaseYear");
-                        movieList.add(new Movie(
-                                titleText.get("text").toString(),
-                                releaseYear.get("year").toString()
-                        ));
+                        //System.out.println((objects.get("primaryImage")).getClass());
+                        if (objects.get("primaryImage") instanceof org.json.JSONObject)
+                            movieUrl = (JSONObject) objects.get("primaryImage");
+                        else
+                            movieUrl = null;
+                        Movie m = new Movie(titleText.get("text").toString(), releaseYear.get("year").toString());
+                        //System.out.println(movieUrl == null ? "null" : movieUrl.toString());
+                        if (movieUrl != null) {
+                            m.setMovieImageUrl(movieUrl.get("url").toString());
+                        }
+                        movieList.add(m);
+                        //System.out.println(m.toString());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

@@ -3,6 +3,7 @@ package edu.northeastern.numadsp23_team20;
 public class Movie {
     private String title;
     private String releaseYear;
+    private String movieImageUrl = "";
 
     public Movie(String title, String releaseDate) {
         this.title = title;
@@ -24,4 +25,13 @@ public class Movie {
     public String getReleaseYear() {
         return releaseYear;
     }
+
+    public String getMovieImageUrl() {
+        return movieImageUrl;
+    }
+
+    public void setMovieImageUrl(String movieImageUrl) {
+        this.movieImageUrl = movieImageUrl;
+    }
+
 }

@@ -28,7 +28,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/MoviePoster"
             android:layout_width="150dp"
             android:layout_height="70dp"
             android:layout_gravity="center"
