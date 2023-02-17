@@ -3,6 +3,7 @@ package edu.northeastern.numadsp23_team20;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,6 +20,7 @@ public class MovieViewHolder extends RecyclerView.ViewHolder {
     public TextView releaseYear;
     public ImageView moviePoster;
     public String imageUrl;
+    private Handler handler = new Handler();
 
     public MovieViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -46,8 +48,13 @@ public class MovieViewHolder extends RecyclerView.ViewHolder {
             try {
                 InputStream in = new java.net.URL(imageUrl).openStream();
                 bimage = BitmapFactory.decodeStream(in);
-                if (bimage != null)
-                    moviePoster.setImageBitmap(bimage);
+                if (bimage != null) {
+                    Bitmap finalBimage = bimage;
+                    handler.post(() -> {
+                        moviePoster.setImageBitmap(finalBimage);
+                    });
+
+                }
             } catch (Exception e) {
                 Log.e("Error Message", e.getMessage());
                 e.printStackTrace();
