@@ -4,10 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -29,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AtYourService extends AppCompatActivity {
 
+    private Handler handler = new Handler();
     private Button searchButton;
     private ProgressBar searchingSpinner;
     private List<Movie> movieList;
@@ -119,6 +118,10 @@ public class AtYourService extends AppCompatActivity {
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
+            handler.post(() -> {
+                searchButton.setVisibility(View.VISIBLE);
+                searchingSpinner.setVisibility(View.INVISIBLE);
+            });
         }
     }
 }
