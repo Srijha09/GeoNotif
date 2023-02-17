@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +25,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AtYourService extends AppCompatActivity {
@@ -36,9 +38,10 @@ public class AtYourService extends AppCompatActivity {
     private RecyclerView movieRecyclerView;
     private JSONArray movieData;
     private AtomicBoolean searchComplete;
+    private TextView noResults;
 
     private boolean isLoading = false;
-    private String next = "titles?startYear=1995";
+    private String next = "titles";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +56,7 @@ public class AtYourService extends AppCompatActivity {
         this.movieRecyclerView.setHasFixedSize(true);
         this.movieRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         this.movieRecyclerView.setAdapter(this.movieAdapter);
+        this.noResults = (TextView) findViewById(R.id.noResultsTextView);
 
         initScrollListener();
     }
@@ -81,17 +85,19 @@ public class AtYourService extends AppCompatActivity {
     }
 
     private void loadMore() {
-        this.movieList.add(null);
-        this.movieAdapter.notifyItemInserted(this.movieList.size() - 1);
-        handler.postDelayed(() -> {
-            movieList.remove(movieList.size() - 1);
-            int scrollPosition = movieList.size();
-            movieAdapter.notifyItemRemoved(scrollPosition);
-            this.searchComplete = new AtomicBoolean(false);
-            FetchMovieData fetchMovieData = new FetchMovieData(this.next);
-            Thread runnableThread = new Thread(fetchMovieData);
-            runnableThread.start();
-        }, 2000);
+        if (this.next != null) {
+            this.movieList.add(null);
+            this.movieAdapter.notifyItemInserted(this.movieList.size() - 1);
+            handler.postDelayed(() -> {
+                movieList.remove(movieList.size() - 1);
+                int scrollPosition = movieList.size();
+                movieAdapter.notifyItemRemoved(scrollPosition);
+                this.searchComplete = new AtomicBoolean(false);
+                FetchMovieData fetchMovieData = new FetchMovieData(this.next);
+                Thread runnableThread = new Thread(fetchMovieData);
+                runnableThread.start();
+            }, 2000);
+        }
     }
 
     public void onSearchButtonClick(View view) {
@@ -143,10 +149,22 @@ public class AtYourService extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                //System.out.println(jsonObject);
                 nextSearchString = jsonObject.get("next").toString().substring(1);
                 movieData = (JSONArray) jsonObject.get("results");
                 searchComplete.set(true);
+
+                if (movieData.length() == 0) {
+                    System.out.println("No results");
+                    handler.post(() -> {
+                        //movieAdapter.notifyDataSetChanged();
+                        searchButton.setVisibility(View.VISIBLE);
+                        searchingSpinner.setVisibility(View.INVISIBLE);
+                        next = null;
+                        isLoading = false;
+                        noResults.setVisibility(View.VISIBLE);
+                    });
+                    return;
+                }
                 JSONObject objects;
                 JSONObject titleText;
                 JSONObject releaseYear;
@@ -154,26 +172,21 @@ public class AtYourService extends AppCompatActivity {
                 for (int i = 0; i < movieData.length(); i++) {
                     try {
                         objects = movieData.getJSONObject(i);
-                        //System.out.println(objects);
                         titleText = (JSONObject) objects.get("titleText");
                         releaseYear = (JSONObject) objects.get("releaseYear");
-                        //System.out.println((objects.get("primaryImage")).getClass());
                         if (objects.get("primaryImage") instanceof org.json.JSONObject)
                             movieUrl = (JSONObject) objects.get("primaryImage");
                         else
                             movieUrl = null;
                         Movie m = new Movie(titleText.get("text").toString(), releaseYear.get("year").toString());
-                        //System.out.println(movieUrl == null ? "null" : movieUrl.toString());
                         if (movieUrl != null) {
                             m.setMovieImageUrl(movieUrl.get("url").toString());
                         }
                         movieList.add(m);
-                        //System.out.println(m.toString());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
-                // movieAdapter.notifyItemRangeInserted(0, movieData.length());
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
