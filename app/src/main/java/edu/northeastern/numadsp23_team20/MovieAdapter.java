@@ -27,8 +27,9 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == VIEW_TYPE_ITEM) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_item, null);
-            return new MovieViewHolder(view);
+//            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_item, null);
+//            return new MovieViewHolder(view);
+            return new MovieViewHolder(LayoutInflater.from(context).inflate(R.layout.movie_item, parent, false));
         } else {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_loading, null);
             return new MovieLoadingHolder(view);

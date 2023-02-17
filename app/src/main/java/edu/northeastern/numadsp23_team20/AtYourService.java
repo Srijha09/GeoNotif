@@ -43,6 +43,9 @@ public class AtYourService extends AppCompatActivity {
     private boolean isLoading = false;
     private String next = "titles";
 
+    private static final String KEY_OF_INSTANCE = "KEY_OF_INSTANCE";
+    private static final String NUMBER_OF_ITEMS = "NUMBER_OF_ITEMS";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +54,7 @@ public class AtYourService extends AppCompatActivity {
         this.searchButton = (Button) findViewById(R.id.searchButton);
         this.searchingSpinner = (ProgressBar) findViewById(R.id.SearchingSpinner);
         this.movieList = new ArrayList<>();
+        initialItemData(savedInstanceState);
         this.movieAdapter = new MovieAdapter(this.movieList, this);
         this.movieRecyclerView = findViewById(R.id.MovieRecyclerView);
         this.movieRecyclerView.setHasFixedSize(true);
@@ -96,7 +100,7 @@ public class AtYourService extends AppCompatActivity {
                 FetchMovieData fetchMovieData = new FetchMovieData(this.next);
                 Thread runnableThread = new Thread(fetchMovieData);
                 runnableThread.start();
-            }, 2000);
+            }, 1000);
         }
     }
 
@@ -109,6 +113,42 @@ public class AtYourService extends AppCompatActivity {
         Thread runnableThread = new Thread(fetchMovieData);
         runnableThread.start();
     }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        int size = movieList == null ? 0 : movieList.size();
+        outState.putInt(NUMBER_OF_ITEMS, size);
+        outState.putString("NEXT URL", next);
+        for (int i = 0; i < size; i++) {
+            outState.putString(KEY_OF_INSTANCE + i + "0", movieList.get(i).getTitle());
+            outState.putString(KEY_OF_INSTANCE + i + "1", movieList.get(i).getReleaseYear());
+            outState.putString(KEY_OF_INSTANCE + i + "2", movieList.get(i).getMovieImageUrl());
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    private void initialItemData(Bundle savedInstanceState) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(NUMBER_OF_ITEMS)) {
+            if (movieList == null || movieList.size() == 0) {
+                movieList.clear();
+                int size = savedInstanceState.getInt(NUMBER_OF_ITEMS);
+                for (int i = 0; i < size; i++) {
+                    String title = savedInstanceState.getString(KEY_OF_INSTANCE + i + "0");
+                    String releaseYear = savedInstanceState.getString(KEY_OF_INSTANCE + i + "1");
+                    String posterUrl = savedInstanceState.getString(KEY_OF_INSTANCE + i + "2");
+                    Movie m = new Movie(title, releaseYear);
+                    if (posterUrl != "") {
+                        m.setMovieImageUrl(posterUrl);
+                    }
+                    movieList.add(m);
+                }
+            }
+            next = savedInstanceState.getString("NEXT URL");
+        } else {
+            movieList = new ArrayList<>();
+        }
+    }
+
 
     class FetchMovieData implements Runnable {
 
@@ -153,7 +193,7 @@ public class AtYourService extends AppCompatActivity {
                 movieData = (JSONArray) jsonObject.get("results");
                 searchComplete.set(true);
 
-                if (movieData.length() == 0) {
+                if (movieData.length() == 0 && movieList.isEmpty()) {
                     System.out.println("No results");
                     handler.post(() -> {
                         //movieAdapter.notifyDataSetChanged();
