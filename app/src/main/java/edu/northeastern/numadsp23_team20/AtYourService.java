@@ -4,10 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,17 +29,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AtYourService extends AppCompatActivity {
 
+    private Button searchButton;
+    private ProgressBar searchingSpinner;
     private List<Movie> movieList;
     private MovieAdapter movieAdapter;
     private RecyclerView movieRecyclerView;
     private JSONArray movieData;
     private AtomicBoolean searchComplete;
+    private final int VIEW_TYPE_ITEM = 0;
+    private final int VIEW_TYPE_LOADING = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_at_your_service);
 
+        this.searchButton = (Button) findViewById(R.id.searchButton);
+        this.searchingSpinner = (ProgressBar) findViewById(R.id.SearchingSpinner);
         this.movieList = new ArrayList<>();
         this.movieAdapter = new MovieAdapter(this.movieList, this);
         this.movieRecyclerView = findViewById(R.id.MovieRecyclerView);
@@ -46,24 +55,23 @@ public class AtYourService extends AppCompatActivity {
     }
 
     public void onSearchButtonClick(View view) {
+        this.searchButton.setVisibility(View.INVISIBLE);
+        this.searchingSpinner.setVisibility(View.VISIBLE);
         this.movieData = new JSONArray();
         this.searchComplete = new AtomicBoolean(false);
         FetchMovieData fetchMovieData = new FetchMovieData();
         Thread runnableThread = new Thread(fetchMovieData);
         runnableThread.start();
-        while (!this.searchComplete.get()) {
-            Log.d("LOG", "Searching...");
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     class FetchMovieData implements Runnable {
         @Override
         public void run() {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             try {
                 URL url = new URL("https://moviesdatabase.p.rapidapi.com/titles");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -87,6 +95,7 @@ public class AtYourService extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                System.out.println(jsonObject);
                 movieData = (JSONArray) jsonObject.get("results");
                 searchComplete.set(true);
                 JSONObject objects;
@@ -102,11 +111,11 @@ public class AtYourService extends AppCompatActivity {
                                 titleText.get("text").toString(),
                                 releaseYear.get("year").toString()
                         ));
-                        movieAdapter.notifyItemInserted(i);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
+                movieAdapter.notifyItemRangeInserted(0, movieData.length());
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
