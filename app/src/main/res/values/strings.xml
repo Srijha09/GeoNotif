@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">NUMADSp23_Team20</string>
+    
+    <string-array name="array_genre">
+        <item>Select your Genre</item>
+        <item>Horror</item>
+        <item>Sci-Fi</item>
+        <item>Fantasy</item>
+        <item>Comedy</item>
+        <item>Action</item>
+        <item>Family</item>
+        <item>Romance</item>
+    </string-array>
+
 </resources>

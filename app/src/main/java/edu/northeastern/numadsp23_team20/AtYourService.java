@@ -5,11 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -24,6 +27,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,6 +50,11 @@ public class AtYourService extends AppCompatActivity {
     private static final String KEY_OF_INSTANCE = "KEY_OF_INSTANCE";
     private static final String NUMBER_OF_ITEMS = "NUMBER_OF_ITEMS";
 
+    private String selectedGenre, selectedStartYear, selectedEndYear; //to hold selected values
+    private TextView tvGenreSpinner, tvStartYear, tvEndYear;         //declaring textview to show error
+    private ArrayAdapter<CharSequence> genreAdapter;
+
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +72,23 @@ public class AtYourService extends AppCompatActivity {
         this.noResults = (TextView) findViewById(R.id.noResultsTextView);
 
         initScrollListener();
+
+        Spinner genreSpinner = findViewById(R.id.Genrespinner);
+        this.genreAdapter = ArrayAdapter.createFromResource(this, R.array.array_genre,R.layout.spinner_layout);
+        genreSpinner.setAdapter(genreAdapter);
+
+        Integer[] yearArray = new Integer[124];
+        int count = 0;
+        for (int year = 1900; year <= 2023; year++) {
+            yearArray[count] = year;
+            count++;
+        }
+        Spinner startYearSpinner = findViewById(R.id.StartYearspinner);
+        ArrayAdapter<Integer> startYearAdapter = new ArrayAdapter<Integer>(this, R.layout.spinner_layout, yearArray);
+        startYearSpinner.setAdapter(startYearAdapter);
+        Spinner endYearSpinner = findViewById(R.id.EndYearspinner);
+        ArrayAdapter<Integer> endYearAdapter = new ArrayAdapter<Integer>(this, R.layout.spinner_layout, yearArray);
+        endYearSpinner.setAdapter(endYearAdapter);
     }
 
     private void initScrollListener() {
