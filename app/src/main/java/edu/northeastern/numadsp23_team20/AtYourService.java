@@ -100,18 +100,20 @@ public class AtYourService extends AppCompatActivity {
         endYearSpinner = findViewById(R.id.EndYearspinner);
         endYearAdapter = new ArrayAdapter<Integer>(this, R.layout.spinner_layout, yearArray);
         endYearSpinner.setAdapter(endYearAdapter);
+        filterData();
     }
 
     private void filterData(){
         genreSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                selectedGenre = String.valueOf(genreSpinner.getSelectedItem());
-
+                selectedGenre = String.valueOf(adapterView.getItemAtPosition(i));
+                Toast.makeText(adapterView.getContext(), "You selected: " + selectedGenre,Toast.LENGTH_LONG).show();
                 startYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        selectedStartYear = Integer.parseInt(startYearSpinner.getSelectedItem().toString());
+                        selectedStartYear = Integer.parseInt(adapterView.getItemAtPosition(i).toString());
+                        Toast.makeText(adapterView.getContext(), "You selected: " + selectedStartYear,Toast.LENGTH_LONG).show();
                     }
 
                     @Override
@@ -122,7 +124,8 @@ public class AtYourService extends AppCompatActivity {
                 endYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        selectedEndYear = Integer.parseInt(endYearSpinner.getSelectedItem().toString());
+                        selectedEndYear = Integer.parseInt(adapterView.getItemAtPosition(i).toString());
+                        Toast.makeText(adapterView.getContext(), "You selected: " + selectedEndYear,Toast.LENGTH_LONG).show();
                     }
 
                     @Override
@@ -181,7 +184,6 @@ public class AtYourService extends AppCompatActivity {
     }
 
     public void onSearchButtonClick(View view) {
-        filterData();
         this.searchButton.setVisibility(View.INVISIBLE);
         this.searchingSpinner.setVisibility(View.VISIBLE);
         this.movieData = new JSONArray();
@@ -246,13 +248,16 @@ public class AtYourService extends AppCompatActivity {
                 e.printStackTrace();
             }
             try {
-//                URL url = new URL("https://moviesdatabase.p.rapidapi.com/titles/utils/genres/" + selectedGenre + "/"
-//                        + selectedStartYear + "/" + selectedEndYear);
-                URL url = new URL("https://moviesdatabase.p.rapidapi.com/" + this.searchString);
+                URL url = new URL("https://moviesdatabase.p.rapidapi.com/titles/");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("X-RapidAPI-Key", "d5b9e87b2bmsh27caa484363c9ddp1cc8eejsn044e58443f1e");
                 conn.setRequestProperty("X-RapidAPI-Host", "moviesdatabase.p.rapidapi.com");
+                if(selectedGenre!=null) {
+                    conn.setRequestProperty("genre", selectedGenre);
+                }
+                conn.setRequestProperty("endYear", String.valueOf(selectedEndYear));
+                conn.setRequestProperty("startYear", String.valueOf(selectedStartYear));
                 conn.setDoInput(true);
                 conn.connect();
                 InputStream inputStream = conn.getInputStream();
@@ -270,6 +275,7 @@ public class AtYourService extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                assert jsonObject != null;
                 nextSearchString = jsonObject.get("next").toString().substring(1);
                 movieData = (JSONArray) jsonObject.get("results");
                 searchComplete.set(true);
