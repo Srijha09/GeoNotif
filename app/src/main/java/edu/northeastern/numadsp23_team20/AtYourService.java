@@ -9,11 +9,13 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,6 +31,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -50,9 +53,12 @@ public class AtYourService extends AppCompatActivity {
     private static final String KEY_OF_INSTANCE = "KEY_OF_INSTANCE";
     private static final String NUMBER_OF_ITEMS = "NUMBER_OF_ITEMS";
 
-    private String selectedGenre, selectedStartYear, selectedEndYear; //to hold selected values
+    private String selectedGenre;
+    private int selectedStartYear, selectedEndYear; //to hold selected values
     private TextView tvGenreSpinner, tvStartYear, tvEndYear;         //declaring textview to show error
     private ArrayAdapter<CharSequence> genreAdapter;
+    private ArrayAdapter<Integer> startYearAdapter, endYearAdapter;
+    private Spinner genreSpinner,startYearSpinner,endYearSpinner;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -73,22 +79,62 @@ public class AtYourService extends AppCompatActivity {
 
         initScrollListener();
 
-        Spinner genreSpinner = findViewById(R.id.Genrespinner);
+        this.genreSpinner = findViewById(R.id.Genrespinner);
         this.genreAdapter = ArrayAdapter.createFromResource(this, R.array.array_genre,R.layout.spinner_layout);
-        genreSpinner.setAdapter(genreAdapter);
+        this.genreSpinner.setAdapter(genreAdapter);
 
-        Integer[] yearArray = new Integer[124];
-        int count = 0;
+        Integer[] yearArray = new Integer[125];
+        int count = 1;
         for (int year = 1900; year <= 2023; year++) {
+            yearArray[0] = 0;
             yearArray[count] = year;
             count++;
         }
-        Spinner startYearSpinner = findViewById(R.id.StartYearspinner);
-        ArrayAdapter<Integer> startYearAdapter = new ArrayAdapter<Integer>(this, R.layout.spinner_layout, yearArray);
+        startYearSpinner = findViewById(R.id.StartYearspinner);
+        startYearAdapter = new ArrayAdapter<Integer>(this, R.layout.spinner_layout, yearArray);
         startYearSpinner.setAdapter(startYearAdapter);
-        Spinner endYearSpinner = findViewById(R.id.EndYearspinner);
-        ArrayAdapter<Integer> endYearAdapter = new ArrayAdapter<Integer>(this, R.layout.spinner_layout, yearArray);
+        endYearSpinner = findViewById(R.id.EndYearspinner);
+        endYearAdapter = new ArrayAdapter<Integer>(this, R.layout.spinner_layout, yearArray);
         endYearSpinner.setAdapter(endYearAdapter);
+    }
+
+    private void filterData(){
+        genreSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedGenre = String.valueOf(genreSpinner.getSelectedItem());
+
+                startYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        selectedStartYear = Integer.parseInt(startYearSpinner.getSelectedItem().toString());
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
+                endYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        selectedEndYear = Integer.parseInt(endYearSpinner.getSelectedItem().toString());
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
     }
 
     private void initScrollListener() {
@@ -131,6 +177,7 @@ public class AtYourService extends AppCompatActivity {
     }
 
     public void onSearchButtonClick(View view) {
+        filterData();
         this.searchButton.setVisibility(View.INVISIBLE);
         this.searchingSpinner.setVisibility(View.VISIBLE);
         this.movieData = new JSONArray();
@@ -193,10 +240,12 @@ public class AtYourService extends AppCompatActivity {
                 e.printStackTrace();
             }
             try {
+//                URL url = new URL("https://moviesdatabase.p.rapidapi.com/titles/utils/genres/" + selectedGenre + "/"
+//                        + selectedStartYear + "/" + selectedEndYear);
                 URL url = new URL("https://moviesdatabase.p.rapidapi.com/" + this.searchString);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
-                conn.setRequestProperty("X-RapidAPI-Key", "36c780a7bamshbd41900545a1fffp1579a1jsn8e009bed63f1");
+                conn.setRequestProperty("X-RapidAPI-Key", "d5b9e87b2bmsh27caa484363c9ddp1cc8eejsn044e58443f1e");
                 conn.setRequestProperty("X-RapidAPI-Host", "moviesdatabase.p.rapidapi.com");
                 conn.setDoInput(true);
                 conn.connect();
