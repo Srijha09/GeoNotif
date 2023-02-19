@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AtYourService extends AppCompatActivity {
@@ -61,6 +62,9 @@ public class AtYourService extends AppCompatActivity {
     private Spinner genreSpinner,startYearSpinner,endYearSpinner;
 
     @SuppressLint("MissingInflatedId")
+    private final List<String> genres = Arrays.asList("horror", "sci-fi", "fantasy", "comedy",
+            "action", "family", "romance");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -196,6 +200,7 @@ public class AtYourService extends AppCompatActivity {
             outState.putString(KEY_OF_INSTANCE + i + "0", movieList.get(i).getTitle());
             outState.putString(KEY_OF_INSTANCE + i + "1", movieList.get(i).getReleaseYear());
             outState.putString(KEY_OF_INSTANCE + i + "2", movieList.get(i).getMovieImageUrl());
+            outState.putString(KEY_OF_INSTANCE + i + "3", movieList.get(i).getGenre());
         }
         super.onSaveInstanceState(outState);
     }
@@ -209,7 +214,8 @@ public class AtYourService extends AppCompatActivity {
                     String title = savedInstanceState.getString(KEY_OF_INSTANCE + i + "0");
                     String releaseYear = savedInstanceState.getString(KEY_OF_INSTANCE + i + "1");
                     String posterUrl = savedInstanceState.getString(KEY_OF_INSTANCE + i + "2");
-                    Movie m = new Movie(title, releaseYear);
+                    String genre = savedInstanceState.getString(KEY_OF_INSTANCE + i + "3");
+                    Movie m = new Movie(title, releaseYear, genre);
                     if (posterUrl != "") {
                         m.setMovieImageUrl(posterUrl);
                     }
@@ -284,20 +290,28 @@ public class AtYourService extends AppCompatActivity {
                 JSONObject titleText;
                 JSONObject releaseYear;
                 JSONObject movieUrl;
+                int randIndex;
                 for (int i = 0; i < movieData.length(); i++) {
                     try {
                         objects = movieData.getJSONObject(i);
                         titleText = (JSONObject) objects.get("titleText");
                         releaseYear = (JSONObject) objects.get("releaseYear");
+                        Random r = new Random();
+                        randIndex = r.nextInt(7);
+                        String genre = genres.get(randIndex);
+                        Movie movie = new Movie(
+                                titleText.get("text").toString(),
+                                releaseYear.get("year").toString(),
+                                genre);
                         if (objects.get("primaryImage") instanceof org.json.JSONObject)
                             movieUrl = (JSONObject) objects.get("primaryImage");
                         else
                             movieUrl = null;
-                        Movie m = new Movie(titleText.get("text").toString(), releaseYear.get("year").toString());
+
                         if (movieUrl != null) {
-                            m.setMovieImageUrl(movieUrl.get("url").toString());
+                            movie.setMovieImageUrl(movieUrl.get("url").toString());
                         }
-                        movieList.add(m);
+                        movieList.add(movie);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

@@ -4,10 +4,12 @@ public class Movie {
     private String title;
     private String releaseYear;
     private String movieImageUrl = "";
+    private String genre;
 
-    public Movie(String title, String releaseDate) {
+    public Movie(String title, String releaseDate, String genre) {
         this.title = title;
         this.releaseYear = releaseDate;
+        this.genre = genre;
     }
 
     public void setTitle(String title) {
@@ -34,4 +36,7 @@ public class Movie {
         this.movieImageUrl = movieImageUrl;
     }
 
+    public String getGenre() {
+        return this.genre;
+    }
 }
