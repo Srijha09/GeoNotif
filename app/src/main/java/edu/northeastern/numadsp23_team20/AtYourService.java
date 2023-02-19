@@ -23,7 +23,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AtYourService extends AppCompatActivity {
@@ -39,6 +41,9 @@ public class AtYourService extends AppCompatActivity {
 
     private boolean isLoading = false;
     private String next = "titles";
+
+    private final List<String> genres = Arrays.asList("horror", "sci-fi", "fantasy", "comedy",
+            "action", "family", "romance");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,21 +155,26 @@ public class AtYourService extends AppCompatActivity {
                 JSONObject objects;
                 JSONObject titleText;
                 JSONObject releaseYear;
+                int randIndex;
                 for (int i = 0; i < movieData.length(); i++) {
                     try {
                         objects = movieData.getJSONObject(i);
                         System.out.println(objects);
                         titleText = (JSONObject) objects.get("titleText");
                         releaseYear = (JSONObject) objects.get("releaseYear");
+                        Random r = new Random();
+                        randIndex = r.nextInt(7);
+                        String genre = genres.get(randIndex);
+                        System.out.println(genre);
                         movieList.add(new Movie(
                                 titleText.get("text").toString(),
-                                releaseYear.get("year").toString()
+                                releaseYear.get("year").toString(),
+                                genre
                         ));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
-                // movieAdapter.notifyItemRangeInserted(0, movieData.length());
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
