@@ -55,11 +55,10 @@ public class AtYourService extends AppCompatActivity {
     private static final String NUMBER_OF_ITEMS = "NUMBER_OF_ITEMS";
 
     private String selectedGenre;
-    private int selectedStartYear, selectedEndYear; //to hold selected values
-    private TextView tvGenreSpinner, tvStartYear, tvEndYear;         //declaring textview to show error
+    private int selectedStartYear, selectedEndYear;
     private ArrayAdapter<CharSequence> genreAdapter;
     private ArrayAdapter<Integer> startYearAdapter, endYearAdapter;
-    private Spinner genreSpinner,startYearSpinner,endYearSpinner;
+    private Spinner genreSpinner, startYearSpinner, endYearSpinner;
 
     @SuppressLint("MissingInflatedId")
     private final List<String> genres = Arrays.asList("horror", "sci-fi", "fantasy", "comedy",
@@ -84,7 +83,7 @@ public class AtYourService extends AppCompatActivity {
         initScrollListener();
 
         this.genreSpinner = findViewById(R.id.Genrespinner);
-        this.genreAdapter = ArrayAdapter.createFromResource(this, R.array.array_genre,R.layout.spinner_layout);
+        this.genreAdapter = ArrayAdapter.createFromResource(this, R.array.array_genre, R.layout.spinner_layout);
         this.genreSpinner.setAdapter(genreAdapter);
 
         Integer[] yearArray = new Integer[125];
@@ -103,37 +102,32 @@ public class AtYourService extends AppCompatActivity {
         filterData();
     }
 
-    private void filterData(){
+    private void filterData() {
         genreSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 selectedGenre = String.valueOf(adapterView.getItemAtPosition(i));
-                Toast.makeText(adapterView.getContext(), "You selected: " + selectedGenre,Toast.LENGTH_LONG).show();
-                startYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        selectedStartYear = Integer.parseInt(adapterView.getItemAtPosition(i).toString());
-                        Toast.makeText(adapterView.getContext(), "You selected: " + selectedStartYear,Toast.LENGTH_LONG).show();
-                    }
+            }
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+        startYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedStartYear = Integer.parseInt(adapterView.getItemAtPosition(i).toString());
+            }
 
-                    }
-                });
-                endYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        selectedEndYear = Integer.parseInt(adapterView.getItemAtPosition(i).toString());
-                        Toast.makeText(adapterView.getContext(), "You selected: " + selectedEndYear,Toast.LENGTH_LONG).show();
-                    }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
-
-                    }
-                });
-
+            }
+        });
+        endYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedEndYear = Integer.parseInt(adapterView.getItemAtPosition(i).toString());
             }
 
             @Override
@@ -184,9 +178,22 @@ public class AtYourService extends AppCompatActivity {
     }
 
     public void onSearchButtonClick(View view) {
+        this.next = "titles";
+        if (!selectedGenre.isEmpty() || selectedEndYear != 0 || selectedStartYear != 0) {
+            this.next += "?";
+            if (!selectedGenre.isEmpty())
+                this.next += "genre=" + selectedGenre + "&";
+            if (selectedStartYear != 0)
+                this.next += "startYear=" + selectedStartYear + "&";
+            if (selectedEndYear != 0)
+                this.next += "endYear=" + selectedEndYear + "&";
+            this.next = this.next.substring(0, this.next.length() - 1);
+        }
+
         this.searchButton.setVisibility(View.INVISIBLE);
         this.searchingSpinner.setVisibility(View.VISIBLE);
         this.movieData = new JSONArray();
+        this.movieList.clear();
         this.searchComplete = new AtomicBoolean(false);
         FetchMovieData fetchMovieData = new FetchMovieData(this.next);
         Thread runnableThread = new Thread(fetchMovieData);
@@ -248,14 +255,11 @@ public class AtYourService extends AppCompatActivity {
                 e.printStackTrace();
             }
             try {
-                URL url = new URL("https://moviesdatabase.p.rapidapi.com/titles/");
+                URL url = new URL("https://moviesdatabase.p.rapidapi.com/" + searchString);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("X-RapidAPI-Key", "d5b9e87b2bmsh27caa484363c9ddp1cc8eejsn044e58443f1e");
                 conn.setRequestProperty("X-RapidAPI-Host", "moviesdatabase.p.rapidapi.com");
-                if(selectedGenre!=null) {
-                    conn.setRequestProperty("genre", selectedGenre);
-                }
                 conn.setRequestProperty("endYear", String.valueOf(selectedEndYear));
                 conn.setRequestProperty("startYear", String.valueOf(selectedStartYear));
                 conn.setDoInput(true);
@@ -281,9 +285,9 @@ public class AtYourService extends AppCompatActivity {
                 searchComplete.set(true);
 
                 if (movieData.length() == 0 && movieList.isEmpty()) {
-                    System.out.println("No results");
                     handler.post(() -> {
-                        //movieAdapter.notifyDataSetChanged();
+                        movieList.clear();
+                        movieAdapter.notifyDataSetChanged();
                         searchButton.setVisibility(View.VISIBLE);
                         searchingSpinner.setVisibility(View.INVISIBLE);
                         next = null;
@@ -304,7 +308,7 @@ public class AtYourService extends AppCompatActivity {
                         releaseYear = (JSONObject) objects.get("releaseYear");
                         Random r = new Random();
                         randIndex = r.nextInt(7);
-                        String genre = genres.get(randIndex);
+                        String genre = selectedGenre.isEmpty() ? genres.get(randIndex) : selectedGenre.toLowerCase(Locale.ROOT);
                         Movie movie = new Movie(
                                 titleText.get("text").toString(),
                                 releaseYear.get("year").toString(),
@@ -329,6 +333,7 @@ public class AtYourService extends AppCompatActivity {
                 movieAdapter.notifyDataSetChanged();
                 searchButton.setVisibility(View.VISIBLE);
                 searchingSpinner.setVisibility(View.INVISIBLE);
+                noResults.setVisibility(View.INVISIBLE);
                 next = this.nextSearchString;
                 isLoading = false;
             });
