@@ -14,6 +14,7 @@ public class StickItToEm extends AppCompatActivity {
     }
 
     public void onSendStickerButtonClick(View view) {
-
+        SelectStickerDialog selectStickerDialog = new SelectStickerDialog();
+        selectStickerDialog.show(getSupportFragmentManager(), "SelectStickerDialog");
     }
 }

@@ -25,6 +25,7 @@
         android:id="@+id/SendStickerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="onSendStickerButtonClick"
         android:text="Send sticker"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
