@@ -10,10 +10,10 @@
         android:id="@+id/teamNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:text="Team 20"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/atYourSeviceButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -23,23 +23,34 @@
         android:id="@+id/atYourSeviceButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
         android:onClick="onAtYourServiceButtonClick"
         android:text="At Your Service"
+        app:layout_constraintBottom_toTopOf="@+id/StickItToEmButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/teamNameTextView" />
+        app:layout_constraintTop_toBottomOf="@id/aboutButton" />
 
     <Button
         android:id="@+id/StickItToEmButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:onClick="onStickItToEmClick"
         android:text="Stick It To 'Em"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/atYourSeviceButton" />
+
+    <Button
+        android:id="@+id/aboutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onAboutButtonClick"
+        android:text="About"
+        app:layout_constraintBottom_toTopOf="@+id/atYourSeviceButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/teamNameTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
