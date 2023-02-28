@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "152403486025",
+    "project_id": "stick-it-to-em-bbf4f",
+    "storage_bucket": "stick-it-to-em-bbf4f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:152403486025:android:0ba16f8148ff8521ff6698",
+        "android_client_info": {
+          "package_name": "edu.northeastern.numadsp23_team20"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "152403486025-4336lj5tch5nfli5g1jbuj0pa9lklt64.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHuuXe-hBLKidzJZHrxHUleBm9zKNxbRc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "152403486025-4336lj5tch5nfli5g1jbuj0pa9lklt64.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
