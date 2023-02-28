@@ -10,27 +10,31 @@
     <ScrollView
         android:id="@+id/ScrollableChatContainer"
         android:layout_width="match_parent"
-        android:layout_height="607dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="10dp"
+        android:background="#F1EFEE"
+        android:foregroundGravity="bottom"
+        app:layout_constraintBottom_toTopOf="@+id/SendStickerButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
+            android:id="@+id/LinearChatLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:orientation="vertical"/>
     </ScrollView>
 
     <Button
         android:id="@+id/SendStickerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
         android:onClick="onSendStickerButtonClick"
         android:text="Send sticker"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ScrollableChatContainer" />
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

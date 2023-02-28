@@ -6,28 +6,33 @@
     android:layout_height="match_parent">
 
     <TableLayout
-        android:layout_width="409dp"
+        android:id="@+id/TableLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
         android:stretchColumns="*"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TableRow
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/sticker1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/action" />
+                android:id="@+id/pikachu"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="10dp"
+                app:srcCompat="@drawable/pikachu" />
 
             <ImageView
-                android:id="@+id/sticker2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/comedy" />
+                android:id="@+id/mewtwo"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                app:srcCompat="@drawable/mewtwo" />
         </TableRow>
 
         <TableRow
@@ -35,16 +40,17 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/sticker3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/action" />
+                android:id="@+id/charmander"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="10dp"
+                app:srcCompat="@drawable/charmander" />
 
             <ImageView
-                android:id="@+id/sticker4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/comedy" />
+                android:id="@+id/squirtle"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                app:srcCompat="@drawable/squirtle" />
         </TableRow>
 
         <TableRow
@@ -52,16 +58,25 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/sticker5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/action" />
+                android:id="@+id/groudon"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                app:srcCompat="@drawable/groudon" />
 
             <ImageView
-                android:id="@+id/sticker6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/comedy" />
+                android:id="@+id/jolteon"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                app:srcCompat="@drawable/jolteon" />
         </TableRow>
     </TableLayout>
+
+    <Space
+        android:id="@+id/space"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TableLayout" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
