@@ -10,6 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 /**
  * A simple {@link Fragment} subclass.
  * create an instance of this fragment.
@@ -37,5 +42,6 @@ public class LoginFragment extends Fragment {
         });
         return view;
     }
+
 
 }
