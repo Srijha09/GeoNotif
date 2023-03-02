@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onStickItToEmClick(View view) {
-        Intent intent = new Intent(MainActivity.this, StickItToEm.class);
+        Intent intent = new Intent(MainActivity.this, AuthActivity.class);
         this.startActivity(intent);
     }
 }

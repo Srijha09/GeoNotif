@@ -1,5 +1,4 @@
 package edu.northeastern.numadsp23_team20;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;

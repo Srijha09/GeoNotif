@@ -1,5 +1,7 @@
 package edu.northeastern.numadsp23_team20;
 
+import static android.app.PendingIntent.getActivity;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
