@@ -1,16 +1,26 @@
 package edu.northeastern.numadsp23_team20;
 
 public class Message {
-    private String timestamp;
-    private int userId;
-    private String stickerName;
+    public String timestamp;
+    public String userId;
+    public String stickerName;
 
-    public Message(int userId, String stickerName) {
+    public Message() {
+
+    }
+
+    public Message(String userId, String stickerName) {
         this.userId = userId;
         this.stickerName = stickerName;
     }
 
-    public int getUserId() {
+    public Message(String userId, String stickerName, String time) {
+        this.userId = userId;
+        this.stickerName = stickerName;
+        this.timestamp = time;
+    }
+
+    public String getUserId() {
         return userId;
     }
 
