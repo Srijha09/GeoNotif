@@ -1,36 +1,31 @@
 package edu.northeastern.numadsp23_team20;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-public class MyAdapter extends FragmentPagerAdapter {
-    int totalTabs;
-    public MyAdapter(Context context, FragmentManager fm, int totalTabs) {
-        super(fm);
-        this.totalTabs = totalTabs;
+public class MyAdapter extends FragmentStateAdapter {
+
+    private String[] titles= new String[]{"Chats","Stickers"};
+    public MyAdapter(@NonNull FragmentActivity fragmentActivity) {
+        super(fragmentActivity);
     }
-    // this is for fragment tabs
+
     @NonNull
     @Override
-    public Fragment getItem(int position) {
+    public Fragment createFragment(int position) {
         switch (position) {
             case 0:
-                ChatFragment chatFragment = new ChatFragment();
-                return chatFragment;
+                return new ChatFragment();
             case 1:
-                StickerFragment stickerFragment = new StickerFragment();
-                return stickerFragment;
-            default:
-                return null;
+                return new StickerFragment();
         }
+        return new ChatFragment();
     }
-    // this counts total number of tabs
+
     @Override
-    public int getCount() {
-        return totalTabs;
+    public int getItemCount() {
+        return titles.length;
     }
 }
