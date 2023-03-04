@@ -28,4 +28,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, AuthActivity.class);
         this.startActivity(intent);
     }
+
+    public void onGeoNotifClick(View view) {
+        Intent intent = new Intent(MainActivity.this, HomePage.class);
+        this.startActivity(intent);
+    }
 }
