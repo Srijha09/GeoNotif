@@ -13,14 +13,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.HashMap;
-
+import com.google.firebase.database.ValueEventListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -48,33 +45,26 @@ public class LoginFragment extends Fragment {
         username = (EditText) view.findViewById(R.id.et_username);
 
         login = (Button) view.findViewById(R.id.btn_login);
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String getuserName = username.getText().toString();
-                HashMap<String, Object> hashMap = new HashMap<>();
-                hashMap.put("name", getuserName);
+        login.setOnClickListener(view1 -> {
+            String getuserName = username.getText().toString();
+            databaseReference.child("Users")
+                    .child(getuserName)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                Intent intent = new Intent(getActivity(), ChooseChat.class);
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(getActivity(), "Invalid Username", Toast.LENGTH_SHORT).show();
+                            }
+                        }
 
-                databaseReference.child("Users")
-                        .child(getuserName)
-                        .setValue(hashMap)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                                if(getuserName!=null) {
-                                    Toast.makeText(getActivity(), "User authenticated", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(getActivity(), StickItToEm.class);
-                                    startActivity(intent);
-                                }
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(getActivity(), ""+e.getMessage(),Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
         });
         return view;
     }
