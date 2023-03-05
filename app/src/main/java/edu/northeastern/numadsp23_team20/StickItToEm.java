@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
 public class StickItToEm extends AppCompatActivity implements SelectStickerDialog.SelectStickerListener {
 
@@ -103,13 +104,20 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
         username = intent.getStringExtra("loggedInUsername");
         System.out.println("Logged In Username - " + username);
         System.out.println("Chosen Username - " + chosenUser);
-
         mDatabase.getReference().child("Users/" + username + "/messages/" + chosenUser).addChildEventListener(
                 new ChildEventListener() {
-
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
                         showMessage(dataSnapshot);
+                        Map<String, String> message = (HashMap<String, String>) dataSnapshot.getValue();
+                        stickerName = message.get("stickerName");
+                        timeStamp = message.get("timestamp");
+                        sentBy = message.get("userId");
+
+                        if (!sentBy.equals(username)) {
+                            System.out.println("I am here");
+                            sendNotification();
+                        }
                     }
 
                     @Override
@@ -135,48 +143,49 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
                 }
         );
 
-        mDatabase.getReference().child("Users/" + username + "/messages").addChildEventListener(
-                new ChildEventListener() {
-
-                    @Override
-                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
-                        HashMap<String, HashMap<String, String>> childSnapshot;
-                        childSnapshot = (HashMap<String, HashMap<String, String>>) dataSnapshot.getValue(); // get the nested values
-                        String key;
-                        try {
-                            key = getRecentNode(childSnapshot);
-                            stickerName = childSnapshot.get(key).get("stickerName");
-                            timeStamp = childSnapshot.get(key).get("timestamp");
-                            sentBy = childSnapshot.get(key).get("userId");
-
-                            if (!sentBy.equals(username)) {
-                                System.out.println("I am here");
-                                sendNotification();
-                            }
-                        } catch (ParseException e) {
-                            throw new RuntimeException(e);
-                        }
-                        //Message values = childSnapshot.getValue(Message.class);
-
-                    }
-
-                    @Override
-                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
-                    }
-
-                    @Override
-                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                    }
-
-                    @Override
-                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, String s) {
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                }
-        );
+//        mDatabase.getReference().child("Users/" + username + "/messages").addChildEventListener(
+//                new ChildEventListener() {
+//
+//                    @Override
+//                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
+//                        HashMap<String, HashMap<String, String>> childSnapshot;
+//                        System.out.println("GetKey(): " + dataSnapshot.getKey());
+//                        childSnapshot = (HashMap<String, HashMap<String, String>>) dataSnapshot.getValue(); // get the nested values
+//                        String key;
+//                        try {
+//                            key = getRecentNode(childSnapshot);
+//                            stickerName = childSnapshot.get(key).get("stickerName");
+//                            timeStamp = childSnapshot.get(key).get("timestamp");
+//                            sentBy = childSnapshot.get(key).get("userId");
+//
+//                            if (!sentBy.equals(username)) {
+//                                System.out.println("I am here");
+//                                sendNotification();
+//                            }
+//                        } catch (ParseException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                        //Message values = childSnapshot.getValue(Message.class);
+//
+//                    }
+//
+//                    @Override
+//                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
+//                    }
+//
+//                    @Override
+//                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+//                    }
+//
+//                    @Override
+//                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, String s) {
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//                    }
+//                }
+//        );
     }
 
     public void onSendStickerButtonClick(View view) {
@@ -325,7 +334,7 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
     public String getRecentNode(HashMap<String, HashMap<String, String>> hash_map) throws ParseException {
         List<String> keys = new ArrayList<>(hash_map.keySet());
         String currentKey = null;
-        long lowestDifferece = 1000000000;
+        long lowestDifferece = Long.MAX_VALUE;
 
         DateFormat formatter = new SimpleDateFormat("hh:mm a");
         String timeNow = formatter.format(new Date());
@@ -342,6 +351,7 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
                 currentKey = keys.get(i);
             }
         }
+        System.out.println("currentKey" + currentKey);
         return currentKey;
     }
 }
