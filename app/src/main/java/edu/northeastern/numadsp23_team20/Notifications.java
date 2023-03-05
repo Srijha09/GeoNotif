@@ -104,7 +104,6 @@ public class Notifications extends AppCompatActivity {
 
     public void sendNotification() {
 
-
         // Build notification
         // Need to define a channel ID after Android Oreo
         String channelId = getString(R.string.channel_id);

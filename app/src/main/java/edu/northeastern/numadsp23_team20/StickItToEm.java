@@ -2,9 +2,17 @@ package edu.northeastern.numadsp23_team20;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +29,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Date;
+import java.util.Locale;
 
 public class StickItToEm extends AppCompatActivity implements SelectStickerDialog.SelectStickerListener {
 
@@ -33,13 +44,19 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
     List<Message> history;
     private FirebaseDatabase mDatabase;
 
-    String chosenUser = "user3";
-    String username = "user1";
+    String chosenUser = "user1";
+    //String username = getIntent().getStringExtra("USERNAME");
+
+    String username = "user3";
+    private String stickerName;
+    private String timeStamp;
+    private String sentBy;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        createNotificationChannel();
         setContentView(R.layout.activity_stick_it_to_em);
         this.linearChatLayout = findViewById(R.id.LinearChatLayout);
         this.scrollableChatContainer = findViewById(R.id.ScrollableChatContainer);
@@ -73,6 +90,39 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         Toast.makeText(getApplicationContext()
                                 , "DBError: " + databaseError, Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
+        mDatabase.getReference().child("Users/" + username + "/messages/" + chosenUser).addChildEventListener(
+                new ChildEventListener() {
+
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
+                        Message values = dataSnapshot.getValue(Message.class); //get values inside  nest
+                        stickerName = values.getStickerName();
+                        timeStamp = values.getTimestamp();
+                        sentBy = values.getUserId();
+
+                        if (!sentBy.equals(username)) {
+                            sendNotification();
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, String s) {
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
                     }
                 }
         );
@@ -182,5 +232,41 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
             this.addToChatWindow(message);
             System.out.println("Hooray");
         }
+
+    }
+
+
+    public void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(getString(R.string.channel_id), name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+    public void sendNotification() {
+        int id = getResources().getIdentifier("edu.northeastern.numadsp23_team20:drawable/" + stickerName, null, null);
+        Bitmap icon = BitmapFactory.decodeResource(getResources(), id);
+
+        String channelId = getString(R.string.channel_id);
+        NotificationCompat.Builder notifyBuild = new NotificationCompat.Builder(this, channelId)
+                .setContentTitle("New sticker from " + sentBy + " at: " + timeStamp )
+                .setContentText("You received a new " + stickerName + " sticker!")
+                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(icon))
+                .setSmallIcon(R.drawable.placeholder_image)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        int idUnique = createID();
+        notificationManager.notify(idUnique, notifyBuild.build());
+    }
+
+    public int createID(){
+        Date now = new Date();
+        int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss",  Locale.US).format(now));
+        return id;
     }
 }
