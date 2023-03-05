@@ -69,6 +69,22 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
         this.history = new ArrayList<>();
         mDatabase = FirebaseDatabase.getInstance();
 
+        //displaying the chosen username in the toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar2);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+        chosenUsername = findViewById(R.id.username);
+        intent = getIntent();
+        String userid = intent.getStringExtra("username");
+        chosenUsername.setText(userid);
+
         mDatabase.getReference().child("Users/" + username + "/messages/" + chosenUser).addChildEventListener(
                 new ChildEventListener() {
 
