@@ -7,6 +7,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -29,9 +30,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import java.util.Locale;
@@ -45,9 +49,8 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
     private FirebaseDatabase mDatabase;
 
     String chosenUser = "user1";
-    //String username = getIntent().getStringExtra("USERNAME");
+    String  username = "user3";
 
-    String username = "user3";
     private String stickerName;
     private String timeStamp;
     private String sentBy;
@@ -62,6 +65,18 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
         this.scrollableChatContainer = findViewById(R.id.ScrollableChatContainer);
         this.history = new ArrayList<>();
         mDatabase = FirebaseDatabase.getInstance();
+
+        //get the logged in user's name.
+        /*
+        Intent intent = getIntent();
+        if(intent.hasExtra("USERNAME")){
+            Bundle bd = getIntent().getExtras();
+            if(!bd.getString("USERNAME").equals(null)){
+                username = bd.getString("USERNAME");
+                System.out.println(username);
+            }
+        }
+         */
 
         mDatabase.getReference().child("Users/" + username + "/messages/" + chosenUser).addChildEventListener(
                 new ChildEventListener() {
@@ -94,19 +109,29 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
                 }
         );
 
-        mDatabase.getReference().child("Users/" + username + "/messages/" + chosenUser).addChildEventListener(
+        mDatabase.getReference().child("Users/" + username + "/messages").addChildEventListener(
                 new ChildEventListener() {
 
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
-                        Message values = dataSnapshot.getValue(Message.class); //get values inside  nest
-                        stickerName = values.getStickerName();
-                        timeStamp = values.getTimestamp();
-                        sentBy = values.getUserId();
+                        HashMap<String, HashMap<String, String>> childSnapshot;
+                        childSnapshot = (HashMap<String, HashMap<String, String>>) dataSnapshot.getValue(); // get the nested values
+                        String key;
+                        try {
+                            key = getRecentNode(childSnapshot);
+                            stickerName = childSnapshot.get(key).get("stickerName");
+                            timeStamp = childSnapshot.get(key).get("timestamp");
+                            sentBy = childSnapshot.get(key).get("userId");
 
-                        if (!sentBy.equals(username)) {
-                            sendNotification();
+                            if (!sentBy.equals(username)) {
+                                System.out.println("I am here");
+                               sendNotification();
+                            }
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
                         }
+                        //Message values = childSnapshot.getValue(Message.class);
+
                     }
 
                     @Override
@@ -268,5 +293,28 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
         Date now = new Date();
         int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss",  Locale.US).format(now));
         return id;
+    }
+
+    public String getRecentNode(HashMap<String, HashMap<String, String>> hash_map) throws ParseException {
+        List<String> keys = new ArrayList<>(hash_map.keySet());
+        String currentKey = null;
+        long lowestDifferece = 1000000000;
+
+        DateFormat formatter = new SimpleDateFormat("hh:mm a");
+        String timeNow = formatter.format(new Date());
+
+        for (int i = 0; i < keys.size(); i++) {
+            String time = hash_map.get(keys.get(i)).get("timestamp");
+            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+            Date date1 = sdf.parse(time);
+            Date date2 = sdf.parse(timeNow);
+
+            long difference = date2.getTime() - date1.getTime();
+            if (difference < lowestDifferece) {
+                lowestDifferece = difference;
+                currentKey = keys.get(i);
+            }
+        }
+        return currentKey;
     }
 }
