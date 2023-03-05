@@ -30,6 +30,7 @@ public class ChatFragment extends Fragment {
     private RecyclerView recyclerView;
     private ChatAdapter chatAdapter;
     private ArrayList<Chat> chatList;
+    private String currUser;
     private FirebaseDatabase mDatabase;
 
     public ChatFragment() {
@@ -48,8 +49,13 @@ public class ChatFragment extends Fragment {
         chatList = new ArrayList<>();
         chatAdapter = new ChatAdapter(chatList, getContext());
         recyclerView.setAdapter(chatAdapter);
-        readChat();
 
+        Bundle args = getArguments();
+        if (args != null) {
+            currUser = args.getString("current_user");
+        }
+        System.out.println(currUser);
+        readChat();
         return view;
     }
 
@@ -60,7 +66,10 @@ public class ChatFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot d : dataSnapshot.getChildren()) {
-                        chatList.add(new Chat(d.getKey().toUpperCase(Locale.ROOT)));
+                        Chat user = new Chat(d.getKey().toUpperCase(Locale.ROOT));
+                        if(!user.getUsername().equals(d.getKey())) {
+                            chatList.add(user);
+                        }
                     }
                 }
                 chatAdapter.notifyDataSetChanged();

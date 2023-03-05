@@ -8,12 +8,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.database.FirebaseDatabase;
+
 /**
  * A simple {@link Fragment} subclass.
  * create an instance of this fragment.
  */
 public class StickerFragment extends Fragment {
-
+    private int countCharmander;
+    private int countGroudon;
+    private int countJolteon;
+    private int countMewTwo;
+    private int countPikachu;
+    private int countSquirtle;
+    private FirebaseDatabase mDatabase;
 
     public StickerFragment() {
         // Required empty public constructor

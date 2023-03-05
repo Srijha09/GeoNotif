@@ -1,8 +1,10 @@
 package edu.northeastern.numadsp23_team20;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.tabs.TabLayout;
@@ -12,10 +14,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Locale;
+
 public class ChooseChat extends AppCompatActivity {
     MyAdapter myAdapter;
     TabLayout tabLayout;
     ViewPager2 viewPager2;
+    String currUsername;
+    Intent intent;
     private String[] titles= new String[]{"Chats","Stickers"};
 
     private FirebaseDatabase mDatabase;
@@ -27,25 +33,22 @@ public class ChooseChat extends AppCompatActivity {
         tabLayout = findViewById(R.id.tabs);
         viewPager2 = findViewById(R.id.view_pager);
         myAdapter = new MyAdapter(this);
-
         viewPager2.setAdapter(myAdapter);
         new TabLayoutMediator(tabLayout,viewPager2,((tab, position) -> tab.setText(titles[position]))).attach();
+        intent = getIntent();
+        currUsername = intent.getStringExtra("username");
+        System.out.println(currUsername);
 
-//        mDatabase = FirebaseDatabase.getInstance();
-//        mDatabase.getReference().child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.exists()) {
-//                    for (DataSnapshot d : dataSnapshot.getChildren()) {
-//                        System.out.println(d.getKey());
-//                    }
-//                }
-//            }//onDataChange
-//
-//            @Override
-//            public void onCancelled(DatabaseError error) {
-//
-//            }//onCancelled
-//        });
+        Bundle bundle = new Bundle();
+        bundle.putString("current_user", currUsername);
+        System.out.println(bundle);
+
+        ChatFragment chatFragment = (ChatFragment)
+                myAdapter.createFragment(0);
+        chatFragment.setArguments(bundle);
+
+        mDatabase = FirebaseDatabase.getInstance();
+
+
     }
 }

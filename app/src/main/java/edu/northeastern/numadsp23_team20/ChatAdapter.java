@@ -45,6 +45,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, StickItToEm.class);
+                intent.putExtra("username",chat.getUsername());
                 context.startActivity(intent);
 
             }
