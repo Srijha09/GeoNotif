@@ -8,6 +8,9 @@ import androidx.core.app.NotificationManagerCompat;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -73,17 +76,6 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
         this.history = new ArrayList<>();
         mDatabase = FirebaseDatabase.getInstance();
 
-        //get the logged in user's name.
-        /*
-        Intent intent = getIntent();
-        if(intent.hasExtra("USERNAME")){
-            Bundle bd = getIntent().getExtras();
-            if(!bd.getString("USERNAME").equals(null)){
-                username = bd.getString("USERNAME");
-                System.out.println(username);
-            }
-        }
-         */
 
         //displaying the chosen username in the toolbar
         Toolbar toolbar = findViewById(R.id.toolbar2);
@@ -115,7 +107,6 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
                         sentBy = message.get("userId");
 
                         if (!sentBy.equals(username)) {
-                            System.out.println("I am here");
                             sendNotification();
                         }
                     }
@@ -142,50 +133,6 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
                     }
                 }
         );
-
-//        mDatabase.getReference().child("Users/" + username + "/messages").addChildEventListener(
-//                new ChildEventListener() {
-//
-//                    @Override
-//                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
-//                        HashMap<String, HashMap<String, String>> childSnapshot;
-//                        System.out.println("GetKey(): " + dataSnapshot.getKey());
-//                        childSnapshot = (HashMap<String, HashMap<String, String>>) dataSnapshot.getValue(); // get the nested values
-//                        String key;
-//                        try {
-//                            key = getRecentNode(childSnapshot);
-//                            stickerName = childSnapshot.get(key).get("stickerName");
-//                            timeStamp = childSnapshot.get(key).get("timestamp");
-//                            sentBy = childSnapshot.get(key).get("userId");
-//
-//                            if (!sentBy.equals(username)) {
-//                                System.out.println("I am here");
-//                                sendNotification();
-//                            }
-//                        } catch (ParseException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//                        //Message values = childSnapshot.getValue(Message.class);
-//
-//                    }
-//
-//                    @Override
-//                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
-//                    }
-//
-//                    @Override
-//                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-//                    }
-//
-//                    @Override
-//                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, String s) {
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//                    }
-//                }
-//        );
     }
 
     public void onSendStickerButtonClick(View view) {
@@ -309,6 +256,7 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
     }
 
     public void sendNotification() {
+
         int id = getResources().getIdentifier("edu.northeastern.numadsp23_team20:drawable/" + stickerName, null, null);
         Bitmap icon = BitmapFactory.decodeResource(getResources(), id);
 
@@ -323,6 +271,7 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         int idUnique = createID();
         notificationManager.notify(idUnique, notifyBuild.build());
+
     }
 
     public int createID() {
@@ -351,7 +300,13 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
                 currentKey = keys.get(i);
             }
         }
-        System.out.println("currentKey" + currentKey);
         return currentKey;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NotificationManager nMgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nMgr.cancelAll();
     }
 }
