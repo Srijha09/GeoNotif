@@ -1,5 +1,6 @@
 package edu.northeastern.numadsp23_team20;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -18,6 +19,12 @@ public class TasksFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_tasks, container, false);
+        View inflatedView = inflater.inflate(R.layout.fragment_tasks, container, false);
+        inflatedView.findViewById(R.id.TempTvuiTrigger).setOnClickListener(l -> {
+            Intent intent = new Intent(getContext(), TaskView.class);
+            this.startActivity(intent);
+        });
+        return inflatedView;
     }
+
 }

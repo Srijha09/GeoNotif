@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+
 public class HomePage extends AppCompatActivity {
 
     private Fragment tasksFragment;
