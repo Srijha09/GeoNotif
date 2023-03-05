@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -64,6 +66,7 @@ public class StickerFragment extends Fragment {
     public void getCount() {
         mDatabase = FirebaseDatabase.getInstance();
         reference = mDatabase.getReference().child("Users/" + username + "/stickerCount");
+
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
             @Override
@@ -71,32 +74,7 @@ public class StickerFragment extends Fragment {
                 System.out.println(snapshot.getValue());
                 HashMap<String, Long> stickerCount = (HashMap<String, Long>) snapshot.getValue();
                 assert stickerCount != null;
-                countCharmander.setText("0");
-                countGroudon.setText("0");
-                countMewTwo.setText("0");
-                countPikachu.setText("0");
-                countJolteon.setText("0");
-                countSquirtle.setText("0");
-                for (String key : stickerCount.keySet()) {
-                    if (key.equals("charmander")) {
-                        countCharmander.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
-                    }
-                    if (key.equals("groudon")) {
-                        countGroudon.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
-                    }
-                    if (key.equals("mewtwo")) {
-                        countMewTwo.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
-                    }
-                    if (key.equals("pikachu")) {
-                        countPikachu.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
-                    }
-                    if (key.equals("jolteon")) {
-                        countJolteon.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
-                    }
-                    if (key.equals("squirtle")) {
-                        countSquirtle.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
-                    }
-                }
+                updateUI(stickerCount);
             }
 
             @Override
@@ -105,5 +83,49 @@ public class StickerFragment extends Fragment {
             }
         });
 
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                System.out.println(snapshot.getValue());
+                HashMap<String, Long> stickerCount = (HashMap<String, Long>) snapshot.getValue();
+                assert stickerCount != null;
+                updateUI(stickerCount);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    public void updateUI(HashMap<String, Long> stickerCount) {
+        countCharmander.setText("0");
+        countGroudon.setText("0");
+        countMewTwo.setText("0");
+        countPikachu.setText("0");
+        countJolteon.setText("0");
+        countSquirtle.setText("0");
+        for (String key : stickerCount.keySet()) {
+            if (key.equals("charmander")) {
+                countCharmander.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
+            }
+            if (key.equals("groudon")) {
+                countGroudon.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
+            }
+            if (key.equals("mewtwo")) {
+                countMewTwo.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
+            }
+            if (key.equals("pikachu")) {
+                countPikachu.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
+            }
+            if (key.equals("jolteon")) {
+                countJolteon.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
+            }
+            if (key.equals("squirtle")) {
+                countSquirtle.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
+            }
+        }
     }
 }
