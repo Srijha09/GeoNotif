@@ -48,9 +48,9 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
     ScrollView scrollableChatContainer;
     LinearLayout linearChatLayout;
     List<Message> history;
-    String chosenUser = "user1";
+    String chosenUser;
 
-    String  username = "user3";
+    String username;
     private FirebaseDatabase mDatabase;
 
     Intent intent;
@@ -99,6 +99,10 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
         intent = getIntent();
         String userid = intent.getStringExtra("username");
         chosenUsername.setText(userid);
+        chosenUser = userid.toLowerCase();
+        username = intent.getStringExtra("loggedInUsername");
+        System.out.println("Logged In Username - " + username);
+        System.out.println("Chosen Username - " + chosenUser);
 
         mDatabase.getReference().child("Users/" + username + "/messages/" + chosenUser).addChildEventListener(
                 new ChildEventListener() {
@@ -147,7 +151,7 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
 
                             if (!sentBy.equals(username)) {
                                 System.out.println("I am here");
-                               sendNotification();
+                                sendNotification();
                             }
                         } catch (ParseException e) {
                             throw new RuntimeException(e);
@@ -294,13 +298,14 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
             notificationManager.createNotificationChannel(channel);
         }
     }
+
     public void sendNotification() {
         int id = getResources().getIdentifier("edu.northeastern.numadsp23_team20:drawable/" + stickerName, null, null);
         Bitmap icon = BitmapFactory.decodeResource(getResources(), id);
 
         String channelId = getString(R.string.channel_id);
         NotificationCompat.Builder notifyBuild = new NotificationCompat.Builder(this, channelId)
-                .setContentTitle("New sticker from " + sentBy + " at: " + timeStamp )
+                .setContentTitle("New sticker from " + sentBy + " at: " + timeStamp)
                 .setContentText("You received a new " + stickerName + " sticker!")
                 .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(icon))
                 .setSmallIcon(R.drawable.placeholder_image)
@@ -311,9 +316,9 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
         notificationManager.notify(idUnique, notifyBuild.build());
     }
 
-    public int createID(){
+    public int createID() {
         Date now = new Date();
-        int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss",  Locale.US).format(now));
+        int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss", Locale.US).format(now));
         return id;
     }
 

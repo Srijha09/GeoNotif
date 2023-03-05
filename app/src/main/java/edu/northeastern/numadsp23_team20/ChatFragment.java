@@ -47,14 +47,16 @@ public class ChatFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         chatList = new ArrayList<>();
-        chatAdapter = new ChatAdapter(chatList, getContext());
-        recyclerView.setAdapter(chatAdapter);
+
+
 
         ChooseChat activity = (ChooseChat) getActivity();
         assert activity != null;
         Bundle bundle = activity.getMyData();
         current_user= bundle.getString("current_user");
         System.out.println(current_user);
+        chatAdapter = new ChatAdapter(chatList, current_user, getContext());
+        recyclerView.setAdapter(chatAdapter);
         readChat();
         return view;
     }

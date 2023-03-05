@@ -19,11 +19,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     private final ArrayList<Chat> chatList;
     private ItemClickListener listener;
     private final Context context;
+    String currentUser;
 
     //Creating the constructor
-    public ChatAdapter(ArrayList<Chat> chatList, Context context) {
+    public ChatAdapter(ArrayList<Chat> chatList, String currentUser, Context context) {
         this.chatList = chatList;
         this.context = context;
+        this.currentUser = currentUser;
     }
 
     public void setOnItemClickListener(ItemClickListener listener) {
@@ -33,7 +35,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.chat_item, parent,false);
+        View view = LayoutInflater.from(context).inflate(R.layout.chat_item, parent, false);
         return new ChatAdapter.ViewHolder(view, listener);
     }
 
@@ -45,9 +47,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, StickItToEm.class);
-                intent.putExtra("username",chat.getUsername());
+                intent.putExtra("username", chat.getUsername());
+                intent.putExtra("loggedInUsername", ChatAdapter.this.currentUser);
                 context.startActivity(intent);
-
             }
         });
     }
@@ -58,9 +60,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView username;
+
         public ViewHolder(@NonNull View itemView, final ItemClickListener listener) {
             super(itemView);
 
