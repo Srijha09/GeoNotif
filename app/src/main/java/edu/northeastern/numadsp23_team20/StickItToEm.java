@@ -2,6 +2,7 @@ package edu.northeastern.numadsp23_team20;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -29,6 +30,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -46,10 +48,13 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
     ScrollView scrollableChatContainer;
     LinearLayout linearChatLayout;
     List<Message> history;
+    String chosenUser = "user1";
+
+    String  username = "user3";
     private FirebaseDatabase mDatabase;
 
-    String chosenUser = "user1";
-    String  username = "user3";
+    Intent intent;
+    TextView chosenUsername;
 
     private String stickerName;
     private String timeStamp;
@@ -61,6 +66,7 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
         super.onCreate(savedInstanceState);
         createNotificationChannel();
         setContentView(R.layout.activity_stick_it_to_em);
+
         this.linearChatLayout = findViewById(R.id.LinearChatLayout);
         this.scrollableChatContainer = findViewById(R.id.ScrollableChatContainer);
         this.history = new ArrayList<>();
@@ -77,6 +83,22 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
             }
         }
          */
+
+        //displaying the chosen username in the toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar2);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+        chosenUsername = findViewById(R.id.username);
+        intent = getIntent();
+        String userid = intent.getStringExtra("username");
+        chosenUsername.setText(userid);
 
         mDatabase.getReference().child("Users/" + username + "/messages/" + chosenUser).addChildEventListener(
                 new ChildEventListener() {

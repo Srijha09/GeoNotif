@@ -54,7 +54,7 @@ public class LoginFragment extends Fragment {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (dataSnapshot.exists()) {
                                 Intent intent = new Intent(getActivity(), ChooseChat.class);
-                                intent.putExtra("USERNAME", getuserName);
+                                intent.putExtra("username", getuserName);
                                 startActivity(intent);
                             } else {
                                 Toast.makeText(getActivity(), "Invalid Username", Toast.LENGTH_SHORT).show();
