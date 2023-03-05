@@ -2,26 +2,38 @@ package edu.northeastern.numadsp23_team20;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
  * create an instance of this fragment.
  */
 public class StickerFragment extends Fragment {
-    private int countCharmander;
-    private int countGroudon;
-    private int countJolteon;
-    private int countMewTwo;
-    private int countPikachu;
-    private int countSquirtle;
+    private TextView countCharmander;
+    private TextView countGroudon;
+    private TextView countJolteon;
+    private TextView countMewTwo;
+    private TextView countPikachu;
+    private TextView countSquirtle;
     private FirebaseDatabase mDatabase;
+    private DatabaseReference reference;
+
+    String username = "user1";
 
     public StickerFragment() {
         // Required empty public constructor
@@ -30,6 +42,52 @@ public class StickerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sticker, container, false);
+        View view = inflater.inflate(R.layout.fragment_sticker, container, false);
+        countCharmander = view.findViewById(R.id.countCharmander);
+        countGroudon= view.findViewById(R.id.countGroudon);
+        countMewTwo = view.findViewById(R.id.countMewtwo);
+        countPikachu = view.findViewById(R.id.countPikachu);
+        countJolteon = view.findViewById(R.id.countJolteon);
+        countSquirtle = view.findViewById(R.id.countSquirtle);
+        getCount();
+        return view;
+    }
+
+    public void getCount() {
+        mDatabase = FirebaseDatabase.getInstance();
+        reference = mDatabase.getReference().child("Users/" + username + "/stickerCount");
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                System.out.println(snapshot.getValue());
+                HashMap<String, Long> stickerCount = (HashMap<String, Long>) snapshot.getValue();
+                for (String key: stickerCount.keySet()){
+                    if (key.equals("charmander")){
+                        countCharmander.setText(stickerCount.get(key).toString());
+                    }
+                    if (key.equals("groudon")){
+                        countGroudon.setText(stickerCount.get(key).toString());
+                    }
+                    if (key.equals("mewtwo")){
+                        countMewTwo.setText(stickerCount.get(key).toString());
+                    }
+                    if (key.equals("pikachu")){
+                        countPikachu.setText(stickerCount.get(key).toString());
+                    }
+                    if (key.equals("jolteon")){
+                        countJolteon.setText(stickerCount.get(key).toString());
+                    }
+                    if (key.equals("squirtle")){
+                        countSquirtle.setText(stickerCount.get(key).toString());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 }
