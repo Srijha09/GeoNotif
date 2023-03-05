@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:text="Team 20"
+        android:textSize="25dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/atYourSeviceButton"
         app:layout_constraintEnd_toEndOf="parent"
