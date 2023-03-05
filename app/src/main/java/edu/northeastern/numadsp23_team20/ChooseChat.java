@@ -24,8 +24,6 @@ public class ChooseChat extends AppCompatActivity {
     Intent intent;
     private String[] titles= new String[]{"Chats","Stickers"};
 
-    private FirebaseDatabase mDatabase;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,17 +36,11 @@ public class ChooseChat extends AppCompatActivity {
         intent = getIntent();
         currUsername = intent.getStringExtra("username");
         System.out.println(currUsername);
+    }
 
+    public Bundle getMyData() {
         Bundle bundle = new Bundle();
         bundle.putString("current_user", currUsername);
-        System.out.println(bundle);
-
-        ChatFragment chatFragment = (ChatFragment)
-                myAdapter.createFragment(0);
-        chatFragment.setArguments(bundle);
-
-        mDatabase = FirebaseDatabase.getInstance();
-
-
+        return bundle;
     }
 }
