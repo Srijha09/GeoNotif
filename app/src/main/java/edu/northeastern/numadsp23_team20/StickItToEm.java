@@ -2,11 +2,13 @@ package edu.northeastern.numadsp23_team20;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -28,6 +30,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,8 +47,10 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
     List<Message> history;
     private FirebaseDatabase mDatabase;
 
+    Intent intent;
+    TextView chosenUsername;
     String chosenUser = "user1";
-    //String username = getIntent().getStringExtra("USERNAME");
+
 
     String username = "user3";
     private String stickerName;
@@ -58,6 +63,7 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
         super.onCreate(savedInstanceState);
         createNotificationChannel();
         setContentView(R.layout.activity_stick_it_to_em);
+
         this.linearChatLayout = findViewById(R.id.LinearChatLayout);
         this.scrollableChatContainer = findViewById(R.id.ScrollableChatContainer);
         this.history = new ArrayList<>();

@@ -1,5 +1,6 @@
 package edu.northeastern.numadsp23_team20;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -57,28 +59,30 @@ public class StickerFragment extends Fragment {
         mDatabase = FirebaseDatabase.getInstance();
         reference = mDatabase.getReference().child("Users/" + username + "/stickerCount");
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 System.out.println(snapshot.getValue());
                 HashMap<String, Long> stickerCount = (HashMap<String, Long>) snapshot.getValue();
+                assert stickerCount != null;
                 for (String key: stickerCount.keySet()){
                     if (key.equals("charmander")){
-                        countCharmander.setText(stickerCount.get(key).toString());
+                        countCharmander.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
                     }
                     if (key.equals("groudon")){
-                        countGroudon.setText(stickerCount.get(key).toString());
+                        countGroudon.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
                     }
                     if (key.equals("mewtwo")){
-                        countMewTwo.setText(stickerCount.get(key).toString());
+                        countMewTwo.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
                     }
                     if (key.equals("pikachu")){
-                        countPikachu.setText(stickerCount.get(key).toString());
+                        countPikachu.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
                     }
                     if (key.equals("jolteon")){
-                        countJolteon.setText(stickerCount.get(key).toString());
+                        countJolteon.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
                     }
                     if (key.equals("squirtle")){
-                        countSquirtle.setText(stickerCount.get(key).toString());
+                        countSquirtle.setText(Objects.requireNonNull(stickerCount.get(key)).toString());
                     }
                 }
             }
