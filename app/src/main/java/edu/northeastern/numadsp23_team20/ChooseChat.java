@@ -22,7 +22,7 @@ public class ChooseChat extends AppCompatActivity {
     ViewPager2 viewPager2;
     String currUsername;
     Intent intent;
-    private String[] titles= new String[]{"Chats","Stickers"};
+    private String[] titles= new String[]{"Chats","Stickers used"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
