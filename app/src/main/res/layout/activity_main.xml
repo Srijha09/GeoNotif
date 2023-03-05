@@ -30,11 +30,14 @@
         android:onClick="onAtYourServiceButtonClick"
         android:text="At Your Service"
         android:textAllCaps="false"
-        android:textColor="@color/primary"
-        app:cornerRadius="8dp"
+        android:textColor="@color/primary_text"
+        app:cornerRadius="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/aboutButton" />
+        app:layout_constraintTop_toBottomOf="@+id/aboutButton"
+        app:rippleColor="@color/button_ripple"
+        app:strokeColor="@color/button_stroke"
+        app:strokeWidth="0.5dp" />
 
     <Button
         android:id="@+id/StickItToEmButton"
@@ -45,11 +48,14 @@
         android:onClick="onStickItToEmClick"
         android:text="Stick It To 'Em"
         android:textAllCaps="false"
-        android:textColor="@color/primary"
-        app:cornerRadius="8dp"
+        android:textColor="@color/primary_text"
+        app:cornerRadius="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/atYourSeviceButton" />
+        app:layout_constraintTop_toBottomOf="@+id/atYourSeviceButton"
+        app:rippleColor="@color/button_ripple"
+        app:strokeColor="@color/button_stroke"
+        app:strokeWidth="0.5dp" />
 
     <Button
         android:id="@+id/aboutButton"
@@ -61,11 +67,14 @@
         android:onClick="onAboutButtonClick"
         android:text="About"
         android:textAllCaps="false"
-        android:textColor="@color/primary"
-        app:cornerRadius="8dp"
+        android:textColor="@color/primary_text"
+        app:cornerRadius="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/teamNameTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/teamNameTextView"
+        app:rippleColor="@color/button_ripple"
+        app:strokeColor="@color/button_stroke"
+        app:strokeWidth="0.5dp" />
 
     <Button
         android:id="@+id/GeoNotifButton"
@@ -76,10 +85,13 @@
         android:onClick="onGeoNotifClick"
         android:text="GeoNotif"
         android:textAllCaps="false"
-        android:textColor="@color/primary"
-        app:cornerRadius="8dp"
+        android:textColor="@color/primary_text"
+        app:cornerRadius="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/StickItToEmButton" />
+        app:layout_constraintTop_toBottomOf="@+id/StickItToEmButton"
+        app:rippleColor="@color/button_ripple"
+        app:strokeColor="@color/button_stroke"
+        app:strokeWidth="0.5dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
