@@ -58,7 +58,6 @@ public class StickerFragment extends Fragment {
         assert activity != null;
         Bundle bundle = activity.getMyData();
         username = bundle.getString("current_user");
-        System.out.println(username);
         getCount();
         return view;
     }
@@ -71,7 +70,6 @@ public class StickerFragment extends Fragment {
             @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 HashMap<String, Long> stickerCount = (HashMap<String, Long>) snapshot.getValue();
                 assert stickerCount != null;
                 updateUI(stickerCount);
@@ -86,7 +84,6 @@ public class StickerFragment extends Fragment {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 HashMap<String, Long> stickerCount = (HashMap<String, Long>) snapshot.getValue();
                 assert stickerCount != null;
                 updateUI(stickerCount);

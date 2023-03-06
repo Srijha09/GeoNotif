@@ -53,7 +53,6 @@ public class ChatFragment extends Fragment {
         assert activity != null;
         Bundle bundle = activity.getMyData();
         current_user = bundle.getString("current_user");
-        System.out.println(current_user);
         chatAdapter = new ChatAdapter(chatList, current_user, getContext());
         recyclerView.setAdapter(chatAdapter);
         readChat();

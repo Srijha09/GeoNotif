@@ -55,7 +55,6 @@ public class ChooseChat extends AppCompatActivity {
         new TabLayoutMediator(tabLayout,viewPager2,((tab, position) -> tab.setText(titles[position]))).attach();
         intent = getIntent();
         currUsername = intent.getStringExtra("username");
-        System.out.println(currUsername);
         mDatabase = FirebaseDatabase.getInstance();
 
         this.valueEventListener = new ValueEventListener() {
@@ -79,14 +78,11 @@ public class ChooseChat extends AppCompatActivity {
                             newMessagesSet.removeAll(prevMessagesSet);
                             prevMessages = messages;
                             String key;
-                            System.out.println("Set: " + newMessagesSet);
                             String[] newMessagesArray = newMessagesSet.toArray(new String[newMessagesSet.size()]);
                             key = newMessagesArray[0];
-                            System.out.println("Key:" + key);
                             String stickerName = messages.get(key).get("stickerName");
                             String timeStamp = messages.get(key).get("timestamp");
                             String sentBy = messages.get(key).get("userId");
-                            System.out.println(stickerName + " " + sentBy);
                             if (!sentBy.equals(currUsername)) {
                                 sendNotification(sentBy, timeStamp, stickerName);
                             }
