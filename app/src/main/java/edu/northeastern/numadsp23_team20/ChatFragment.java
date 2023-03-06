@@ -49,11 +49,10 @@ public class ChatFragment extends Fragment {
         chatList = new ArrayList<>();
 
 
-
         ChooseChat activity = (ChooseChat) getActivity();
         assert activity != null;
         Bundle bundle = activity.getMyData();
-        current_user= bundle.getString("current_user");
+        current_user = bundle.getString("current_user");
         System.out.println(current_user);
         chatAdapter = new ChatAdapter(chatList, current_user, getContext());
         recyclerView.setAdapter(chatAdapter);
@@ -69,7 +68,7 @@ public class ChatFragment extends Fragment {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot d : dataSnapshot.getChildren()) {
                         Chat user = new Chat(d.getKey().toUpperCase(Locale.ROOT));
-                        if(!current_user.equals(d.getKey())) {
+                        if (!current_user.equals(d.getKey())) {
                             chatList.add(user);
                         }
                     }
@@ -83,6 +82,5 @@ public class ChatFragment extends Fragment {
 
             }
         });
-
     }
 }
