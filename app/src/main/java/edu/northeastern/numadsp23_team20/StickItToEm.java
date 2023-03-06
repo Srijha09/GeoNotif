@@ -60,15 +60,10 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
     Intent intent;
     TextView chosenUsername;
 
-    private String stickerName;
-    private String timeStamp;
-    private String sentBy;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        createNotificationChannel();
         setContentView(R.layout.activity_stick_it_to_em);
 
         this.linearChatLayout = findViewById(R.id.LinearChatLayout);
@@ -76,39 +71,22 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
         this.history = new ArrayList<>();
         mDatabase = FirebaseDatabase.getInstance();
 
-
-        //displaying the chosen username in the toolbar
         Toolbar toolbar = findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(view -> finish());
         chosenUsername = findViewById(R.id.username);
         intent = getIntent();
         String userid = intent.getStringExtra("username");
         chosenUsername.setText(userid);
         chosenUser = userid.toLowerCase();
         username = intent.getStringExtra("loggedInUsername");
-        System.out.println("Logged In Username - " + username);
-        System.out.println("Chosen Username - " + chosenUser);
         mDatabase.getReference().child("Users/" + username + "/messages/" + chosenUser).addChildEventListener(
                 new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
                         showMessage(dataSnapshot);
-                        Map<String, String> message = (HashMap<String, String>) dataSnapshot.getValue();
-                        stickerName = message.get("stickerName");
-                        timeStamp = message.get("timestamp");
-                        sentBy = message.get("userId");
-
-                        if (!sentBy.equals(username)) {
-                            sendNotification();
-                        }
                     }
 
                     @Override
@@ -234,73 +212,9 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
 
     private void showMessage(DataSnapshot dataSnapshot) {
         Message message = dataSnapshot.getValue(Message.class);
-
         if (dataSnapshot.getKey() != null) {
             this.addToChatWindow(message);
-            System.out.println("Hooray");
         }
-
-    }
-
-
-    public void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.channel_name);
-            String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(getString(R.string.channel_id), name, importance);
-            channel.setDescription(description);
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    public void sendNotification() {
-
-        int id = getResources().getIdentifier("edu.northeastern.numadsp23_team20:drawable/" + stickerName, null, null);
-        Bitmap icon = BitmapFactory.decodeResource(getResources(), id);
-
-        String channelId = getString(R.string.channel_id);
-        NotificationCompat.Builder notifyBuild = new NotificationCompat.Builder(this, channelId)
-                .setContentTitle("New sticker from " + sentBy + " at: " + timeStamp)
-                .setContentText("You received a new " + stickerName + " sticker!")
-                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(icon))
-                .setSmallIcon(R.drawable.placeholder_image)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true);
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        int idUnique = createID();
-        notificationManager.notify(idUnique, notifyBuild.build());
-
-    }
-
-    public int createID() {
-        Date now = new Date();
-        int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss", Locale.US).format(now));
-        return id;
-    }
-
-    public String getRecentNode(HashMap<String, HashMap<String, String>> hash_map) throws ParseException {
-        List<String> keys = new ArrayList<>(hash_map.keySet());
-        String currentKey = null;
-        long lowestDifferece = Long.MAX_VALUE;
-
-        DateFormat formatter = new SimpleDateFormat("hh:mm a");
-        String timeNow = formatter.format(new Date());
-
-        for (int i = 0; i < keys.size(); i++) {
-            String time = hash_map.get(keys.get(i)).get("timestamp");
-            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
-            Date date1 = sdf.parse(time);
-            Date date2 = sdf.parse(timeNow);
-
-            long difference = date2.getTime() - date1.getTime();
-            if (difference < lowestDifferece) {
-                lowestDifferece = difference;
-                currentKey = keys.get(i);
-            }
-        }
-        return currentKey;
     }
 
     @Override

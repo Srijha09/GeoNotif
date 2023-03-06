@@ -7,118 +7,126 @@
     tools:context=".StickerFragment"
     android:background="#D3D3D3">
 
-    <GridLayout
-        android:id="@+id/GridLayout1"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="96dp"
-        android:layout_marginEnd="10dp"
-        android:columnCount="2"
-        android:orientation="horizontal"
-        android:rowCount="6"
-        android:stretchColumns="*"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/charmander"
-            android:layout_width="160dp"
-            android:layout_height="90dp"
-            android:layout_row="0"
-            android:layout_column="0"
-            android:layout_gravity="left|top"
-            android:src="@drawable/charmander" />
-
-        <TextView
-            android:id="@+id/countCharmander"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
+            android:orientation="vertical" >
 
-        <ImageView
-            android:id="@+id/groudon"
-            android:layout_width="160dp"
-            android:layout_height="90dp"
-            android:layout_gravity="left|top"
-            android:src="@drawable/groudon" />
+            <GridLayout
+                android:id="@+id/GridLayout1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="60dp"
+                android:layout_marginTop="96dp"
+                android:layout_marginEnd="10dp"
+                android:columnCount="2"
+                android:orientation="horizontal"
+                android:rowCount="6"
+                android:stretchColumns="*">
 
-        <TextView
-            android:id="@+id/countGroudon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:textSize="20sp"
-            android:textColor="@color/black"/>
+                <ImageView
+                    android:id="@+id/charmander"
+                    android:layout_width="160dp"
+                    android:layout_height="90dp"
+                    android:layout_row="0"
+                    android:layout_column="0"
+                    android:layout_gravity="left|top"
+                    android:src="@drawable/charmander" />
 
-        <ImageView
-            android:id="@+id/mewtwo"
-            android:layout_width="160dp"
-            android:layout_height="90dp"
-            android:src="@drawable/mewtwo" />
+                <TextView
+                    android:id="@+id/countCharmander"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/countMewtwo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:textSize="20sp"
-            android:textColor="@color/black"/>
+                <ImageView
+                    android:id="@+id/groudon"
+                    android:layout_width="160dp"
+                    android:layout_height="90dp"
+                    android:layout_gravity="left|top"
+                    android:src="@drawable/groudon" />
 
-        <ImageView
-            android:id="@+id/pikachu"
-            android:layout_width="160dp"
-            android:layout_height="90dp"
-            android:layout_gravity="left|top"
-            android:src="@drawable/pikachu" />
+                <TextView
+                    android:id="@+id/countGroudon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/countPikachu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:textSize="20sp"
-            android:textColor="@color/black"/>
+                <ImageView
+                    android:id="@+id/mewtwo"
+                    android:layout_width="160dp"
+                    android:layout_height="90dp"
+                    android:src="@drawable/mewtwo" />
 
-        <ImageView
-            android:id="@+id/jolteon"
-            android:layout_width="160dp"
-            android:layout_height="90dp"
-            android:layout_gravity="left|top"
-            android:src="@drawable/jolteon" />
+                <TextView
+                    android:id="@+id/countMewtwo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/countJolteon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:textSize="20sp"
-            android:textColor="@color/black"/>
+                <ImageView
+                    android:id="@+id/pikachu"
+                    android:layout_width="160dp"
+                    android:layout_height="90dp"
+                    android:layout_gravity="left|top"
+                    android:src="@drawable/pikachu" />
 
-        <ImageView
-            android:id="@+id/squirtle"
-            android:layout_width="160dp"
-            android:layout_height="90dp"
-            android:layout_gravity="left|top"
-            android:src="@drawable/squirtle" />
+                <TextView
+                    android:id="@+id/countPikachu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/countSquirtle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:textSize="20sp"
-            android:textColor="@color/black"/>
-    </GridLayout>
+                <ImageView
+                    android:id="@+id/jolteon"
+                    android:layout_width="160dp"
+                    android:layout_height="90dp"
+                    android:layout_gravity="left|top"
+                    android:src="@drawable/jolteon" />
+
+                <TextView
+                    android:id="@+id/countJolteon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
+
+                <ImageView
+                    android:id="@+id/squirtle"
+                    android:layout_width="160dp"
+                    android:layout_height="90dp"
+                    android:layout_gravity="left|top"
+                    android:src="@drawable/squirtle" />
+
+                <TextView
+                    android:id="@+id/countSquirtle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
+            </GridLayout>
+        </LinearLayout>
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 
