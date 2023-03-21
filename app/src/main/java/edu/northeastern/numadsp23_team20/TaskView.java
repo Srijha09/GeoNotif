@@ -2,9 +2,13 @@ package edu.northeastern.numadsp23_team20;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
@@ -40,14 +44,21 @@ public class TaskView extends AppCompatActivity {
         GeoPoint centerPoint = new GeoPoint(42.3447, -71.0996);
         mapController.setCenter(centerPoint);
         // Set marker
-        Marker startMarker = new Marker(this.map);
-        startMarker.setPosition(centerPoint);
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        Marker marker = new Marker(this.map);
+        marker.setPosition(centerPoint);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        Drawable d = ResourcesCompat.getDrawable(getResources(), R.drawable.pin, null);
+        Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
+        Drawable dr = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap,
+                (int) (20.0f * getResources().getDisplayMetrics().density),
+                (int) (20.0f * getResources().getDisplayMetrics().density),
+                true));
+        marker.setIcon(dr);
         // Disable scroll and zoom
         this.map.setOnTouchListener((v, event) -> true);
         // Define radius circle
         double radiusInMeters = 100;
-        GeoPoint circleCenter = startMarker.getPosition();
+        GeoPoint circleCenter = marker.getPosition();
         Polygon circlePolygon = new Polygon();
         circlePolygon.setPoints(Polygon.pointsAsCircle(circleCenter, radiusInMeters));
         circlePolygon.getFillPaint().setColor(ContextCompat.getColor(
@@ -57,7 +68,7 @@ public class TaskView extends AppCompatActivity {
         circlePolygon.getOutlinePaint().setStrokeWidth(0f);
         // Add layers to map
         this.map.getOverlays().add(circlePolygon);
-        this.map.getOverlays().add(startMarker);
+        this.map.getOverlays().add(marker);
         // Refresh the map view to update the overlays
         this.map.invalidate();
     }
