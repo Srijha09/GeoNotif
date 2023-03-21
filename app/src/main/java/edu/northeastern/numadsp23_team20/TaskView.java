@@ -30,7 +30,7 @@ public class TaskView extends AppCompatActivity {
         setContentView(R.layout.activity_task_view);
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
-        this.map = findViewById(R.id.map);
+        this.map = findViewById(R.id.MapView);
         this.customizeMap();
     }
 
@@ -50,8 +50,8 @@ public class TaskView extends AppCompatActivity {
         Drawable d = ResourcesCompat.getDrawable(getResources(), R.drawable.pin, null);
         Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
         Drawable dr = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap,
-                (int) (20.0f * getResources().getDisplayMetrics().density),
-                (int) (20.0f * getResources().getDisplayMetrics().density),
+                (int) (18.0f * getResources().getDisplayMetrics().density),
+                (int) (18.0f * getResources().getDisplayMetrics().density),
                 true));
         marker.setIcon(dr);
         // Disable scroll and zoom
