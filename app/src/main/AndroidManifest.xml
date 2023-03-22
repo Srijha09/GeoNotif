@@ -16,13 +16,6 @@
         android:theme="@style/Theme.NUMADSp23_Team20"
         tools:targetApi="31">
         <activity
-            android:name=".ForgotPasswordActivity"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-        <activity
             android:name=".LoginActivity"
             android:exported="false"
             android:noHistory="true">
@@ -34,6 +27,20 @@
             android:name=".SignupActivity"
             android:exported="false"
             android:noHistory="true">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".EditTask"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".TaskView"
+            android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />

@@ -7,7 +7,7 @@
     tools:context="HomePage">
 
     <FrameLayout
-        android:id="@+id/frameLayout"
+        android:id="@+id/FrameLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="75dp"
@@ -26,6 +26,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_navigation_menu" />
+        app:menu="@menu/bottom_navigation_menu"
+        app:labelVisibilityMode="labeled"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

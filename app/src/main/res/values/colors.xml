@@ -9,5 +9,11 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="primary">#15255A</color>
+    <color name="primary_text">#15255A</color>
     <color name="primary_highlight">#E91E63</color>
+    <color name="button_stroke">#15255A</color>
+    <color name="button_ripple">#E1E2E6</color>
+
+    <color name="map_radius_fill">#26E91E63</color>
+    <color name="map_radius_outline">#E91E63</color>
 </resources>

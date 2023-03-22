@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, HomePage.class);
             this.startActivity(intent);
         } else {
-            Intent intent = new Intent(MainActivity.this, SignupActivity.class);
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             this.startActivity(intent);
         }
     }

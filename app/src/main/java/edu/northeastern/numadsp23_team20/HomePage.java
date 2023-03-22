@@ -1,33 +1,52 @@
 package edu.northeastern.numadsp23_team20;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
+
 
 public class HomePage extends AppCompatActivity {
+
+    private Fragment tasksFragment;
+    private Fragment groupsFragment;
+    private Fragment friendsFragment;
+    private Fragment profileFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
-        ProfileFragment profileFragment = new ProfileFragment();
+        this.tasksFragment = new TasksFragment();
+        this.groupsFragment = new GroupsFragment();
+        this.friendsFragment = new FriendsFragment();
+        this.profileFragment = new ProfileFragment();
         BottomNavigationView bottomNavigationMenu = findViewById(R.id.BottomNavigationMenu);
-        FirebaseAuth.getInstance().signOut();
+        this.setFragment(this.tasksFragment);
         bottomNavigationMenu.setOnItemSelectedListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.profile:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, profileFragment).commit();
-                    return true;
-                case R.id.friends:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, profileFragment).commit();
-                    return true;
-                default:
-                    System.out.println(item.getTitle());
-            }
-            return false;
+            this.setFragment(this.getFragment(item.getTitle().toString()));
+            return true;
         });
+    }
+
+    private Fragment getFragment(String itemTitle) {
+        System.out.println(itemTitle);
+        switch (itemTitle) {
+            case "Tasks":
+                return this.tasksFragment;
+            case "Groups":
+                return this.groupsFragment;
+            case "Friends":
+                return this.friendsFragment;
+            case "Profile":
+                return this.profileFragment;
+        }
+        return null;
+    }
+
+    private void setFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.FrameLayout, fragment).commit();
     }
 }

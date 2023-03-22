@@ -28,15 +28,15 @@
                 android:layout_height="wrap_content"
                 android:text="Sign Up"
                 android:textAlignment="center"
-                android:textColor="@color/primary_highlight"
+                android:textColor="@color/primary_text"
                 android:textSize="36sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/edit_txt_Fullname"
+                android:id="@+id/fullnameEditText"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/custom_edittext"
                 android:drawablePadding="8dp"
                 android:hint="Full Name"
@@ -45,10 +45,10 @@
 
 
             <EditText
-                android:id="@+id/edit_txt_Username"
+                android:id="@+id/usernameEditText"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/custom_edittext"
                 android:drawablePadding="8dp"
                 android:hint="Username"
@@ -56,12 +56,11 @@
                 android:textColor="@color/black" />
 
 
-
             <EditText
-                android:id="@+id/edit_txt_Email"
+                android:id="@+id/emailEditText"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/custom_edittext"
                 android:drawablePadding="8dp"
                 android:hint="Email"
@@ -70,7 +69,7 @@
 
 
             <EditText
-                android:id="@+id/edit_txt_Pass"
+                android:id="@+id/passwordEditText"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
@@ -81,22 +80,26 @@
                 android:textColor="@color/black" />
 
             <Button
-                android:id="@+id/button_register"
+                android:id="@+id/registerButton"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="30dp"
+                android:backgroundTint="@color/primary_text"
                 android:text="Sign Up"
                 android:textSize="18sp"
-                app:cornerRadius="20dp" />
+                app:cornerRadius="20dp"
+                app:rippleColor="@color/button_ripple"
+                app:strokeColor="@color/button_stroke"
+                app:strokeWidth="0.5dp" />
 
             <TextView
-                android:id="@+id/text_view_login"
+                android:id="@+id/loginTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
                 android:padding="8dp"
-                android:text="Already an user? Login"
+                android:text="Already a user? Login"
                 android:textColor="@color/primary_highlight"
                 android:textSize="14sp" />
         </LinearLayout>
