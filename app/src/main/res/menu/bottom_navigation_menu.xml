@@ -2,21 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/tasks"
-        android:title="Tasks"
-        android:icon="@drawable/tasks"/>
+        android:icon="@drawable/tasks"
+        android:title="Tasks" />
 
     <item
         android:id="@+id/groups"
-        android:title="Groups"
-        android:icon="@drawable/groups"/>
+        android:icon="@drawable/groups"
+        android:title="Groups" />
 
     <item
         android:id="@+id/friends"
-        android:title="Friends"
-        android:icon="@drawable/friends"/>
+        android:icon="@drawable/friends"
+        android:title="Friends" />
 
     <item
-        android:id="@+id/settings"
-        android:title="Settings"
-        android:icon="@drawable/settings"/>
+        android:id="@+id/profile"
+        android:icon="@drawable/user"
+        android:title="Profile" />
 </menu>
