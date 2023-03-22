@@ -13,7 +13,7 @@ public class HomePage extends AppCompatActivity {
     private Fragment tasksFragment;
     private Fragment groupsFragment;
     private Fragment friendsFragment;
-    private Fragment settingsFragment;
+    private Fragment profileFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +22,7 @@ public class HomePage extends AppCompatActivity {
         this.tasksFragment = new TasksFragment();
         this.groupsFragment = new GroupsFragment();
         this.friendsFragment = new FriendsFragment();
-        this.settingsFragment = new SettingsFragment();
+        this.profileFragment = new ProfileFragment();
         BottomNavigationView bottomNavigationMenu = findViewById(R.id.BottomNavigationMenu);
         this.setFragment(this.tasksFragment);
         bottomNavigationMenu.setOnItemSelectedListener(item -> {
@@ -34,15 +34,19 @@ public class HomePage extends AppCompatActivity {
     private Fragment getFragment(String itemTitle) {
         System.out.println(itemTitle);
         switch (itemTitle) {
-            case "Tasks": return this.tasksFragment;
-            case "Groups": return this.groupsFragment;
-            case "Friends": return this.friendsFragment;
-            case "Settings": return this.settingsFragment;
+            case "Tasks":
+                return this.tasksFragment;
+            case "Groups":
+                return this.groupsFragment;
+            case "Friends":
+                return this.friendsFragment;
+            case "Profile":
+                return this.profileFragment;
         }
         return null;
     }
 
     private void setFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.FrameLayout,fragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.FrameLayout, fragment).commit();
     }
 }
