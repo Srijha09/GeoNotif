@@ -61,7 +61,7 @@ public class SignupActivity extends AppCompatActivity {
                             FirebaseDatabase.getInstance().getReference("GeoNotif")
                                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(data).
                                     addOnCompleteListener(task1 -> {
-                                        Intent intent = new Intent(SignupActivity.this, MainActivity.class);
+                                        Intent intent = new Intent(SignupActivity.this, HomePage.class);
                                         startActivity(intent);
                                         finish();
                                     });
