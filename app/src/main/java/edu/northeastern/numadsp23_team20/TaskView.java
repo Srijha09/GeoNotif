@@ -5,12 +5,15 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.View;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -71,5 +74,22 @@ public class TaskView extends AppCompatActivity {
         this.map.getOverlays().add(marker);
         // Refresh the map view to update the overlays
         this.map.invalidate();
+    }
+
+    public void onTaskEditFloatingButtonClick(View view) {
+        Intent intent = new Intent(this, EditTask.class);
+        this.startActivity(intent);
+    }
+
+    public void onTaskDeleteFloatingButtonClick(View view) {
+        new AlertDialog.Builder(this)
+            .setTitle("Warning")
+            .setMessage("Are you sure you want to delete this task?")
+            .setIcon(R.drawable.warning)
+            .setPositiveButton("CONFIRM", (dialogInterface, whichButton) -> {
+                this.finish();
+            })
+            .setNegativeButton(android.R.string.no, null)
+            .show();
     }
 }
