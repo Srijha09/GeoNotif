@@ -34,7 +34,9 @@ public class ProfileFragment extends Fragment {
         logoutButton = view.findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener(v -> {
             mAuth.signOut();
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            getActivity().finish();
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             this.startActivity(intent);
         });
         return view;
