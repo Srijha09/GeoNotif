@@ -2,9 +2,22 @@ package edu.northeastern.numadsp23_team20;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +33,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
 
 public class StickItToEm extends AppCompatActivity implements SelectStickerDialog.SelectStickerListener {
 
@@ -31,24 +52,38 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
     ScrollView scrollableChatContainer;
     LinearLayout linearChatLayout;
     List<Message> history;
+    String chosenUser;
+
+    String username;
     private FirebaseDatabase mDatabase;
 
-    String chosenUser = "user3";
-    String username = "user1";
+    Intent intent;
+    TextView chosenUsername;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stick_it_to_em);
+
         this.linearChatLayout = findViewById(R.id.LinearChatLayout);
         this.scrollableChatContainer = findViewById(R.id.ScrollableChatContainer);
         this.history = new ArrayList<>();
         mDatabase = FirebaseDatabase.getInstance();
 
+        Toolbar toolbar = findViewById(R.id.toolbar2);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(view -> finish());
+        chosenUsername = findViewById(R.id.username);
+        intent = getIntent();
+        String userid = intent.getStringExtra("username");
+        chosenUsername.setText(userid);
+        chosenUser = userid.toLowerCase();
+        username = intent.getStringExtra("loggedInUsername");
         mDatabase.getReference().child("Users/" + username + "/messages/" + chosenUser).addChildEventListener(
                 new ChildEventListener() {
-
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
                         showMessage(dataSnapshot);
@@ -177,10 +212,15 @@ public class StickItToEm extends AppCompatActivity implements SelectStickerDialo
 
     private void showMessage(DataSnapshot dataSnapshot) {
         Message message = dataSnapshot.getValue(Message.class);
-
         if (dataSnapshot.getKey() != null) {
             this.addToChatWindow(message);
-            System.out.println("Hooray");
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NotificationManager nMgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nMgr.cancelAll();
     }
 }
