@@ -25,16 +25,16 @@ public class EditTask extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_task);
 
-//        Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
-//        this.addressSearchActivity = registerForActivityResult(
-//            new ActivityResultContracts.StartActivityForResult(),
-//            result -> {
-//                if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-//                    Place place = Autocomplete.getPlaceFromIntent(result.getData());
-//                    System.out.println(place.getName() + ", " + place.getLatLng());
-//                }
-//            }
-//        );
+        // Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
+        this.addressSearchActivity = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                    Place place = Autocomplete.getPlaceFromIntent(result.getData());
+                    System.out.println(place.getName() + ", " + place.getLatLng());
+                }
+            }
+        );
     }
 
     public void onAddressSearch(View view) {
