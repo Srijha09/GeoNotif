@@ -42,6 +42,7 @@
                 android:drawablePadding="8dp"
                 android:hint="Email"
                 android:padding="8dp"
+                android:text="eshwar@gmail.com"
                 android:textColor="@color/black"
                 android:textColorHighlight="@color/cardview_dark_background" />
 
@@ -54,6 +55,7 @@
                 android:drawablePadding="8dp"
                 android:hint="Password"
                 android:inputType="textPassword"
+                android:text="testing"
                 android:padding="8dp"
                 android:textColor="@color/black"
                 android:textColorHighlight="@color/cardview_dark_background" />
