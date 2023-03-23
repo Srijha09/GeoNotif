@@ -44,7 +44,8 @@
                 android:padding="8dp"
                 android:text="eshwar@gmail.com"
                 android:textColor="@color/black"
-                android:textColorHighlight="@color/cardview_dark_background" />
+                android:textColorHighlight="@color/cardview_dark_background"
+                android:textSize="14sp" />
 
             <EditText
                 android:id="@+id/loginPasswordEditText"
@@ -55,33 +56,37 @@
                 android:drawablePadding="8dp"
                 android:hint="Password"
                 android:inputType="textPassword"
-                android:text="testing"
                 android:padding="8dp"
+                android:text="testing"
                 android:textColor="@color/black"
-                android:textColorHighlight="@color/cardview_dark_background" />
+                android:textColorHighlight="@color/cardview_dark_background"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/forgotPassText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="right"
                 android:padding="8dp"
                 android:text="Forgot Password?"
-                android:layout_gravity="right"
-                android:textColor="@color/primary_text"
+                android:textColor="@color/primary_highlight"
                 android:textSize="14sp" />
 
             <Button
                 android:id="@+id/loginButton"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="20dp"
                 android:backgroundTint="@color/primary_text"
+                android:fontFamily="sans-serif-medium"
                 android:text="Login"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:cornerRadius="20dp"
                 app:rippleColor="@color/button_ripple"
                 app:strokeColor="@color/button_stroke"
-                app:strokeWidth="0.5dp"
-                android:textSize="18sp"
-                app:cornerRadius="20dp" />
+                app:strokeWidth="0.5dp" />
 
             <TextView
                 android:id="@+id/signUpText"
