@@ -7,33 +7,35 @@
     tools:context=".TaskView">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/TaskDeleteFloatingButton"
+        android:id="@+id/TaskEditFloatingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:clickable="true"
-        android:onClick="onTaskDeleteFloatingButtonClick"
+        android:onClick="onTaskEditFloatingButtonClick"
         app:backgroundTint="@color/white"
         app:elevation="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:maxImageSize="25dp"
-        app:srcCompat="@android:drawable/ic_menu_delete" />
+        app:srcCompat="@android:drawable/ic_menu_edit"
+        app:tint="@color/primary" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/TaskEditFloatingButton"
+        android:id="@+id/TaskDeleteFloatingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:clickable="true"
-        android:onClick="onTaskEditFloatingButtonClick"
+        android:onClick="onTaskDeleteFloatingButtonClick"
         app:backgroundTint="@color/white"
         app:elevation="10dp"
-        app:layout_constraintEnd_toEndOf="@+id/TaskDeleteFloatingButton"
-        app:layout_constraintTop_toBottomOf="@+id/TaskDeleteFloatingButton"
+        app:layout_constraintEnd_toEndOf="@+id/TaskEditFloatingButton"
+        app:layout_constraintTop_toBottomOf="@+id/TaskEditFloatingButton"
         app:maxImageSize="25dp"
-        app:srcCompat="@android:drawable/ic_menu_edit" />
+        app:srcCompat="@android:drawable/ic_menu_delete"
+        app:tint="@color/primary" />
 
     <LinearLayout
         android:layout_width="250dp"
@@ -127,6 +129,20 @@
                     android:fontFamily="sans-serif-light"
                     android:text="📍 Task location"
                     android:textColor="@color/primary_text" />
+
+                <Button
+                    android:id="@+id/TaskDetailsCompleteButton"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="50dp"
+                    android:backgroundTint="@color/primary"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:text="Mark complete"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    app:cornerRadius="5dp" />
 
             </LinearLayout>
         </ScrollView>
