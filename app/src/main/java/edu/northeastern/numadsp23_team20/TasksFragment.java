@@ -57,7 +57,16 @@ public class TasksFragment extends Fragment {
             this.setMapMarker(latLong.get(0), latLong.get(1));
         }
 
+        inflatedView.findViewById(R.id.AddTaskButton).setOnClickListener(view -> {
+            this.onAddTaskButtonClick(view);
+        });
+
         return inflatedView;
+    }
+
+    public void onAddTaskButtonClick(View view) {
+        Intent intent = new Intent(getContext(), AddTask.class);
+        this.startActivity(intent);
     }
 
     @SuppressLint("ClickableViewAccessibility")

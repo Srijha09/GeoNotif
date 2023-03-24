@@ -18,11 +18,18 @@
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="MAPS_API_KEY"/>
+            android:value="MAPS_API_KEY" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <activity
+            android:name=".AddTask"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".LoginActivity"
             android:exported="false"

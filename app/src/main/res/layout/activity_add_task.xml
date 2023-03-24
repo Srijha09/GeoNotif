@@ -2,11 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/EditTask"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:isScrollContainer="true"
-    tools:context=".EditTask">
+    tools:context=".AddTask">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -17,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-            android:id="@+id/EditFormContainerLayout"
+            android:id="@+id/AddFormContainerLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -26,16 +24,16 @@
             android:paddingRight="15dp">
 
             <TextView
-                android:id="@+id/EditTaskHeading"
+                android:id="@+id/AddTaskHeading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:text="Edit task"
+                android:text="Add task"
                 android:textColor="@color/primary_text"
                 android:textSize="24sp" />
 
             <TextView
-                android:id="@+id/EditTaskTitleLabel"
+                android:id="@+id/AddTaskTitleLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
@@ -45,7 +43,7 @@
                 android:textSize="16sp" />
 
             <EditText
-                android:id="@+id/EditTaskTitleValue"
+                android:id="@+id/AddTaskTitleValue"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="10dp"
@@ -57,7 +55,7 @@
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/EditTaskDescriptionLabel"
+                android:id="@+id/AddTaskDescriptionLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
@@ -67,7 +65,7 @@
                 android:textSize="16sp" />
 
             <EditText
-                android:id="@+id/EditTaskDescriptionValue"
+                android:id="@+id/AddTaskDescriptionValue"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:layout_marginTop="10dp"
@@ -82,7 +80,7 @@
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/EditTaskLocationLabel"
+                android:id="@+id/AddTaskLocationLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
@@ -92,20 +90,20 @@
                 android:textSize="16sp" />
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/EditTaskMapContainer"
+                android:id="@+id/AddTaskMapContainer"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_marginTop="10dp"
                 app:cardCornerRadius="10dp">
 
                 <org.osmdroid.views.MapView
-                    android:id="@+id/EditTaskMapView"
+                    android:id="@+id/AddTaskMapView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </androidx.cardview.widget.CardView>
 
             <TextView
-                android:id="@+id/EditTaskLocationValue"
+                android:id="@+id/AddTaskLocationValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -114,16 +112,14 @@
                 android:textSize="14sp" />
 
             <Button
-                android:id="@+id/EditTaskUpdateButton"
+                android:id="@+id/AddTaskUpdateButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_marginTop="10dp"
                 android:backgroundTint="@color/white"
-                android:enabled="false"
                 android:fontFamily="sans-serif-medium"
-                android:onClick="onEditTaskUpdateButtonClick"
-                android:text="Change location"
+                android:text="Find location"
                 android:textAllCaps="false"
                 android:textColor="@color/primary_highlight"
                 android:textSize="12sp"
@@ -140,13 +136,12 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/EditTaskCancelButton"
+                    android:id="@+id/AddTaskCancelButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"
                     android:layout_weight="1"
                     android:backgroundTint="@color/white"
-                    android:onClick="onEditTaskCancelButtonClick"
                     android:text="Cancel"
                     android:textAllCaps="false"
                     android:textColor="@color/primary_text"
@@ -156,13 +151,12 @@
                     app:strokeWidth="0.5dp" />
 
                 <Button
-                    android:id="@+id/EditTaskSubmitButton"
+                    android:id="@+id/AddTaskSubmitButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"
                     android:backgroundTint="@color/primary"
-                    android:onClick="onEditTaskSubmitButtonClick"
                     android:text="Submit"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
@@ -172,4 +166,5 @@
 
         </LinearLayout>
     </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

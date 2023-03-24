@@ -14,8 +14,6 @@
             android:id="@+id/TasksTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
             android:fontFamily="sans-serif-medium"
             android:text="Tasks"
             android:textColor="@color/primary_text"
@@ -23,17 +21,35 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <org.osmdroid.views.MapView
-            android:id="@+id/TasksMapView"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/TasksMapContainer"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            app:cardCornerRadius="10dp"
+            app:layout_constraintTop_toBottomOf="@+id/TasksTitle">
+
+            <org.osmdroid.views.MapView
+                android:id="@+id/TasksMapView"
+                android:layout_width="match_parent"
+                android:layout_height="300dp">
+
+            </org.osmdroid.views.MapView>
+        </androidx.cardview.widget.CardView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/AddTaskButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="20dp"
+            android:clickable="true"
+            android:src="@android:drawable/ic_input_add"
+            app:backgroundTint="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/TasksTitle"
-            app:layout_constraintVertical_bias="1.0" />
+            app:maxImageSize="35dp"
+            app:tint="@color/primary_highlight" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
