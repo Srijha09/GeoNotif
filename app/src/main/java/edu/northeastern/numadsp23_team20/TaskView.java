@@ -44,7 +44,9 @@ public class TaskView extends AppCompatActivity {
         IMapController mapController = this.map.getController();
         mapController.setZoom(18.8);
         // Set center
-        GeoPoint centerPoint = new GeoPoint(42.3447, -71.0996);
+        Intent intent = getIntent();
+        GeoPoint centerPoint = new GeoPoint(intent.getExtras().getDouble("taskLatitude"),
+                intent.getExtras().getDouble("taskLongitude"));
         mapController.setCenter(centerPoint);
         // Set marker
         Marker marker = new Marker(this.map);
