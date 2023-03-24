@@ -4,15 +4,151 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:isScrollContainer="true"
     tools:context=".EditTask">
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/EditTaskHeading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
+        android:fontFamily="sans-serif-black"
         android:text="Edit task"
+        android:textColor="@color/primary_text"
+        android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/EditTaskHeading">
+
+        <LinearLayout
+            android:id="@+id/EditFormContainerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <TextView
+                android:id="@+id/EditTaskTitleLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="Title"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/EditTaskTitleValue"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/custom_edittext"
+                android:drawablePadding="8dp"
+                android:hint="Task title"
+                android:padding="8dp"
+                android:textColor="@color/primary_text"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/EditTaskDescriptionLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Description"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/EditTaskDescriptionValue"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/custom_edittext"
+                android:drawablePadding="8dp"
+                android:fadeScrollbars="true"
+                android:gravity="top"
+                android:hint="Task description"
+                android:padding="8dp"
+                android:scrollbars="vertical"
+                android:textColor="@color/primary_text"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/EditTaskLocationLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Location"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/EditTaskLocationValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/custom_edittext"
+                    android:drawablePadding="8dp"
+                    android:fadeScrollbars="true"
+                    android:hint="Task location"
+                    android:inputType="none"
+                    android:isScrollContainer="false"
+                    android:padding="8dp"
+                    android:scrollbars="horizontal"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
+                    android:text=""
+                    android:textColor="@color/primary_text"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/EditTaskUpdateButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/white"
+                    android:onClick="onEditTaskUpdateButtonClick"
+                    android:text="Update"
+                    android:textAllCaps="false"
+                    android:textColor="@color/primary_highlight"
+                    app:cornerRadius="5dp"
+                    app:rippleColor="@color/button_ripple"
+                    app:strokeColor="@color/primary_highlight"
+                    app:strokeWidth="0.5dp" />
+
+            </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/EditTaskMapContainer"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                app:cardCornerRadius="8dp">
+
+                <org.osmdroid.views.MapView
+                    android:id="@+id/EditTaskMapView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
