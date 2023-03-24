@@ -55,6 +55,7 @@ public class EditTask extends AppCompatActivity {
                     Place place = Autocomplete.getPlaceFromIntent(result.getData());
                     setMapMarker(place.getLatLng().latitude, place.getLatLng().longitude);
                     editTaskLocationValue.setText(place.getName());
+                    // System.out.println(place.getAddressComponents());
                 }
             }
         );
@@ -72,7 +73,8 @@ public class EditTask extends AppCompatActivity {
     }
 
     public void onEditTaskUpdateButtonClick(View view) {
-        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG);
+        List<Place.Field> fields = Arrays.asList(Place.Field.NAME, Place.Field.LAT_LNG,
+                Place.Field.ADDRESS_COMPONENTS);
         Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY,
                 fields).build(this);
         this.addressSearchActivity.launch(intent);
