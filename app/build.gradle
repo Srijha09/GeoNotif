@@ -64,4 +64,6 @@ dependencies {
     implementation 'org.osmdroid:osmdroid-android:6.1.14'
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
     implementation 'com.google.android.libraries.places:places:1.0.0'
+    implementation 'com.firebase:geofire-android:3.2.0'
+
 }
