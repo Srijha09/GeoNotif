@@ -72,7 +72,7 @@ public class TasksFragment extends Fragment {
     @SuppressLint("ClickableViewAccessibility")
     private void configureMap() {
         this.map.setTileSource(TileSourceFactory.MAPNIK);
-        this.mapController.setZoom(15);
+        this.mapController.setZoom(16);
         this.map.setMultiTouchControls(true);
         this.map.setClickable(true);
     }
