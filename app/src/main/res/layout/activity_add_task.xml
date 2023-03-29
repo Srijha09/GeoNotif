@@ -160,6 +160,7 @@
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"
                     android:backgroundTint="@color/primary"
+                    android:onClick="onAddTaskSubmitButton"
                     android:text="Submit"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
