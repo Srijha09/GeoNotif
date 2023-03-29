@@ -1,8 +1,11 @@
 package edu.northeastern.numadsp23_team20;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -21,6 +24,7 @@ public class HomePage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
+        this.checkLocationPermissions();
         this.tasksFragment = new TasksFragment();
         this.groupsFragment = new GroupsFragment();
         this.friendsFragment = new FriendsFragment();
@@ -37,6 +41,19 @@ public class HomePage extends AppCompatActivity {
                 new LocationItem("sad", 42.344847632021015, -71.09957277886753)));
         taskService.createTask(new Task("task3", "desc33",
                 new LocationItem("tasty", 42.344974507513825, -71.09819948797578)));
+    }
+
+    private void checkLocationPermissions() {
+        boolean noFineLocationAccess = ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
+        boolean noCoarseLocationAccess = ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
+        if (noFineLocationAccess && noCoarseLocationAccess) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION},
+                    101);
+        }
     }
 
     private Fragment getFragment(String itemTitle) {

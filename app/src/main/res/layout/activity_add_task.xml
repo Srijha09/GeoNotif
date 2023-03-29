@@ -99,7 +99,8 @@
                 <org.osmdroid.views.MapView
                     android:id="@+id/AddTaskMapView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:visibility="visible" />
             </androidx.cardview.widget.CardView>
 
             <TextView
@@ -109,16 +110,18 @@
                 android:layout_marginTop="5dp"
                 android:text="Task location"
                 android:textColor="@color/primary_text"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:visibility="invisible" />
 
             <Button
-                android:id="@+id/AddTaskUpdateButton"
+                android:id="@+id/AddTaskFindLocationButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_marginTop="10dp"
                 android:backgroundTint="@color/white"
                 android:fontFamily="sans-serif-medium"
+                android:onClick="onAddTaskFindLocationButton"
                 android:text="Find location"
                 android:textAllCaps="false"
                 android:textColor="@color/primary_highlight"
