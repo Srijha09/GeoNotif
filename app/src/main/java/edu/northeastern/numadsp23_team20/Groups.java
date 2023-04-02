@@ -1,17 +1,19 @@
 package edu.northeastern.numadsp23_team20;
 
 public class Groups implements ItemClickListener{
-    String username;
+    String groupname;
     String imageURL;
 
     public Groups(){
     }
-    public Groups(String username, String imageURL){
-        this.username = username;
+    public Groups(String groupname, String imageURL){
+        this.groupname = groupname;
         this.imageURL = imageURL;
     }
+
+
     public String getUsername(){
-        return username;
+        return groupname;
     }
     public String getImageURL(){
         return imageURL;
