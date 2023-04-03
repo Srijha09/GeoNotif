@@ -4,12 +4,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -22,7 +24,9 @@ import java.util.Locale;
 public class GroupsFragment extends Fragment {
     private RecyclerView recyclerView;
     private GroupsAdapter groupsAdapter;
+    private Button startGroup;
     private ArrayList<Groups> groupsList;
+    CreateaGroupDialog addgroupDialog;
     private String current_groups;
     private FirebaseDatabase mDatabase;
 
@@ -48,9 +52,18 @@ public class GroupsFragment extends Fragment {
 //        current_groups = bundle.getString("current_user");
         groupsAdapter = new GroupsAdapter(groupsList, getContext());
         recyclerView.setAdapter(groupsAdapter);
+        startGroup = view.findViewById(R.id.groupStart);
+        startGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onCreateGroupButtonClick(v);
+            }
+        });
         //openGroupTask();
         return view;
     }
+
+
     private void openGroupTask() {
 
 //        mDatabase = FirebaseDatabase.getInstance();
@@ -74,5 +87,12 @@ public class GroupsFragment extends Fragment {
 //
 //            }
 //        });
+    }
+
+
+    public void onCreateGroupButtonClick(View view) {
+        this.addgroupDialog = new CreateaGroupDialog();
+        this.addgroupDialog.show(getParentFragmentManager(), "CreateaGroupDialog");
+
     }
 }

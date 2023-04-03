@@ -12,6 +12,7 @@
 
     <Button
         style="?android:attr/borderlessButtonStyle"
+        android:id="@+id/groupStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start a group"
