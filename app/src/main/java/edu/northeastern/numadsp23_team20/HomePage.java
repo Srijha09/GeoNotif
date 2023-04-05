@@ -18,8 +18,6 @@ public class HomePage extends AppCompatActivity {
     private Fragment friendsFragment;
     private Fragment profileFragment;
 
-    private TaskService taskService = new TaskService();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,12 +33,6 @@ public class HomePage extends AppCompatActivity {
             this.setFragment(this.getFragment(item.getTitle().toString()));
             return true;
         });
-        taskService.createTask(new Task("task1", "desc1",
-                new LocationItem("target", 42.344847632021015, -71.09957277886753)));
-        taskService.createTask(new Task("task2", "desc2",
-                new LocationItem("sad", 42.344847632021015, -71.09957277886753)));
-        taskService.createTask(new Task("task3", "desc33",
-                new LocationItem("tasty", 42.344974507513825, -71.09819948797578)));
     }
 
     private void checkLocationPermissions() {
