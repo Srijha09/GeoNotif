@@ -5,7 +5,9 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -43,17 +45,28 @@ public class AddTask extends AppCompatActivity {
         this.getCurrentUserLocation();
     }
 
-    public void onAddTaskFindLocationButton(View view) {
+    public void onAddTaskFindLocationButtonClick(View view) {
         findViewById(R.id.AddTaskLocationValue).setVisibility(View.VISIBLE);
     }
 
-    public void onAddTaskSubmitButton(View view) {
+    public void onAddTaskCancelButtonClick(View view) {
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("NewTask", false);
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
+    }
+
+    public void onAddTaskSubmitButtonClick(View view) {
         String taskTitle = ((TextView) findViewById(R.id.AddTaskTitleValue)).getText().toString();
         String taskDescription = ((TextView) findViewById(R.id.AddTaskDescriptionValue)).getText().toString();
         LocationItem location = new LocationItem("Boylston", this.taskLatitude, this.taskLongitude);
         Task task = new Task(taskTitle, taskDescription, location);
         TaskService taskService = new TaskService();
         taskService.createTask(task);
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("NewTask", true);
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
     }
 
     private void getCurrentUserLocation() {

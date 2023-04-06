@@ -1,6 +1,7 @@
 package edu.northeastern.numadsp23_team20;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,8 +9,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -31,7 +38,8 @@ public class TasksFragment extends Fragment {
 
     private MapView map;
     private IMapController mapController;
-    private List<List<Double>> taskLocations;
+    private ActivityResultLauncher<Intent> addTaskActivityLaunch;
+    private TaskService taskService;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,31 +50,41 @@ public class TasksFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View inflatedView = inflater.inflate(R.layout.fragment_tasks, container, false);
-
         Context ctx = getContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         this.map = inflatedView.findViewById(R.id.TasksMapView);
         this.mapController = this.map.getController();
-        this.taskLocations = new ArrayList<>();
-        this.taskLocations.add(Arrays.asList(42.3447, -71.0996));
-        this.taskLocations.add(Arrays.asList(42.3398, -71.0892));
-        this.taskLocations.add(Arrays.asList(42.3471, -71.0817));
-        this.taskLocations.add(Arrays.asList(42.3473, -71.0971));
         this.configureMap();
-        for (List<Double> latLong: this.taskLocations) {
-            this.setMapMarker(latLong.get(0), latLong.get(1));
-        }
-
-        inflatedView.findViewById(R.id.AddTaskButton).setOnClickListener(view -> {
-            this.onAddTaskButtonClick(view);
+        RecyclerView tasksRecyclerView = inflatedView.findViewById(R.id.TasksRecyclerView);
+        this.taskService = new TaskService();
+        this.taskService.setTaskServiceListener(tasks -> {
+            for (Task task: tasks) {
+                this.setMapMarker(task.getLocation().getLat(), task.getLocation().getLon());
+            }
+            TaskListAdapter taskListAdapter = new TaskListAdapter(tasks);
+            tasksRecyclerView.setAdapter(taskListAdapter);
+            tasksRecyclerView.setHasFixedSize(true);
+            tasksRecyclerView.setLayoutManager(new LinearLayoutManager(ctx));
         });
-
+        this.taskService.readTasks();
+        this.addTaskActivityLaunch = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent data = result.getData();
+                    Bundle intentExtras = data.getExtras();
+                    if (intentExtras.getBoolean("NewTask")) {
+                        this.taskService.readTasks();
+                    }
+                }
+            });
+        inflatedView.findViewById(R.id.AddTaskButton).setOnClickListener(this::onAddTaskButtonClick);
         return inflatedView;
     }
 
     public void onAddTaskButtonClick(View view) {
         Intent intent = new Intent(getContext(), AddTask.class);
-        this.startActivity(intent);
+        this.addTaskActivityLaunch.launch(intent);
     }
 
     @SuppressLint("ClickableViewAccessibility")
