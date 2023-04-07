@@ -49,7 +49,6 @@ public class HomePage extends AppCompatActivity {
     }
 
     private Fragment getFragment(String itemTitle) {
-        System.out.println(itemTitle);
         switch (itemTitle) {
             case "Tasks":
                 return this.tasksFragment;
