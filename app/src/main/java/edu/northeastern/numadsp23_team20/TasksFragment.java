@@ -28,12 +28,15 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
-public class TasksFragment extends Fragment {
+import java.util.List;
+
+public class TasksFragment extends Fragment implements OnTaskItemClickListener {
 
     private MapView map;
     private IMapController mapController;
     private ActivityResultLauncher<Intent> addTaskActivityLaunch;
     private TaskService taskService;
+    private List<Task> taskList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,10 +55,11 @@ public class TasksFragment extends Fragment {
         RecyclerView tasksRecyclerView = inflatedView.findViewById(R.id.TasksRecyclerView);
         this.taskService = new TaskService();
         this.taskService.setTaskServiceListener(tasks -> {
+            this.taskList = tasks;
             for (Task task: tasks) {
-                this.setMapMarker(task.getLocation().getLat(), task.getLocation().getLon());
+                this.setMapMarker(task);
             }
-            TaskListAdapter taskListAdapter = new TaskListAdapter(tasks);
+            TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this);
             tasksRecyclerView.setAdapter(taskListAdapter);
             tasksRecyclerView.setHasFixedSize(true);
             tasksRecyclerView.setLayoutManager(new LinearLayoutManager(ctx));
@@ -101,19 +105,35 @@ public class TasksFragment extends Fragment {
         return mapMarker;
     }
 
-    private void setMapMarker(double latitude, double longitude) {
-        GeoPoint markerPoint = new GeoPoint(latitude, longitude);
+    private void setMapMarker(Task task) {
+        GeoPoint markerPoint = new GeoPoint(task.getLocation().getLat(), task.getLocation().getLon());
         this.mapController.setCenter(markerPoint);
         Marker mapMarker = this.getCustomizedMapMarker();
         mapMarker.setPosition(markerPoint);
         mapMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         mapMarker.setOnMarkerClickListener((marker, mapView) -> {
             Intent intent = new Intent(getContext(), TaskView.class);
-            intent.putExtra("taskLatitude", latitude);
-            intent.putExtra("taskLongitude", longitude);
+            intent.putExtra("taskTitle", task.getTaskName());
+            intent.putExtra("taskDescription", task.getDescription());
+            intent.putExtra("taskLocation", task.getLocation().getKey());
+            intent.putExtra("taskLatitude", task.getLocation().getLat());
+            intent.putExtra("taskLongitude", task.getLocation().getLon());
             startActivity(intent);
             return true;
         });
         this.map.getOverlays().add(mapMarker);
+    }
+
+    @Override
+    public void onTaskItemClick(int position) {
+        System.out.println("Clicked " + position);
+        Task task = this.taskList.get(position);
+        Intent intent = new Intent(getContext(), TaskView.class);
+        intent.putExtra("taskTitle", task.getTaskName());
+        intent.putExtra("taskDescription", task.getDescription());
+        intent.putExtra("taskLocation", task.getLocation().getKey());
+        intent.putExtra("taskLatitude", task.getLocation().getLat());
+        intent.putExtra("taskLongitude", task.getLocation().getLon());
+        startActivity(intent);
     }
 }

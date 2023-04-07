@@ -11,12 +11,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskListViewHolder> {
+public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskListViewHolder>
+        implements OnTaskItemClickListener {
 
     private List<Task> taskList;
+    private OnTaskItemClickListener onTaskItemClickListener;
 
-    public TaskListAdapter(List<Task> taskList) {
+    public TaskListAdapter(List<Task> taskList, OnTaskItemClickListener onTaskItemClickListener) {
         this.taskList = taskList;
+        this.onTaskItemClickListener = onTaskItemClickListener;
     }
 
     @NonNull
@@ -40,7 +43,10 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
         return this.taskList.size();
     }
 
-    public class TaskListViewHolder extends RecyclerView.ViewHolder {
+    @Override
+    public void onTaskItemClick(int position) {}
+
+    public class TaskListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView RVTaskTitle;
         private TextView RVTaskLocation;
@@ -50,6 +56,17 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
 
             this.RVTaskTitle = itemView.findViewById(R.id.RVTaskTitle);
             this.RVTaskLocation = itemView.findViewById(R.id.RVTaskLocation);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (onTaskItemClickListener != null) {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    onTaskItemClickListener.onTaskItemClick(position);
+                }
+            }
         }
     }
 }
