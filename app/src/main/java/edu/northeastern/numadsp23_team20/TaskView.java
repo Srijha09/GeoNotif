@@ -27,6 +27,7 @@ import org.osmdroid.views.overlay.Polygon;
 public class TaskView extends AppCompatActivity {
 
     MapView map;
+    String taskName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,7 @@ public class TaskView extends AppCompatActivity {
         this.customizeMap();
 
         Intent intent = getIntent();
+        this.taskName = intent.getExtras().getString("taskTitle");
         ((TextView) findViewById(R.id.TaskTitleTextView)).setText(intent.getExtras().getString("taskTitle"));
         ((TextView) findViewById(R.id.TaskDetailsDescription)).setText(intent.getExtras().getString("taskDescription"));
         ((TextView) findViewById(R.id.TaskDetailsLocation)).setText("\uD83D\uDCCD " + intent.getExtras().getString("taskLocation"));
@@ -101,6 +103,8 @@ public class TaskView extends AppCompatActivity {
             .setMessage("Are you sure you want to delete this task?")
             .setIcon(R.drawable.warning)
             .setPositiveButton("CONFIRM", (dialogInterface, whichButton) -> {
+                TaskService taskService = new TaskService();
+                taskService.deleteTask(this.taskName);
                 this.finish();
             })
             .setNegativeButton(android.R.string.no, null)
