@@ -85,7 +85,13 @@ public class TaskView extends AppCompatActivity {
     }
 
     public void onTaskEditFloatingButtonClick(View view) {
+        Intent thisIntent = getIntent();
         Intent intent = new Intent(this, EditTask.class);
+        intent.putExtra("taskTitle", thisIntent.getExtras().getString("taskTitle"));
+        intent.putExtra("taskDescription", thisIntent.getExtras().getString("taskDescription"));
+        intent.putExtra("taskLocation", thisIntent.getExtras().getString("taskLocation"));
+        intent.putExtra("taskLatitude", thisIntent.getExtras().getDouble("taskLatitude"));
+        intent.putExtra("taskLongitude", thisIntent.getExtras().getDouble("taskLongitude"));
         this.startActivity(intent);
     }
 

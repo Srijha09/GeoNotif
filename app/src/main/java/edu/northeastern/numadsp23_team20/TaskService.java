@@ -80,6 +80,13 @@ public class TaskService {
         });
     }
 
+    public void editTask(Task task, Task updatedTask) {
+        String userId = this.firebaseUser.getUid();
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/tasks/"
+                + task.getTaskName());
+        this.ref.setValue(updatedTask);
+    }
+
     public interface TaskServiceListener {
         void onTasksLoaded(List<Task> tasks);
     }
