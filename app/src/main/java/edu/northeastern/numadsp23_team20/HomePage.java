@@ -5,6 +5,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -33,6 +34,8 @@ public class HomePage extends AppCompatActivity {
             this.setFragment(this.getFragment(item.getTitle().toString()));
             return true;
         });
+        Intent intent = new Intent(this, LocationService.class);
+        startService(intent);
     }
 
     private void checkLocationPermissions() {
@@ -40,10 +43,13 @@ public class HomePage extends AppCompatActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
         boolean noCoarseLocationAccess = ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-        if (noFineLocationAccess && noCoarseLocationAccess) {
+        boolean noBackgroundLocationAccess = ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED;
+        if (noFineLocationAccess || noCoarseLocationAccess || noBackgroundLocationAccess) {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION},
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_BACKGROUND_LOCATION},
                     101);
         }
     }
