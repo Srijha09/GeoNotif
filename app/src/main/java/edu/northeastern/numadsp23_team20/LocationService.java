@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -15,7 +16,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -24,6 +27,7 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryDataEventListener;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -70,7 +74,42 @@ public class LocationService extends Service {
             @Override
             public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
 //                System.out.println("Key: " + dataSnapshot.getKey());
-                sendNotification(dataSnapshot.getKey(), location.latitude + "," + location.longitude);
+                DatabaseReference taskRef = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId
+                        + "/tasks/" + dataSnapshot.getKey());
+                taskRef.get().addOnCompleteListener(t -> {
+                    if (!t.isSuccessful()) {
+                        Log.e("firebase", "Error getting data", t.getException());
+                    } else {
+                        Task task = new Task();
+                        for (DataSnapshot item : t.getResult().getChildren()) {
+                            if (item.getKey().equals("taskName"))
+                                task.setTaskName(item.getValue().toString());
+                            else if (item.getKey().equals("description"))
+                                task.setDescription(item.getValue().toString());
+                            else if (item.getKey().equals("location")) {
+                                String key = "";
+                                double lat = 0.0;
+                                double lon = 0.0;
+
+                                for (DataSnapshot locationDetail : item.getChildren()) {
+                                    if (locationDetail.getKey().equals("key")) {
+                                        key = locationDetail.getValue().toString();
+                                    }
+                                    if (locationDetail.getKey().equals("lat")) {
+                                        lat = (double) locationDetail.getValue();
+                                    }
+                                    if (locationDetail.getKey().equals("lon")) {
+                                        lon = (double) locationDetail.getValue();
+                                    }
+                                    LocationItem locationItem = new LocationItem(key, lat, lon);
+                                    task.setLocation(locationItem);
+                                }
+                            }
+                        }
+                        sendNotification(task);
+                    }
+                });
+
             }
 
             @Override
@@ -189,14 +228,25 @@ public class LocationService extends Service {
         }
     }
 
-    private void sendNotification(String title, String text) {
-//        System.out.println(title + "," + text);
+    private void sendNotification(Task task) {
+
+        Intent intent = new Intent(getApplicationContext(), TaskView.class);
+        intent.putExtra("taskTitle", task.getTaskName());
+        intent.putExtra("taskDescription", task.getDescription());
+        intent.putExtra("taskLocation", task.getLocation().getKey());
+        intent.putExtra("taskLatitude", task.getLocation().getLat());
+        intent.putExtra("taskLongitude", task.getLocation().getLon());
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "TaskNotificationChannel")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle(title)
-                .setContentText(text)
+                .setSmallIcon(R.mipmap.ic_geonotif_logo_foreground)
+                .setContentTitle("You have a task nearby!")
+                .setContentText(task.getTaskName())
+                .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true);
+
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Random random = new Random();
         notificationManager.notify(random.nextInt(), builder.build());

@@ -89,6 +89,7 @@ public class TaskService {
 
     public void deleteTask(String taskName) {
         String userId = this.firebaseUser.getUid();
+        System.out.println(taskName);
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/tasks/"
                 + taskName);
         this.ref.removeValue();
