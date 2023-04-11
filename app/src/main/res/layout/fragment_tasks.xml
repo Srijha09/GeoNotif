@@ -46,7 +46,7 @@
             <org.osmdroid.views.MapView
                 android:id="@+id/TasksMapView"
                 android:layout_width="match_parent"
-                android:layout_height="300dp">
+                android:layout_height="280dp">
 
             </org.osmdroid.views.MapView>
         </androidx.cardview.widget.CardView>
@@ -69,47 +69,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/divider2">
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/TasksRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <include
-                    android:id="@+id/item1"
-                    layout="@layout/task_recyclerview_item"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <include
-                    android:id="@+id/item2"
-                    layout="@layout/task_recyclerview_item"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <include
-                    android:id="@+id/item3"
-                    layout="@layout/task_recyclerview_item"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <include
-                    android:id="@+id/item4"
-                    layout="@layout/task_recyclerview_item"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <include
-                    android:id="@+id/item5"
-                    layout="@layout/task_recyclerview_item"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <include
-                    android:id="@+id/item6"
-                    layout="@layout/task_recyclerview_item"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
+                android:layout_height="match_parent" />
         </ScrollView>
 
 

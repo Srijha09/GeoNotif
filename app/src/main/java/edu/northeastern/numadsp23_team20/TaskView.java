@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
+import android.widget.TextView;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -26,6 +27,7 @@ import org.osmdroid.views.overlay.Polygon;
 public class TaskView extends AppCompatActivity {
 
     MapView map;
+    String taskName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,12 @@ public class TaskView extends AppCompatActivity {
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         this.map = findViewById(R.id.MapView);
         this.customizeMap();
+
+        Intent intent = getIntent();
+        this.taskName = intent.getExtras().getString("taskTitle");
+        ((TextView) findViewById(R.id.TaskTitleTextView)).setText(intent.getExtras().getString("taskTitle"));
+        ((TextView) findViewById(R.id.TaskDetailsDescription)).setText(intent.getExtras().getString("taskDescription"));
+        ((TextView) findViewById(R.id.TaskDetailsLocation)).setText("\uD83D\uDCCD " + intent.getExtras().getString("taskLocation"));
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -79,7 +87,13 @@ public class TaskView extends AppCompatActivity {
     }
 
     public void onTaskEditFloatingButtonClick(View view) {
+        Intent thisIntent = getIntent();
         Intent intent = new Intent(this, EditTask.class);
+        intent.putExtra("taskTitle", thisIntent.getExtras().getString("taskTitle"));
+        intent.putExtra("taskDescription", thisIntent.getExtras().getString("taskDescription"));
+        intent.putExtra("taskLocation", thisIntent.getExtras().getString("taskLocation"));
+        intent.putExtra("taskLatitude", thisIntent.getExtras().getDouble("taskLatitude"));
+        intent.putExtra("taskLongitude", thisIntent.getExtras().getDouble("taskLongitude"));
         this.startActivity(intent);
     }
 
@@ -89,6 +103,8 @@ public class TaskView extends AppCompatActivity {
             .setMessage("Are you sure you want to delete this task?")
             .setIcon(R.drawable.warning)
             .setPositiveButton("CONFIRM", (dialogInterface, whichButton) -> {
+                TaskService taskService = new TaskService();
+                taskService.deleteTask(this.taskName);
                 this.finish();
             })
             .setNegativeButton(android.R.string.no, null)
