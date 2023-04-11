@@ -28,6 +28,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -42,7 +44,7 @@ public class ProfileFragment extends Fragment {
     FirebaseAuth mAuth;
 
     View view;
-    Button logoutButton;
+    Button logoutButton, deleteAccountButton;
 
     ImageView profileImage;
     FloatingActionButton fab;
@@ -88,6 +90,7 @@ public class ProfileFragment extends Fragment {
             mAuth.signOut();
             Intent intent = new Intent(getActivity(), MainActivity.class);
             getActivity().finish();
+            getActivity().stopService(new Intent(this.getContext(), LocationService.class));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             this.startActivity(intent);
         });
