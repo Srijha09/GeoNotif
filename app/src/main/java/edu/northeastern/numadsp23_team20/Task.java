@@ -45,8 +45,12 @@ public class Task {
     @NonNull
     @Override
     public String toString() {
-        return "Task [taskName=" + getTaskName() + ", description=" + getDescription()
-                + ", location()=" + getLocation().toString() + "]";
+        if (this.getLocation() != null)
+            return "Task [taskName=" + getTaskName() + ", description=" + getDescription()
+                    + ", location()=" + getLocation().toString() + "]";
+        else
+            return "Task [taskName=" + getTaskName() + ", description=" + getDescription()
+                    + "]";
     }
 
 }

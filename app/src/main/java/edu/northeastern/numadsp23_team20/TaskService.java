@@ -36,7 +36,7 @@ public class TaskService {
         String userId = this.firebaseUser.getUid();
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/locations");
         this.geoFire = new GeoFire(this.ref);
-        this.geoFire.setLocation(task.getLocation().getKey(), new GeoLocation(
+        this.geoFire.setLocation(task.getTaskName(), new GeoLocation(
                 task.getLocation().getLat(), task.getLocation().getLon()));
 
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/tasks/"
