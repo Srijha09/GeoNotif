@@ -44,7 +44,7 @@ public class ProfileFragment extends Fragment {
     FirebaseAuth mAuth;
 
     View view;
-    Button logoutButton, deleteAccountButton;
+    Button logoutButton;
 
     ImageView profileImage;
     FloatingActionButton fab;
