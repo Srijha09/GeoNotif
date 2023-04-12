@@ -7,6 +7,7 @@ public class Task {
     private String taskName;
     private String description;
     private LocationItem location;
+    private boolean isComplete;
 
     public Task() {
         //default constructor
@@ -53,4 +54,11 @@ public class Task {
                     + "]";
     }
 
+    public boolean getIsComplete() {
+        return isComplete;
+    }
+
+    public void setIsComplete(boolean complete) {
+        isComplete = complete;
+    }
 }

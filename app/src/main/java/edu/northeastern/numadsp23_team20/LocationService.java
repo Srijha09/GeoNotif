@@ -84,6 +84,8 @@ public class LocationService extends Service {
                         for (DataSnapshot item : t.getResult().getChildren()) {
                             if (item.getKey().equals("taskName"))
                                 task.setTaskName(item.getValue().toString());
+                            else if (item.getKey().equals("isComplete"))
+                                task.setIsComplete((Boolean) item.getValue());
                             else if (item.getKey().equals("description"))
                                 task.setDescription(item.getValue().toString());
                             else if (item.getKey().equals("location")) {
@@ -106,7 +108,8 @@ public class LocationService extends Service {
                                 }
                             }
                         }
-                        sendNotification(task);
+                        if(!task.getIsComplete())
+                            sendNotification(task);
                     }
                 });
 

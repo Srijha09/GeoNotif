@@ -50,8 +50,7 @@ public class TaskService {
         this.ref.get().addOnCompleteListener(tasks -> {
             if (!tasks.isSuccessful()) {
                 Log.e("firebase", "Error getting data", tasks.getException());
-            }
-            else {
+            } else {
                 List<Task> tasksList = new ArrayList<>();
                 for (DataSnapshot item : tasks.getResult().getChildren()) {
                     Task task = new Task();
@@ -73,6 +72,7 @@ public class TaskService {
                         LocationItem locationItem = new LocationItem(key, lat, lon);
                         task.setLocation(locationItem);
                     }
+                    task.setIsComplete((Boolean) item.child("isComplete").getValue());
                     tasksList.add(task);
                 }
                 taskServiceListener.onTasksLoaded(tasksList);
