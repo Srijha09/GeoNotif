@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,6 +33,7 @@ import java.util.List;
 
 public class TasksFragment extends Fragment implements OnTaskItemClickListener {
 
+    Context ctx;
     private MapView map;
     private IMapController mapController;
     private ActivityResultLauncher<Intent> addTaskActivityLaunch;
@@ -47,8 +49,8 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View inflatedView = inflater.inflate(R.layout.fragment_tasks, container, false);
-        Context ctx = getContext();
-        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        this.ctx = getContext();
+        Configuration.getInstance().load(this.ctx, PreferenceManager.getDefaultSharedPreferences(this.ctx));
         this.map = inflatedView.findViewById(R.id.TasksMapView);
         this.mapController = this.map.getController();
         this.configureMap();
@@ -62,7 +64,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
             TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this);
             tasksRecyclerView.setAdapter(taskListAdapter);
             tasksRecyclerView.setHasFixedSize(true);
-            tasksRecyclerView.setLayoutManager(new LinearLayoutManager(ctx));
+            tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this.ctx));
         });
         this.taskService.readTasks();
         this.addTaskActivityLaunch = registerForActivityResult(
@@ -95,11 +97,11 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
 
     private Marker getCustomizedMapMarker() {
         Marker mapMarker = new Marker(this.map);
-        Drawable d = ResourcesCompat.getDrawable(getResources(), R.drawable.pin, null);
-        Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
-        Drawable dr = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap,
-                (int) (18.0f * getResources().getDisplayMetrics().density),
-                (int) (18.0f * getResources().getDisplayMetrics().density),
+        Drawable pin_drawable = ResourcesCompat.getDrawable(this.ctx.getResources(), R.drawable.pin, null);;
+        Bitmap bitmap = ((BitmapDrawable) pin_drawable).getBitmap();
+        Drawable dr = new BitmapDrawable(this.ctx.getResources(), Bitmap.createScaledBitmap(bitmap,
+                (int) (18.0f * this.ctx.getResources().getDisplayMetrics().density),
+                (int) (18.0f * this.ctx.getResources().getDisplayMetrics().density),
                 true));
         mapMarker.setIcon(dr);
         return mapMarker;
