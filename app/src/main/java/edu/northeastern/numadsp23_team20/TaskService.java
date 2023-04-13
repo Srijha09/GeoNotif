@@ -36,7 +36,7 @@ public class TaskService {
         String userId = this.firebaseUser.getUid();
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/locations");
         this.geoFire = new GeoFire(this.ref);
-        this.geoFire.setLocation(task.getLocation().getKey(), new GeoLocation(
+        this.geoFire.setLocation(task.getTaskName(), new GeoLocation(
                 task.getLocation().getLat(), task.getLocation().getLon()));
 
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/tasks/"
@@ -50,8 +50,7 @@ public class TaskService {
         this.ref.get().addOnCompleteListener(tasks -> {
             if (!tasks.isSuccessful()) {
                 Log.e("firebase", "Error getting data", tasks.getException());
-            }
-            else {
+            } else {
                 List<Task> tasksList = new ArrayList<>();
                 for (DataSnapshot item : tasks.getResult().getChildren()) {
                     Task task = new Task();
@@ -73,6 +72,7 @@ public class TaskService {
                         LocationItem locationItem = new LocationItem(key, lat, lon);
                         task.setLocation(locationItem);
                     }
+                    task.setIsComplete((Boolean) item.child("isComplete").getValue());
                     tasksList.add(task);
                 }
                 taskServiceListener.onTasksLoaded(tasksList);

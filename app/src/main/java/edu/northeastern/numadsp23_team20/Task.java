@@ -7,6 +7,7 @@ public class Task {
     private String taskName;
     private String description;
     private LocationItem location;
+    private boolean isComplete;
 
     public Task() {
         //default constructor
@@ -45,8 +46,19 @@ public class Task {
     @NonNull
     @Override
     public String toString() {
-        return "Task [taskName=" + getTaskName() + ", description=" + getDescription()
-                + ", location()=" + getLocation().toString() + "]";
+        if (this.getLocation() != null)
+            return "Task [taskName=" + getTaskName() + ", description=" + getDescription()
+                    + ", location()=" + getLocation().toString() + "]";
+        else
+            return "Task [taskName=" + getTaskName() + ", description=" + getDescription()
+                    + "]";
     }
 
+    public boolean getIsComplete() {
+        return isComplete;
+    }
+
+    public void setIsComplete(boolean complete) {
+        isComplete = complete;
+    }
 }

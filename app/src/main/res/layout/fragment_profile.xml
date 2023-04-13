@@ -6,32 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ProfileFragment">
 
-    <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent">-->
-
-    <!--        <TextView-->
-    <!--            android:id="@+id/ProfileTitle"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:fontFamily="sans-serif-medium"-->
-    <!--            android:text="Profile"-->
-    <!--            android:textColor="@color/primary_text"-->
-    <!--            android:textSize="24sp"-->
-    <!--            app:layout_constraintStart_toStartOf="parent"-->
-    <!--            app:layout_constraintTop_toTopOf="parent" />-->
-
-    <!--        <Button-->
-    <!--            android:id="@+id/logoutButton"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_marginTop="30dp"-->
-    <!--            android:text="Logout"-->
-    <!--            android:textColor="@color/white"-->
-    <!--            app:layout_constraintStart_toStartOf="parent"-->
-    <!--            app:layout_constraintTop_toBottomOf="@+id/ProfileTitle" />-->
-
-    <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -41,16 +15,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/ProfileTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="Profile"
-                        android:textColor="@color/primary_text"
-                        android:textSize="24sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/ProfileTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="Profile"
+                android:textColor="@color/primary_text"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -63,27 +37,6 @@
                     android:layout_height="160dp"
                     android:layout_centerInParent="true"
                     tools:ignore="UselessParent">
-
-                    <!--                    <com.mikhaellopez.circularimageview.CircularImageView-->
-                    <!--                        android:id="@+id/imgProfile"-->
-                    <!--                        android:layout_width="152dp"-->
-                    <!--                        android:layout_height="149dp"-->
-                    <!--                        android:layout_alignParentStart="true"-->
-                    <!--                        android:layout_alignParentTop="true"-->
-                    <!--                        android:layout_gravity="center"-->
-                    <!--                        android:layout_marginStart="16dp"-->
-                    <!--                        android:layout_marginTop="16dp"-->
-                    <!--                        android:layout_marginEnd="16dp"-->
-                    <!--                        android:layout_marginBottom="16dp"-->
-                    <!--                        android:background="@drawable/profile_bg"-->
-                    <!--                        android:padding="3dp"-->
-                    <!--                        android:scaleType="centerInside"-->
-                    <!--                        app:srcCompat="@drawable/ic_person"-->
-                    <!--                        app:civ_border_width="4dp"-->
-                    <!--                        app:civ_border_color="#FF0000"-->
-                    <!--                        app:civ_shadow="true"-->
-                    <!--                        app:civ_shadow_radius="10dp"-->
-                    <!--                        app:civ_shadow_color="#66000000" />-->
 
                     <com.mikhaellopez.circularimageview.CircularImageView
                         android:id="@+id/imgProfile"
@@ -108,15 +61,22 @@
 
             </RelativeLayout>
 
-                    <Button
-                        android:id="@+id/logoutButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="30dp"
-                        android:text="Logout"
-                        android:textColor="@color/white"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/ProfileTitle" />
+            <LinearLayout
+                android:id="@+id/LinearLayout02"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_width="match_parent"
+                android:layout_alignParentBottom="true">
+
+                <Button
+                    android:id="@+id/logoutButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    android:layout_margin="10dp"
+                    android:text="Logout" />
+            </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
