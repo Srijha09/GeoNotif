@@ -1,10 +1,16 @@
 package edu.northeastern.numadsp23_team20;
 
+import static android.text.TextUtils.isEmpty;
+
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -26,7 +32,6 @@ public class GroupsFragment extends Fragment {
     private GroupsAdapter groupsAdapter;
     private Button startGroup;
     private ArrayList<Groups> groupsList;
-    CreateaGroupDialog addgroupDialog;
     private String current_groups;
     private FirebaseDatabase mDatabase;
 
@@ -56,13 +61,49 @@ public class GroupsFragment extends Fragment {
         startGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onCreateGroupButtonClick(v);
+                addDialogBox();
             }
         });
         //openGroupTask();
         return view;
     }
 
+
+    /**
+     * alert dialogbox to add a new list view
+     */
+    private void addDialogBox(){
+        View view=getLayoutInflater().inflate(R.layout.activity_createa_group_dialog, null);
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
+        alertDialog.setView(view);
+        EditText group_name = view.findViewById(R.id.editgroupname);
+        ImageView image_url = view.findViewById(R.id.groupimage);
+        alertDialog.setPositiveButton("Save", (dialogInterface, i) -> {
+
+        });
+        alertDialog.setNegativeButton("Cancel", (dialogInterface, i) -> {
+            // do something when the negative button is clicked
+            dialogInterface.dismiss();
+        });
+        AlertDialog alert = alertDialog.create();
+        alert.show();
+        alert.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view1 -> {
+            if(!isEmpty(group_name.getText().toString()) && !isEmpty(image_url.toString())){
+                String groupname = group_name.getText().toString();
+                String imageurl = image_url.toString();
+                Groups groups = new Groups(groupname, imageurl);
+                groupsList.add(groups);
+                alert.dismiss();
+
+            }else{
+                Toast.makeText(requireContext(), "Fields cannot be empty",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        });
+
+
+    }
 
     private void openGroupTask() {
 
@@ -90,9 +131,4 @@ public class GroupsFragment extends Fragment {
     }
 
 
-    public void onCreateGroupButtonClick(View view) {
-        this.addgroupDialog = new CreateaGroupDialog();
-        this.addgroupDialog.show(getParentFragmentManager(), "CreateaGroupDialog");
-
-    }
 }
