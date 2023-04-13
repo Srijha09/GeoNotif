@@ -93,6 +93,9 @@ public class TaskService {
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/tasks/"
                 + taskName);
         this.ref.removeValue();
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/locations/"
+                + taskName);
+        this.ref.removeValue();
     }
 
     public interface TaskServiceListener {
