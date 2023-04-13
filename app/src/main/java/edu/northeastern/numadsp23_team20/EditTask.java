@@ -29,6 +29,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.w3c.dom.Text;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +41,13 @@ public class EditTask extends AppCompatActivity {
     private MapView map;
     private IMapController mapController;
     private Marker mapMarker;
+    private Task task;
+
+    private TextView editTaskTitleValue;
+    private TextView editTaskDescriptionValue;
+    private String taskLocation;
+    private double taskLatitude;
+    private double taskLongitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +61,12 @@ public class EditTask extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                     Place place = Autocomplete.getPlaceFromIntent(result.getData());
-                    setMapMarker(place.getLatLng().latitude, place.getLatLng().longitude);
-                    editTaskLocationValue.setText(place.getName());
-                    // System.out.println(place.getAddressComponents());
+                    this.taskLocation = place.getName();
+                    this.taskLatitude = place.getLatLng().latitude;
+                    this.taskLongitude = place.getLatLng().longitude;
+                    setMapMarker(this.taskLatitude, this.taskLongitude);
+                    editTaskLocationValue.setText("\uD83D\uDCCD " + place.getName());
+
                 }
             }
         );
@@ -65,11 +76,22 @@ public class EditTask extends AppCompatActivity {
         this.map = findViewById(R.id.EditTaskMapView);
         this.mapController = this.map.getController();
         this.mapMarker = new Marker(this.map);
-        double mapMarkerLatitude = 42.3447;
-        double mapMarkerLongitude = -71.0996;
+        Intent intent = this.getIntent();
+        String taskTitle = intent.getExtras().getString("taskTitle");
+        String taskDescription = intent.getExtras().getString("taskDescription");
+        this.taskLocation = intent.getExtras().getString("taskLocation");
+        this.taskLatitude = intent.getExtras().getDouble("taskLatitude");
+        this.taskLongitude = intent.getExtras().getDouble("taskLongitude");
+        LocationItem locationItem = new LocationItem(this.taskLocation, this.taskLatitude, this.taskLongitude);
+        this.task = new Task(taskTitle, taskDescription, locationItem);
         this.configureMap();
         this.customizeMapMarker();
-        this.setMapMarker(mapMarkerLatitude, mapMarkerLongitude);
+        this.setMapMarker(this.taskLatitude, this.taskLongitude);
+        this.editTaskTitleValue = findViewById(R.id.EditTaskTitleValue);
+        this.editTaskTitleValue.setText(taskTitle);
+        this.editTaskDescriptionValue = findViewById(R.id.EditTaskDescriptionValue);
+        this.editTaskDescriptionValue.setText(taskDescription);
+        ((TextView) findViewById(R.id.EditTaskLocationValue)).setText("\uD83D\uDCCD " + taskLocation);
     }
 
     public void onEditTaskUpdateButtonClick(View view) {
@@ -88,6 +110,13 @@ public class EditTask extends AppCompatActivity {
         new AlertDialog.Builder(this)
             .setMessage("Are you sure you want to edit this task?")
             .setPositiveButton("CONFIRM", (dialogInterface, whichButton) -> {
+                LocationItem locationItem = new LocationItem(
+                        this.taskLocation, this.taskLatitude, this.taskLongitude
+                );
+                Task updatedTask = new Task(this.editTaskTitleValue.getText().toString(),
+                        this.editTaskDescriptionValue.getText().toString(), locationItem);
+                TaskService taskService = new TaskService();
+                taskService.editTask(this.task, updatedTask);
                 this.finish();
             })
             .setNegativeButton(android.R.string.no, null)

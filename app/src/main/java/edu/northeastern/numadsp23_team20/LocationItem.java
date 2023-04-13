@@ -1,5 +1,7 @@
 package edu.northeastern.numadsp23_team20;
 
+import androidx.annotation.NonNull;
+
 public class LocationItem {
 
     public String getKey() {
@@ -34,5 +36,12 @@ public class LocationItem {
         this.key = key;
         this.lat = lat;
         this.lon = lon;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "LocationItem [key=" + getKey() + ", lat=" + getLat()
+                + ", long()=" + getLon() + "]";
     }
 }
