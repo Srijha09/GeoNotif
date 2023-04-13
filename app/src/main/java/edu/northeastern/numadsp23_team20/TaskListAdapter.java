@@ -31,7 +31,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
     public TaskListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View taskRecyclerView = inflater.inflate(R.layout.task_recyclerview_item, parent, false);
+        View taskRecyclerView = inflater.inflate(R.layout.task_recyclerview_completeditem, parent, false);
         return new TaskListViewHolder(taskRecyclerView);
     }
 

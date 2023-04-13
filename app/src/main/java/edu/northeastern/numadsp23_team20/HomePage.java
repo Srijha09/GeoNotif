@@ -26,7 +26,7 @@ public class HomePage extends AppCompatActivity {
         this.checkLocationPermissions();
         this.tasksFragment = new TasksFragment();
         this.groupsFragment = new GroupsFragment();
-        this.friendsFragment = new FriendsFragment();
+        // this.friendsFragment = new FriendsFragment();
         this.profileFragment = new ProfileFragment();
         BottomNavigationView bottomNavigationMenu = findViewById(R.id.BottomNavigationMenu);
         this.setFragment(this.tasksFragment);
