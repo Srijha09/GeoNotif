@@ -27,6 +27,11 @@ public class FriendsFragment extends Fragment {
 
     private static ArrayList<FriendsData> all_users;
     private static ArrayList<FriendsData> friends;
+    private static FriendsRecyclerView adapter_friends;
+
+    private static FriendsRecyclerView adapter_all_users;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -36,10 +41,11 @@ public class FriendsFragment extends Fragment {
         friends = new ArrayList<>();
 
         //get entries from the database
-        all_users.add(new FriendsData("Bob", "follow"));
+        all_users.add(new FriendsData("Bob", "following"));
         all_users.add(new FriendsData("Sally", "follow"));
+        all_users.add(new FriendsData("Alexa", "following"));
 
-        friends.add(new FriendsData("Susan", "following"));
+        friends.add(new FriendsData("Bob", "following"));
         friends.add(new FriendsData("Alexa", "following"));
 
     }
@@ -94,7 +100,7 @@ public class FriendsFragment extends Fragment {
     public static class Tab1Fragment extends Fragment {
 
         private RecyclerView recyclerView;
-        private FriendsRecyclerView adapter;
+        //private  FriendsRecyclerView adapter_all_users;
 
 
         FriendsRecyclerView.OnButtonClickListener listener = new FriendsRecyclerView.OnButtonClickListener() {
@@ -106,10 +112,17 @@ public class FriendsFragment extends Fragment {
 
                 if (datapoint.getButtonDetails().equals("Following")) {
                     datapoint.setButtonDetails("Follow");
+                    friends.remove(datapoint);
+
+                    //remove from database (user's friends) too.
                 } else {
                     datapoint.setButtonDetails("Following");
+                    friends.add(datapoint);
+                    //add to database (user's friends)  too.
                 }
-                adapter.notifyDataSetChanged(); // Notify the adapter that the data has changed
+                adapter_friends.notifyDataSetChanged(); // Notify the adapter that the data has changed
+                adapter_all_users.notifyDataSetChanged(); // Notify the adapter that the data has changed
+
             }
         };
 
@@ -120,8 +133,8 @@ public class FriendsFragment extends Fragment {
             //get values from database
 
             recyclerView = view.findViewById(R.id.recycler_view);
-            adapter = new FriendsRecyclerView(all_users, listener);
-            recyclerView.setAdapter(adapter);
+            adapter_all_users = new FriendsRecyclerView(all_users, listener);
+            recyclerView.setAdapter(adapter_all_users);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
             return view;
@@ -131,19 +144,24 @@ public class FriendsFragment extends Fragment {
     public static class Tab2Fragment extends Fragment {
 
         private RecyclerView recyclerView;
-        private FriendsRecyclerView adapter;
+        //private  FriendsRecyclerView adapter_friends;
 
         FriendsRecyclerView.OnButtonClickListener listener = new FriendsRecyclerView.OnButtonClickListener() {
             @Override
             public void onButtonClickChange(int position) {
                 //friends.set(position, "New Data"); // Update the data source
                 FriendsData data = friends.get(position);
-                if (data.getButtonDetails().equals("Following")) {
-                    data.setButtonDetails("Follow");
-                } else {
-                    data.setButtonDetails("Following");
+
+                for (int i = 0; i < all_users.size(); i++) {
+                    if (data.getUserName().equals(all_users.get(i).getUserName())) {
+                        all_users.get(i).setButtonDetails("follow");
+                        adapter_all_users.notifyDataSetChanged(); // Notify the adapter that the data has changed
+                    }
                 }
-                adapter.notifyDataSetChanged(); // Notify the adapter that the data has changed
+                friends.remove(data);
+                //remove from database (user friends) too.
+
+                adapter_friends.notifyDataSetChanged(); // Notify the adapter that the data has changed
             }
         };
 
@@ -154,8 +172,8 @@ public class FriendsFragment extends Fragment {
 
 
             recyclerView = view.findViewById(R.id.recycler_view);
-            adapter = new FriendsRecyclerView(friends, listener);
-            recyclerView.setAdapter(adapter);
+            adapter_friends = new FriendsRecyclerView(friends, listener);
+            recyclerView.setAdapter(adapter_friends);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
             return view;
