@@ -28,4 +28,6 @@ public class MyAdapter extends FragmentStateAdapter {
     public int getItemCount() {
         return titles.length;
     }
+
+
 }

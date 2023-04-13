@@ -12,7 +12,7 @@
         <item>Romance</item>
     </string-array>
 
-    <string name="about">Team Name - Team 20\nTeam Members - \nEshwar Hebbur Shivakumar, Rahul Suresh, Srijha Kalyan, Rutuja Shah</string>
+    <string name="members">⦿ Eshwar Hebbur Shivakumar\n⦿ Rahul Suresh\n⦿ Rutuja Shah\n⦿ Srijha Kalyan</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
     <string name="channel_name">Notifcation Name</string>
@@ -30,5 +30,6 @@
     <string name="title_activity_tab_chat">TabChatActivity</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
+    <string name="location_pin">📍</string>
 
 </resources>
