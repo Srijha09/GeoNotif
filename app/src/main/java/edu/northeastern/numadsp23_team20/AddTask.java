@@ -18,8 +18,10 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -100,6 +102,16 @@ public class AddTask extends AppCompatActivity {
     public void onAddTaskSubmitButtonClick(View view) {
         String taskTitle = ((TextView) findViewById(R.id.AddTaskTitleValue)).getText().toString();
         String taskDescription = ((TextView) findViewById(R.id.AddTaskDescriptionValue)).getText().toString();
+
+        if (!validateTaskTitle(taskTitle)) {
+            return;
+        } else if (!validateTaskDescription(taskDescription)) {
+            return;
+        } else if (!validateLocation()) {
+            Toast.makeText(this, "Please choose a location", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         LocationItem location = new LocationItem(this.taskLocationName, this.taskLatitude, this.taskLongitude);
         Task task = new Task(taskTitle, taskDescription, location);
         TaskService taskService = new TaskService();
@@ -108,6 +120,31 @@ public class AddTask extends AppCompatActivity {
         returnIntent.putExtra("NewTask", true);
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
+    }
+
+    private boolean validateLocation() {
+        if (this.taskLocationName == null || this.taskLocationName.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateTaskTitle(String taskTitle) {
+        if (TextUtils.isEmpty(taskTitle)) {
+            ((TextView) findViewById(R.id.AddTaskTitleValue)).requestFocus();
+            ((TextView) findViewById(R.id.AddTaskTitleValue)).setError("Task Name is required");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateTaskDescription(String taskDescription) {
+        if (TextUtils.isEmpty(taskDescription)) {
+            ((TextView) findViewById(R.id.AddTaskDescriptionValue)).requestFocus();
+            ((TextView) findViewById(R.id.AddTaskDescriptionValue)).setError("Task Description is required");
+            return false;
+        }
+        return true;
     }
 
     private void getCurrentUserLocation() {
@@ -122,14 +159,14 @@ public class AddTask extends AppCompatActivity {
                     101);
         }
         fusedLocationClient.getLastLocation()
-            .addOnSuccessListener(this, location -> {
-                if (location != null) {
-                    this.currentUserLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
-                    this.taskLatitude = location.getLatitude();
-                    this.taskLongitude = location.getLongitude();
-                    this.configureMap();
-                }
-            });
+                .addOnSuccessListener(this, location -> {
+                    if (location != null) {
+                        this.currentUserLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
+                        this.taskLatitude = location.getLatitude();
+                        this.taskLongitude = location.getLongitude();
+                        this.configureMap();
+                    }
+                });
     }
 
     @SuppressLint("ClickableViewAccessibility")

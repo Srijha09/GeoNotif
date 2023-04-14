@@ -14,9 +14,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -55,20 +57,20 @@ public class EditTask extends AppCompatActivity {
         setContentView(R.layout.activity_edit_task);
 
         this.editTaskLocationValue = findViewById(R.id.EditTaskLocationValue);
-        // Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
+        Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
         this.addressSearchActivity = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                    Place place = Autocomplete.getPlaceFromIntent(result.getData());
-                    this.taskLocation = place.getName();
-                    this.taskLatitude = place.getLatLng().latitude;
-                    this.taskLongitude = place.getLatLng().longitude;
-                    setMapMarker(this.taskLatitude, this.taskLongitude);
-                    editTaskLocationValue.setText("\uD83D\uDCCD " + place.getName());
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        Place place = Autocomplete.getPlaceFromIntent(result.getData());
+                        this.taskLocation = place.getName();
+                        this.taskLatitude = place.getLatLng().latitude;
+                        this.taskLongitude = place.getLatLng().longitude;
+                        setMapMarker(this.taskLatitude, this.taskLongitude);
+                        editTaskLocationValue.setText("\uD83D\uDCCD " + place.getName());
 
+                    }
                 }
-            }
         );
 
         Context ctx = getApplicationContext();
@@ -106,21 +108,56 @@ public class EditTask extends AppCompatActivity {
         this.finish();
     }
 
+    private boolean validateLocation() {
+        if (this.taskLocation == null || this.taskLocation.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateTaskTitle() {
+        if (TextUtils.isEmpty(this.editTaskTitleValue.getText().toString())) {
+            ((TextView) findViewById(R.id.EditTaskTitleValue)).requestFocus();
+            ((TextView) findViewById(R.id.EditTaskTitleValue)).setError("Task Name is required");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateTaskDescription() {
+        if (TextUtils.isEmpty(this.editTaskDescriptionValue.getText().toString())) {
+            ((TextView) findViewById(R.id.EditTaskDescriptionValue)).requestFocus();
+            ((TextView) findViewById(R.id.EditTaskDescriptionValue)).setError("Task Description is required");
+            return false;
+        }
+        return true;
+    }
+
     public void onEditTaskSubmitButtonClick(View view) {
+
+        if (!validateTaskTitle()) {
+            return;
+        } else if (!validateTaskDescription()) {
+            return;
+        } else if (!validateLocation()) {
+            Toast.makeText(this, "Please choose a location", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         new AlertDialog.Builder(this)
-            .setMessage("Are you sure you want to edit this task?")
-            .setPositiveButton("CONFIRM", (dialogInterface, whichButton) -> {
-                LocationItem locationItem = new LocationItem(
-                        this.taskLocation, this.taskLatitude, this.taskLongitude
-                );
-                Task updatedTask = new Task(this.editTaskTitleValue.getText().toString(),
-                        this.editTaskDescriptionValue.getText().toString(), locationItem);
-                TaskService taskService = new TaskService();
-                taskService.editTask(this.task, updatedTask);
-                this.finish();
-            })
-            .setNegativeButton(android.R.string.no, null)
-            .show();
+                .setMessage("Are you sure you want to edit this task?")
+                .setPositiveButton("CONFIRM", (dialogInterface, whichButton) -> {
+                    LocationItem locationItem = new LocationItem(
+                            this.taskLocation, this.taskLatitude, this.taskLongitude
+                    );
+                    Task updatedTask = new Task(this.editTaskTitleValue.getText().toString(),
+                            this.editTaskDescriptionValue.getText().toString(), locationItem);
+                    TaskService taskService = new TaskService();
+                    taskService.editTask(this.task, updatedTask);
+                    this.finish();
+                })
+                .setNegativeButton(android.R.string.no, null)
+                .show();
     }
 
     @SuppressLint("ClickableViewAccessibility")
