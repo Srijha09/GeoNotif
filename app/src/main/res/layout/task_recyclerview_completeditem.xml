@@ -67,6 +67,7 @@
                 android:layout_height="wrap_content"
                 android:buttonTint="@color/primary"
                 android:checked="true"
+                android:clickable="false"
                 android:textAlignment="textEnd" />
         </LinearLayout>
 
