@@ -4,44 +4,72 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".GroupsFragment"
-    android:background="#D3D3D3">
+    android:background="#FFFFFF">
 
 
     <!-- TODO: Update blank fragment layout -->
 
-    <Button
-        style="?android:attr/borderlessButtonStyle"
-        android:id="@+id/groupStart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start a group"
-        android:textColor="@color/primary_highlight"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:titleTextColor="@android:color/white"
+        tools:layout_editor_absoluteX="-89dp">
+
+        <Button
+            android:id="@+id/groupStart"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start a group"
+            android:layout_marginStart="160dp"
+            android:layout_gravity="end"
+            android:textColor="@color/primary_highlight"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.appcompat.widget.Toolbar>
 
     <TextView
+        android:id="@+id/groups_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Groups"
-        android:textColor="@color/primary_highlight"
-        android:textSize="34dp"
-        app:layout_constraintBottom_toTopOf="@+id/recycler_view"
+        android:textColor="@color/primary_text"
+        android:textSize="24sp"
+        android:layout_marginTop="80dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.11"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.882" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="match_parent"
-        android:layout_height="545dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="5dp"
+        android:scrollbars="none"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.973"
-        tools:layout_editor_absoluteX="0dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/groups_txt"
+        app:layout_constraintVertical_bias="0.0">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp" />
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
