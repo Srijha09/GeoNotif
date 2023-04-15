@@ -42,8 +42,6 @@ public class HomePage extends AppCompatActivity {
             this.setFragment(this.getFragment(item.getTitle().toString()));
             return true;
         });
-//        Intent intent = new Intent(this, LocationService.class);
-//        startService(intent);
 
         if (savedInstanceState != null) {
             // Restore the previously selected fragment
@@ -61,7 +59,7 @@ public class HomePage extends AppCompatActivity {
     }
 
     private void setSettings() {
-        if (this.settings.getNotifSetting() == GeoNotif.ENABLE_NOTIF_SETTING) {
+        if (this.settings.getNotifSetting().equalsIgnoreCase(GeoNotif.ENABLE_NOTIF_SETTING)) {
             Intent intent = new Intent(this, LocationService.class);
             startService(intent);
         }
