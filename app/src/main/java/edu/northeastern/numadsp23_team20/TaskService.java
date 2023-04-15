@@ -2,16 +2,21 @@ package edu.northeastern.numadsp23_team20;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class TaskService {
 
@@ -34,19 +39,33 @@ public class TaskService {
 
     public void createTask(Task task) {
         String userId = this.firebaseUser.getUid();
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/locations");
+        UUID uuid = UUID.randomUUID();
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations");
         this.geoFire = new GeoFire(this.ref);
-        this.geoFire.setLocation(task.getTaskName(), new GeoLocation(
+        this.geoFire.setLocation(uuid.toString(), new GeoLocation(
                 task.getLocation().getLat(), task.getLocation().getLon()));
-
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/tasks/"
-                + task.getTaskName());
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + uuid.toString());
         this.ref.setValue(task);
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId);
+//        this.ref.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                User currentUser = snapshot.getValue(User.class);
+//                currentUser.addTask(uuid.toString());
+//                DatabaseReference r = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId);
+//                r.setValue(currentUser);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
     }
 
     public void readTasks() {
         String userId = this.firebaseUser.getUid();
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/tasks");
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Tasks");
         this.ref.get().addOnCompleteListener(tasks -> {
             if (!tasks.isSuccessful()) {
                 Log.e("firebase", "Error getting data", tasks.getException());
@@ -82,8 +101,7 @@ public class TaskService {
 
     public void editTask(Task task, Task updatedTask) {
         String userId = this.firebaseUser.getUid();
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/tasks/"
-                + task.getTaskName());
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + task.getTaskName());
         this.ref.setValue(updatedTask);
     }
 

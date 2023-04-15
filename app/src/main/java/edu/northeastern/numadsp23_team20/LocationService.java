@@ -63,7 +63,7 @@ public class LocationService extends Service {
         this.mAuth = FirebaseAuth.getInstance();
         this.firebaseUser = mAuth.getCurrentUser();
         String userId = this.firebaseUser.getUid();
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/locations");
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations");
         this.geoFire = new GeoFire(this.ref);
         ref.keepSynced(true);
         this.geoQuery = geoFire.queryAtLocation(new GeoLocation(0.0, 0.0), 0.3);
@@ -74,8 +74,7 @@ public class LocationService extends Service {
             @Override
             public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
 //                System.out.println("Key: " + dataSnapshot.getKey());
-                DatabaseReference taskRef = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId
-                        + "/tasks/" + dataSnapshot.getKey());
+                DatabaseReference taskRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + dataSnapshot.getKey());
                 taskRef.get().addOnCompleteListener(t -> {
                     if (!t.isSuccessful()) {
                         Log.e("firebase", "Error getting data", t.getException());
@@ -108,7 +107,7 @@ public class LocationService extends Service {
                                 }
                             }
                         }
-                        if(!task.getIsComplete())
+                        if (!task.getIsComplete())
                             sendNotification(task);
                     }
                 });
