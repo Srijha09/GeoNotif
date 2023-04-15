@@ -67,16 +67,16 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         this.configureMap();
         RecyclerView tasksRecyclerView = inflatedView.findViewById(R.id.TasksRecyclerView);
         this.taskService = new TaskService();
-        this.taskService.setTaskServiceListener(tasks -> {
-            this.taskList = tasks;
-            for (Task task: tasks) {
-                this.setMapMarker(task);
-            }
-            TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this);
-            tasksRecyclerView.setAdapter(taskListAdapter);
-            tasksRecyclerView.setHasFixedSize(true);
-            tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this.ctx));
-        });
+//        this.taskService.setTaskServiceListener(tasks -> {
+//            this.taskList = tasks;
+//            for (Task task: tasks) {
+//                this.setMapMarker(task);
+//            }
+//            TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this);
+//            tasksRecyclerView.setAdapter(taskListAdapter);
+//            tasksRecyclerView.setHasFixedSize(true);
+//            tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this.ctx));
+//        });
         this.taskService.readTasks();
         this.addTaskActivityLaunch = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),

@@ -57,6 +57,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
     public void onBindViewHolder(@NonNull TaskListViewHolder holder, int position) {
         Task task = this.taskList.get(position);
         holder.RVTaskTitle.setText(task.getTaskName());
+        holder.RVTaskType.setText(task.getTaskType());
         holder.RVTaskLocation.setText("\uD83D\uDCCD " + task.getLocation().getKey());
         System.out.println(task.getTaskName() + ":" + task.getIsComplete());
         holder.RVCheckBox.setChecked(task.getIsComplete());
@@ -81,12 +82,14 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
 
         private TextView RVTaskTitle;
         private TextView RVTaskLocation;
+        private TextView RVTaskType;
         public CheckBox RVCheckBox;
 
         public TaskListViewHolder(@NonNull View itemView) {
             super(itemView);
 
             this.RVTaskTitle = itemView.findViewById(R.id.RVTaskTitle);
+            this.RVTaskType = itemView.findViewById(R.id.RVTaskType);
             this.RVTaskLocation = itemView.findViewById(R.id.RVTaskLocation);
             this.RVCheckBox = itemView.findViewById(R.id.checkBox);
             itemView.setOnClickListener(this);

@@ -10,6 +10,8 @@ public class Task {
     private boolean isComplete;
     private String uuid;
 
+    private String taskType;
+
     public String getUuid() {
         return uuid;
     }
@@ -78,5 +80,13 @@ public class Task {
 
     public void setIsComplete(boolean complete) {
         isComplete = complete;
+    }
+
+    public String getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(String taskType) {
+        this.taskType = taskType;
     }
 }

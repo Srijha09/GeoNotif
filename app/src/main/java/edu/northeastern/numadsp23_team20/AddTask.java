@@ -5,6 +5,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -37,6 +39,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -53,12 +56,18 @@ public class AddTask extends AppCompatActivity {
     private Marker mapMarker;
     private ActivityResultLauncher<Intent> addressSearchActivity;
     private TextView addTaskLocationValue;
+    private TaskTypeListAdapter taskTypeListAdapter;
+    private OnTaskTypeAssigneeItemClickListener onTaskTypeAssigneeItemClickListener;
+    private TaskType taskType;
+    private String nonPersonalTaskTypeAssignee;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
+        this.taskType = TaskType.PERSONAL;
+        this.nonPersonalTaskTypeAssignee = "";
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
         this.map = findViewById(R.id.AddTaskMapView);
         this.mapMarker = new Marker(this.map);
@@ -92,6 +101,32 @@ public class AddTask extends AppCompatActivity {
         this.addressSearchActivity.launch(intent);
     }
 
+    public void onAddTaskTypePersonalRadioButtonClick(View view) {
+        RecyclerView addTaskTypeRecyclerViewContainer = findViewById(R.id.AddTaskTypeRecyclerViewContainer);
+        addTaskTypeRecyclerViewContainer.setVisibility(View.GONE);
+        this.taskType = TaskType.PERSONAL;
+        this.nonPersonalTaskTypeAssignee = "";
+    }
+
+    public void onAddTaskTypeGroupRadioButtonClick(View view) {
+        RecyclerView addTaskTypeRecyclerViewContainer = findViewById(R.id.AddTaskTypeRecyclerViewContainer);
+        addTaskTypeRecyclerViewContainer.setVisibility(View.VISIBLE);
+        this.taskType = TaskType.GROUP;
+        this.nonPersonalTaskTypeAssignee = "";
+        List<String> arrayList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            arrayList.add("RB " + i);
+        }
+        onTaskTypeAssigneeItemClickListener = assignee -> {
+            taskTypeListAdapter.notifyDataSetChanged();
+            nonPersonalTaskTypeAssignee = assignee;
+        };
+
+        addTaskTypeRecyclerViewContainer.setLayoutManager(new LinearLayoutManager(this));
+        taskTypeListAdapter = new TaskTypeListAdapter(arrayList, onTaskTypeAssigneeItemClickListener);
+        addTaskTypeRecyclerViewContainer.setAdapter(taskTypeListAdapter);
+    }
+
     public void onAddTaskCancelButtonClick(View view) {
         Intent returnIntent = new Intent();
         returnIntent.putExtra("NewTask", false);
@@ -114,6 +149,15 @@ public class AddTask extends AppCompatActivity {
 
         LocationItem location = new LocationItem(this.taskLocationName, this.taskLatitude, this.taskLongitude);
         Task task = new Task(taskTitle, taskDescription, location);
+
+        if (taskType == TaskType.PERSONAL) {
+            task.setTaskType("Personal task");
+        } else if (taskType == TaskType.GROUP) {
+            task.setTaskType("Group task: " + nonPersonalTaskTypeAssignee);
+        } else {
+            task.setTaskType("Friend task: " + nonPersonalTaskTypeAssignee);
+        }
+
         TaskService taskService = new TaskService();
         UUID uuid = UUID.randomUUID();
         task.setUuid(uuid.toString());
