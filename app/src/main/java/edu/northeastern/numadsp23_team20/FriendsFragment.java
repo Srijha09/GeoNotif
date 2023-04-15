@@ -1,6 +1,7 @@
 package edu.northeastern.numadsp23_team20;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.lifecycle.ViewModel;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -37,18 +39,30 @@ public class FriendsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        all_users = new ArrayList<>();
-        friends = new ArrayList<>();
+            all_users = new ArrayList<>();
+            friends = new ArrayList<>();
 
-        //get entries from the database
-        all_users.add(new FriendsData("Bob", "following"));
-        all_users.add(new FriendsData("Sally", "follow"));
-        all_users.add(new FriendsData("Alexa", "following"));
+            //get entries from the database. Below is dummy data
+            all_users.add(new FriendsData("Bob", "Follow"));
+            all_users.add(new FriendsData("Sally", "Follow"));
+            all_users.add(new FriendsData("Alexa", "Follow"));
 
-        friends.add(new FriendsData("Bob", "following"));
-        friends.add(new FriendsData("Alexa", "following"));
 
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Save the current tab position
+        outState.putInt("tab_position", mTabLayout.getSelectedTabPosition());
+
+        // Save the list of friends
+        outState.putParcelableArrayList("fall_users", all_users);
+
+        outState.putParcelableArrayList("friends", friends);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,6 +75,16 @@ public class FriendsFragment extends Fragment {
         MyPagerAdapter pagerAdapter = new MyPagerAdapter(getChildFragmentManager());
         mViewPager.setAdapter(pagerAdapter);
         mTabLayout.setupWithViewPager(mViewPager);
+
+        // Check if the saved instance state is not null
+        if (savedInstanceState != null) {
+            // Restore the tab position
+            int tabPosition = savedInstanceState.getInt("tab_position");
+            mTabLayout.getTabAt(tabPosition).select();
+            all_users = savedInstanceState.getParcelableArrayList("all_users");
+            friends = savedInstanceState.getParcelableArrayList("friends");
+        }
+
 
         return view;
 
@@ -78,6 +102,12 @@ public class FriendsFragment extends Fragment {
         public int getCount() {
             return tabTitles.length;
         }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
+
 
         @Override
         public Fragment getItem(int position) {
@@ -137,6 +167,12 @@ public class FriendsFragment extends Fragment {
             recyclerView.setAdapter(adapter_all_users);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+            // Check if the saved instance state is not null
+            if (savedInstanceState != null) {
+                all_users = savedInstanceState.getParcelableArrayList("all_users");
+                adapter_all_users.notifyDataSetChanged();
+            }
+
             return view;
         }
     }
@@ -171,13 +207,21 @@ public class FriendsFragment extends Fragment {
             View view = inflater.inflate(R.layout.activity_fragment_tab2, container, false);
 
 
+
             recyclerView = view.findViewById(R.id.recycler_view);
             adapter_friends = new FriendsRecyclerView(friends, listener);
             recyclerView.setAdapter(adapter_friends);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+            // Check if the saved instance state is not null
+            if (savedInstanceState != null) {
+                friends = savedInstanceState.getParcelableArrayList("friends");
+                adapter_friends.notifyDataSetChanged();
+            }
+
             return view;
         }
     }
+
 
 }

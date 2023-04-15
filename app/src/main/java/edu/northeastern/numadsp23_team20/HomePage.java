@@ -3,6 +3,7 @@ package edu.northeastern.numadsp23_team20;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
 import android.content.Intent;
@@ -18,6 +19,9 @@ public class HomePage extends AppCompatActivity {
     private Fragment groupsFragment;
     private Fragment friendsFragment;
     private Fragment profileFragment;
+
+    private static final String FRAGMENT_TAG = "my_fragment_tag";
+    private String currentFragmentTag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +40,27 @@ public class HomePage extends AppCompatActivity {
         });
         Intent intent = new Intent(this, LocationService.class);
         startService(intent);
+
+        if (savedInstanceState != null) {
+            // Restore the previously selected fragment
+            currentFragmentTag = savedInstanceState.getString(FRAGMENT_TAG);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            Fragment fragment = fragmentManager.findFragmentByTag(currentFragmentTag);
+            if (fragment != null) {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.BottomNavigationMenu, fragment, currentFragmentTag)
+                        .commit();
+            }
+        }
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Save the tag of the current fragment
+        outState.putString(FRAGMENT_TAG, currentFragmentTag);
+    }
+
 
     private void checkLocationPermissions() {
         boolean noFineLocationAccess = ActivityCompat.checkSelfPermission(this,

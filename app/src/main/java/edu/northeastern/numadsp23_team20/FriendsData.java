@@ -1,24 +1,39 @@
 package edu.northeastern.numadsp23_team20;
 
-public class FriendsData {
+import android.os.Parcel;
+import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
 
+public class FriendsData implements Parcelable {
+
+    //private String imageUrl;
     private String userName;
     private String buttonDetails;
 
     //intialize the variables of our link object.
     public FriendsData(String userName, String buttonDetails) {
+        //this.imageUrl = imageURL;
         this.userName = userName;
         this.buttonDetails = buttonDetails;
     }
 
-    //when the unit is clicked, do something.
-    /**
-    public void onLinkUnitClicked(Context context) {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(linkUrl));
-        context.startActivity(browserIntent);
+    protected FriendsData(Parcel in) {
+        userName = in.readString();
+        buttonDetails = in.readString();
     }
-     **/
+
+    public static final Creator<FriendsData> CREATOR = new Creator<FriendsData>() {
+        @Override
+        public FriendsData createFromParcel(Parcel in) {
+            return new FriendsData(in);
+        }
+
+        @Override
+        public FriendsData[] newArray(int size) {
+            return new FriendsData[size];
+        }
+    };
 
     //getters
     public String getUserName() {
@@ -30,11 +45,24 @@ public class FriendsData {
     }
 
     //setters
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
     public void setButtonDetails(String buttonDetails) {
         this.buttonDetails = buttonDetails;
+    }
+
+    /*
+    public String getImageUrl() {
+        return imageUrl;
+    }
+     */
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel parcel, int i) {
+        parcel.writeString(userName);
+        parcel.writeString(buttonDetails);
     }
 }

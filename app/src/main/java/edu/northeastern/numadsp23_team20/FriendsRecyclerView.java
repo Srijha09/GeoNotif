@@ -4,10 +4,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.squareup.picasso.Picasso;
 
 import java.text.BreakIterator;
 import java.util.List;
@@ -50,6 +54,14 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
         holder.button.setText(data.getButtonDetails());
 
 
+        // Load the image into the ImageView using Glide
+        //Glide.with(holder.itemView.getContext())
+        //.load(data.getImageUrl())
+        //.into(holder.photoImageView);
+        //Picasso.get().load(data.getImageUrl()).into(holder.photoImageView);
+
+
+
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -64,12 +76,15 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
 
     // Provide a reference to the views for each data item
     public class ViewHolder extends RecyclerView.ViewHolder {
+        //public ImageView photoImageView;
         public TextView userName;
 
         public Button button;
 
         public ViewHolder(View view, OnButtonClickListener listener) {
             super(view);
+
+            //photoImageView = itemView.findViewById(R.id.photo_of_user);
             userName = view.findViewById(R.id.name_of_person);
             button = view.findViewById(R.id.follow_button);
 
