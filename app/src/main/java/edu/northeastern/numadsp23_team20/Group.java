@@ -4,12 +4,21 @@ import java.util.List;
 
 public class Group {
 
+    private String uuid;
     private String groupName;
     private List<String> groupParticipants;
 
     public Group(String groupName, List<String> groupParticipants) {
         this.groupName = groupName;
         this.groupParticipants = groupParticipants;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getGroupName() {
