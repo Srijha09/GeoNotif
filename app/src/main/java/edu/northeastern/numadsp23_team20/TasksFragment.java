@@ -135,7 +135,6 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
 
     @Override
     public void onTaskItemClick(int position) {
-        System.out.println("Clicked " + position);
         Task task = this.taskList.get(position);
         Intent intent = new Intent(getContext(), TaskView.class);
         intent.putExtra("taskTitle", task.getTaskName());

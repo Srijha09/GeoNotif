@@ -63,7 +63,6 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
 
         holder.RVCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             task.setIsComplete(isChecked);
-            System.out.println(task.getTaskName());
             notifyItemChanged(position);
             this.taskService.createTask(task);
         });
