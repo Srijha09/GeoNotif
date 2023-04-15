@@ -57,8 +57,9 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
         RecyclerView tasksRecyclerView = inflatedView.findViewById(R.id.TasksRecyclerView);
         this.taskService = new TaskService();
         this.taskService.setTaskServiceListener(tasks -> {
+            System.out.println("tasks" + tasks);
             this.taskList = tasks;
-            for (Task task: tasks) {
+            for (Task task : tasks) {
                 this.setMapMarker(task);
             }
             TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this);
@@ -68,16 +69,16 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
         });
         this.taskService.readTasks();
         this.addTaskActivityLaunch = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    Intent data = result.getData();
-                    Bundle intentExtras = data.getExtras();
-                    if (intentExtras.getBoolean("NewTask")) {
-                        this.taskService.readTasks();
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        Bundle intentExtras = data.getExtras();
+                        if (intentExtras.getBoolean("NewTask")) {
+                            this.taskService.readTasks();
+                        }
                     }
-                }
-            });
+                });
         inflatedView.findViewById(R.id.AddTaskButton).setOnClickListener(this::onAddTaskButtonClick);
         return inflatedView;
     }
@@ -97,7 +98,8 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
 
     private Marker getCustomizedMapMarker() {
         Marker mapMarker = new Marker(this.map);
-        Drawable pin_drawable = ResourcesCompat.getDrawable(this.ctx.getResources(), R.drawable.pin, null);;
+        Drawable pin_drawable = ResourcesCompat.getDrawable(this.ctx.getResources(), R.drawable.pin, null);
+        ;
         Bitmap bitmap = ((BitmapDrawable) pin_drawable).getBitmap();
         Drawable dr = new BitmapDrawable(this.ctx.getResources(), Bitmap.createScaledBitmap(bitmap,
                 (int) (18.0f * this.ctx.getResources().getDisplayMetrics().density),

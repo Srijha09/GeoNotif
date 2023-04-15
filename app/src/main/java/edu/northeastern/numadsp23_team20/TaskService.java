@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -111,8 +112,29 @@ public class TaskService {
 //                taskServiceListener.onTasksLoaded(tasksList);
 //            }
 //        });
-//        List<Task> tasksList = new ArrayList<>();
-//        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Tasks");
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Tasks");
+        this.ref.get().addOnCompleteListener(tasks -> {
+            if (!tasks.isSuccessful()) {
+                Log.e("firebase", "Error getting data", tasks.getException());
+            } else {
+                System.out.println(tasks.getResult().getValue());
+                List<Task> tasksList = new ArrayList<>();
+                for (DataSnapshot item : tasks.getResult().getChildren()) {
+                    String taskUUID = item.getValue().toString();
+                    DatabaseReference readRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + taskUUID);
+                    readRef.get().addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
+                            Log.e("firebase", "Error getting data", task.getException());
+                        } else {
+                            Task t = task.getResult().getValue(Task.class);
+                            System.out.println(t.toString());
+                            tasksList.add(t);
+                        }
+                    });
+                }
+                taskServiceListener.onTasksLoaded(tasksList);
+            }
+        });
 //        this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
 //            @Override
 //            public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -138,6 +160,8 @@ public class TaskService {
 //                            }
 //                        });
 //                    }
+//                    System.out.println(tasksList.size());
+//                    taskServiceListener.onTasksLoaded(tasksList);
 //                }
 //            }
 //
@@ -146,8 +170,6 @@ public class TaskService {
 //
 //            }
 //        });
-//        System.out.println(tasksList.size());
-//        taskServiceListener.onTasksLoaded(tasksList);
     }
 
     public void editTask(Task task, Task updatedTask) {
