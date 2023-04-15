@@ -2,6 +2,7 @@ package edu.northeastern.numadsp23_team20;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,16 +42,19 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Groups group = groupsList.get(position);
-        holder.groupname.setText(group.getUsername());
+        holder.groupname.setText(group.getGroupname());
         if(group.getImageURL().equals("default")){
             holder.groupImage.setImageResource(R.drawable.groups);
         }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TasksFragment tasksFragment = new TasksFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("groupName", group.getGroupname());
+                GroupTasksFragment grouptasksFragment = new GroupTasksFragment();
+                grouptasksFragment.setArguments(bundle);
                 FragmentTransaction transaction = ((FragmentActivity) context).getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.FrameLayout, tasksFragment);
+                transaction.replace(R.id.FrameLayout, grouptasksFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();
             }

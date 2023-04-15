@@ -12,7 +12,7 @@ public class Groups implements ItemClickListener{
     }
 
 
-    public String getUsername(){
+    public String getGroupname(){
         return groupname;
     }
     public String getImageURL(){
