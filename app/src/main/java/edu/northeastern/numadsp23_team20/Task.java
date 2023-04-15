@@ -8,6 +8,15 @@ public class Task {
     private String description;
     private LocationItem location;
     private boolean isComplete;
+    private String uuid;
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     public Task() {
         //default constructor

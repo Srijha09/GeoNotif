@@ -57,8 +57,9 @@ public class SignupActivity extends AppCompatActivity {
             mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener
                     (task -> {
                         if (task.isSuccessful()) {
-                            User data = new User(fullName, username, email);
-                            FirebaseDatabase.getInstance().getReference("GeoNotif")
+                            String uid = task.getResult().getUser().getUid();
+                            User data = new User(fullName, username, email, uid);
+                            FirebaseDatabase.getInstance().getReference("GeoNotif/Users")
                                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(data).
                                     addOnCompleteListener(task1 -> {
                                         Intent intent = new Intent(SignupActivity.this, HomePage.class);
@@ -67,7 +68,11 @@ public class SignupActivity extends AppCompatActivity {
                                     });
                         } else {
                             System.out.println(task.getException().getLocalizedMessage());
-                            Toast.makeText(SignupActivity.this, "Check Email or Password", Toast.LENGTH_SHORT).show();
+                            if (task.getException().getLocalizedMessage().equals("The email address is already in use by another account.")) {
+                                emailEditText.setError("Email is already in use.");
+                            } else {
+                                Toast.makeText(SignupActivity.this, "Check Email or Password", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     });
         });

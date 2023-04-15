@@ -120,6 +120,8 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
             intent.putExtra("taskLocation", task.getLocation().getKey());
             intent.putExtra("taskLatitude", task.getLocation().getLat());
             intent.putExtra("taskLongitude", task.getLocation().getLon());
+            intent.putExtra("taskComplete", task.getIsComplete());
+            intent.putExtra("taskUUID", task.getUuid());
             startActivity(intent);
             return true;
         });
@@ -136,6 +138,8 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
         intent.putExtra("taskLocation", task.getLocation().getKey());
         intent.putExtra("taskLatitude", task.getLocation().getLat());
         intent.putExtra("taskLongitude", task.getLocation().getLon());
+        intent.putExtra("taskComplete", task.getIsComplete());
+        intent.putExtra("taskUUID", task.getUuid());
         startActivity(intent);
     }
 }
