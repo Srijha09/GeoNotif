@@ -28,6 +28,14 @@ public class Task {
         this.location = location;
     }
 
+    public Task(String taskName, String description, LocationItem location, String uuid, boolean isComplete) {
+        this.taskName = taskName;
+        this.description = description;
+        this.location = location;
+        this.uuid = uuid;
+        this.isComplete = isComplete;
+    }
+
     public String getTaskName() {
         return taskName;
     }
@@ -57,7 +65,8 @@ public class Task {
     public String toString() {
         if (this.getLocation() != null)
             return "Task [taskName=" + getTaskName() + ", description=" + getDescription()
-                    + ", location()=" + getLocation().toString() + "]";
+                    + ", location()=" + getLocation().toString()
+                    + ", uuid=" + getUuid() + ", isComplete=" + getIsComplete() + "]";
         else
             return "Task [taskName=" + getTaskName() + ", description=" + getDescription()
                     + "]";

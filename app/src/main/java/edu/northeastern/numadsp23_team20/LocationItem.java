@@ -38,6 +38,9 @@ public class LocationItem {
         this.lon = lon;
     }
 
+    LocationItem() {
+    }
+
     @NonNull
     @Override
     public String toString() {
