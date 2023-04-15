@@ -29,6 +29,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TasksFragment extends Fragment implements OnTaskItemClickListener {
@@ -55,17 +56,19 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
         this.mapController = this.map.getController();
         this.configureMap();
         RecyclerView tasksRecyclerView = inflatedView.findViewById(R.id.TasksRecyclerView);
+        this.taskList = new ArrayList<>();
         this.taskService = new TaskService();
-        this.taskService.setTaskServiceListener(tasks -> {
-            System.out.println("tasks" + tasks);
-            this.taskList = tasks;
-            for (Task task : tasks) {
-                this.setMapMarker(task);
+        TaskListAdapter taskListAdapter = new TaskListAdapter(this.taskList, this);
+        tasksRecyclerView.setAdapter(taskListAdapter);
+        tasksRecyclerView.setHasFixedSize(true);
+        tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this.ctx));
+        this.taskService.setTaskServiceListener(new TaskService.TaskServiceListener() {
+            @Override
+            public void onTaskLoaded(Task task) {
+                setMapMarker(task);
+                taskList.add(task);
+                taskListAdapter.notifyDataSetChanged();
             }
-            TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this);
-            tasksRecyclerView.setAdapter(taskListAdapter);
-            tasksRecyclerView.setHasFixedSize(true);
-            tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this.ctx));
         });
         this.taskService.readTasks();
         this.addTaskActivityLaunch = registerForActivityResult(
@@ -91,7 +94,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
     @SuppressLint("ClickableViewAccessibility")
     private void configureMap() {
         this.map.setTileSource(TileSourceFactory.MAPNIK);
-        this.mapController.setZoom(16);
+        this.mapController.setZoom(3);
         this.map.setMultiTouchControls(true);
         this.map.setClickable(true);
     }

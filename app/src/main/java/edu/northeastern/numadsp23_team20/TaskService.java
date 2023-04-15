@@ -118,7 +118,6 @@ public class TaskService {
                 Log.e("firebase", "Error getting data", tasks.getException());
             } else {
                 System.out.println(tasks.getResult().getValue());
-                List<Task> tasksList = new ArrayList<>();
                 for (DataSnapshot item : tasks.getResult().getChildren()) {
                     String taskUUID = item.getValue().toString();
                     DatabaseReference readRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + taskUUID);
@@ -127,12 +126,10 @@ public class TaskService {
                             Log.e("firebase", "Error getting data", task.getException());
                         } else {
                             Task t = task.getResult().getValue(Task.class);
-                            System.out.println(t.toString());
-                            tasksList.add(t);
+                            taskServiceListener.onTaskLoaded(t);
                         }
                     });
                 }
-                taskServiceListener.onTasksLoaded(tasksList);
             }
         });
 //        this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
@@ -193,6 +190,6 @@ public class TaskService {
     }
 
     public interface TaskServiceListener {
-        void onTasksLoaded(List<Task> tasks);
+        void onTaskLoaded(Task task);
     }
 }
