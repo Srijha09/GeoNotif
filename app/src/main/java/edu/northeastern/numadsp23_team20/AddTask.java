@@ -63,18 +63,26 @@ public class AddTask extends AppCompatActivity {
     private GroupService groupService;
     private GroupService.GroupServiceListener groupServiceListener;
     private List<String> groupsList;
+    private RecyclerView addTaskTypeRecyclerViewContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
+        this.addTaskTypeRecyclerViewContainer = findViewById(R.id.AddTaskTypeRecyclerViewContainer);
+        groupsList = new ArrayList<>();
+        onTaskTypeAssigneeItemClickListener = assignee -> {
+            taskTypeListAdapter.notifyDataSetChanged();
+            nonPersonalTaskTypeAssignee = assignee;
+        };
+        this.addTaskTypeRecyclerViewContainer.setLayoutManager(new LinearLayoutManager(this));
+        taskTypeListAdapter = new TaskTypeListAdapter(this.groupsList, onTaskTypeAssigneeItemClickListener);
+        addTaskTypeRecyclerViewContainer.setAdapter(taskTypeListAdapter);
         this.groupService = new GroupService();
-        this.groupService.setGroupServiceListener(new GroupService.GroupServiceListener() {
-            @Override
-            public void onUserGroupsLoaded(List<String> groups) {
-                groupsList = groups;
-            }
+        this.groupService.setGroupServiceListener(group -> {
+            groupsList.add(group);
+            taskTypeListAdapter.notifyDataSetChanged();
         });
         this.groupService.readGroupsForUser();
         this.taskType = TaskType.PERSONAL;
@@ -113,24 +121,15 @@ public class AddTask extends AppCompatActivity {
     }
 
     public void onAddTaskTypePersonalRadioButtonClick(View view) {
-        RecyclerView addTaskTypeRecyclerViewContainer = findViewById(R.id.AddTaskTypeRecyclerViewContainer);
         addTaskTypeRecyclerViewContainer.setVisibility(View.GONE);
         this.taskType = TaskType.PERSONAL;
         this.nonPersonalTaskTypeAssignee = "";
     }
 
     public void onAddTaskTypeGroupRadioButtonClick(View view) {
-        RecyclerView addTaskTypeRecyclerViewContainer = findViewById(R.id.AddTaskTypeRecyclerViewContainer);
         addTaskTypeRecyclerViewContainer.setVisibility(View.VISIBLE);
         this.taskType = TaskType.GROUP;
         this.nonPersonalTaskTypeAssignee = "";
-        onTaskTypeAssigneeItemClickListener = assignee -> {
-            taskTypeListAdapter.notifyDataSetChanged();
-            nonPersonalTaskTypeAssignee = assignee;
-        };
-        addTaskTypeRecyclerViewContainer.setLayoutManager(new LinearLayoutManager(this));
-        taskTypeListAdapter = new TaskTypeListAdapter(this.groupsList, onTaskTypeAssigneeItemClickListener);
-        addTaskTypeRecyclerViewContainer.setAdapter(taskTypeListAdapter);
     }
 
     public void onAddTaskCancelButtonClick(View view) {

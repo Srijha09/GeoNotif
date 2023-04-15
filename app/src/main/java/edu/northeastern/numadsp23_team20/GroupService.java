@@ -106,12 +106,26 @@ public class GroupService {
                 Log.e("firebase", "Error getting data", userGroups.getException());
             } else {
                 List<String> groupUUIDs = (List<String>) userGroups.getResult().getValue();
-                groupServiceListener.onUserGroupsLoaded(groupUUIDs);
+                for (String groupUUID: groupUUIDs) {
+                    DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference(
+                            "GeoNotif/Groups/" + groupUUID);
+                    groupRef.get().addOnCompleteListener(group -> {
+                        if (!group.isSuccessful()) {
+                            Log.e("firebase", "Error getting data", group.getException());
+                        } else {
+                            for (DataSnapshot groupDetails : group.getResult().getChildren()) {
+                                if (groupDetails.getKey().equals("groupName")) {
+                                    groupServiceListener.onUserGroupLoaded(groupDetails.getValue().toString());
+                                }
+                            }
+                        }
+                    });
+                }
             }
         });
     }
 
     public interface GroupServiceListener {
-        void onUserGroupsLoaded(List<String> groups);
+        void onUserGroupLoaded(String group);
     }
 }
