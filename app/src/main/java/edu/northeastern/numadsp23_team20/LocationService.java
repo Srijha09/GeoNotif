@@ -182,11 +182,10 @@ public class LocationService extends Service {
 
         @Override
         public void onProviderEnabled(String provider) {
-      }
+        }
 
         @Override
         public void onProviderDisabled(String provider) {
-//            System.out.println("LocationService" + "Provider disabled: " + provider);
         }
     };
 
