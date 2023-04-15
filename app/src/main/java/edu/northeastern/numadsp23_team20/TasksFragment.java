@@ -31,6 +31,7 @@ import org.osmdroid.views.overlay.Marker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class TasksFragment extends Fragment implements OnTaskItemClickListener {
 
@@ -82,6 +83,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
                         }
                     }
                 });
+
         inflatedView.findViewById(R.id.AddTaskButton).setOnClickListener(this::onAddTaskButtonClick);
         return inflatedView;
     }
@@ -89,6 +91,23 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
     public void onAddTaskButtonClick(View view) {
         Intent intent = new Intent(getContext(), AddTask.class);
         this.addTaskActivityLaunch.launch(intent);
+
+        // Reference to create group and add task to group
+
+//        GroupService groupService = new GroupService();
+//        List<String> groupParticipants = new ArrayList<>();
+//        groupParticipants.add("0807XrhHnbYCitusNryNuiFhaRB2");
+//        groupParticipants.add("MCusNMtwr7hNW7e5xg6Un4tEpfu2");
+//        Group group = new Group("Group 1", groupParticipants);
+//        UUID groupUuid = UUID.randomUUID();
+//        group.setUuid(groupUuid.toString());
+//        groupService.createGroup(group);
+//        LocationItem locationItem = new LocationItem("Fenway park", 42.3467, -71.0972);
+//        Task task = new Task("Fenway test task", "Fenway test task description",
+//                locationItem);
+//        UUID taskUuid = UUID.randomUUID();
+//        task.setUuid(taskUuid.toString());
+//        groupService.addTaskToGroup(groupUuid.toString(), task);
     }
 
     @SuppressLint("ClickableViewAccessibility")
