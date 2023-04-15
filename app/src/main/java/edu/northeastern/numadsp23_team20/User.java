@@ -60,7 +60,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "Task [Fullname=" + getFullname() + ", username=" + getUsername()
+        return "User [Fullname=" + getFullname() + ", username=" + getUsername()
                 + ", email=" + getEmailId() + ", uid=" + getUid() + "]";
     }
 }

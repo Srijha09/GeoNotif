@@ -11,10 +11,12 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -23,13 +25,18 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -45,6 +52,7 @@ public class ProfileFragment extends Fragment {
 
     View view;
     Button logoutButton;
+    private EditText fullNameEditText, emailEditText;
 
     ImageView profileImage;
     FloatingActionButton fab;
@@ -64,23 +72,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_profile, container, false);
-        StorageReference pathReference = storageRef.child("profileImages/" + firebaseUser.getUid() + "/profile.jpg");
-        profileImage = view.findViewById(R.id.imgProfile);
         fab = view.findViewById(R.id.fab_add_photo);
-        pathReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri downloadUrl) {
-                if (ProfileFragment.super.getContext() == null) {
-                } else {
-                    Glide.with(ProfileFragment.super.getContext())
-                            .load(downloadUrl)
-                            .circleCrop()
-                            .into(profileImage);
-                }
-            }
-        });
-
-
         fab.setOnClickListener(v -> ImagePicker.with(this)
                 .galleryOnly()
                 .cropSquare()
@@ -95,6 +87,33 @@ public class ProfileFragment extends Fragment {
             this.startActivity(intent);
         });
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        StorageReference pathReference = storageRef.child("profileImages/" + firebaseUser.getUid() + "/profile.jpg");
+        profileImage = view.findViewById(R.id.imgProfile);
+        fullNameEditText = view.findViewById(R.id.fullnameTextBox);
+        emailEditText = view.findViewById(R.id.emailTextBox);
+        System.out.println(emailEditText);
+        DatabaseReference mDatabase;
+        mDatabase = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + firebaseUser.getUid());
+        mDatabase.get().addOnSuccessListener(dataSnapshot -> {
+            User user = dataSnapshot.getValue(User.class);
+            emailEditText.setText(firebaseUser.getEmail());
+            fullNameEditText.setText(user.getFullname());
+        });
+
+        pathReference.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
+            if (ProfileFragment.super.getContext() == null) {
+            } else {
+                Glide.with(ProfileFragment.super.getContext())
+                        .load(downloadUrl)
+                        .circleCrop()
+                        .into(profileImage);
+            }
+        });
     }
 
     @Override
