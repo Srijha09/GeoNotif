@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -23,10 +24,13 @@ public class HomePage extends AppCompatActivity {
     private static final String FRAGMENT_TAG = "my_fragment_tag";
     private String currentFragmentTag;
 
+    private GeoNotif settings;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
+        this.settings = (GeoNotif) getApplication();
         this.checkLocationPermissions();
         this.tasksFragment = new TasksFragment();
         this.groupsFragment = new GroupsFragment();
@@ -38,8 +42,8 @@ public class HomePage extends AppCompatActivity {
             this.setFragment(this.getFragment(item.getTitle().toString()));
             return true;
         });
-        Intent intent = new Intent(this, LocationService.class);
-        startService(intent);
+//        Intent intent = new Intent(this, LocationService.class);
+//        startService(intent);
 
         if (savedInstanceState != null) {
             // Restore the previously selected fragment
@@ -52,6 +56,21 @@ public class HomePage extends AppCompatActivity {
                         .commit();
             }
         }
+        loadSharedPreferences();
+        setSettings();
+    }
+
+    private void setSettings() {
+        if (this.settings.getNotifSetting() == GeoNotif.ENABLE_NOTIF_SETTING) {
+            Intent intent = new Intent(this, LocationService.class);
+            startService(intent);
+        }
+    }
+
+    private void loadSharedPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences(GeoNotif.PREFERENCES, MODE_PRIVATE);
+        String notifSetting = sharedPreferences.getString(GeoNotif.NOTIF_SETTING, GeoNotif.ENABLE_NOTIF_SETTING);
+        this.settings.setNotifSetting(notifSetting);
     }
 
     @Override
