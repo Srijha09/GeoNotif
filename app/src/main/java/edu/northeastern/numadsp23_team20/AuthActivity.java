@@ -1,5 +1,4 @@
 package edu.northeastern.numadsp23_team20;
-
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;

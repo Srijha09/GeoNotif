@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -46,10 +48,11 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, TasksFragment.class);
-                //intent.putExtra("username", chat.getUsername());
-                //intent.putExtra("grouptasks", GroupsAdapter.this.currentGroup);
-                context.startActivity(intent);
+                TasksFragment tasksFragment = new TasksFragment();
+                FragmentTransaction transaction = ((FragmentActivity) context).getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.FrameLayout, tasksFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
             }
         });
     }

@@ -3,6 +3,7 @@ package edu.northeastern.numadsp23_team20;
 import static android.text.TextUtils.isEmpty;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -64,6 +66,39 @@ public class GroupsFragment extends Fragment {
                 addDialogBox();
             }
         });
+        //deleting a group when swiped left
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getLayoutPosition();
+                // Create and show the alert dialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                builder.setMessage("Are you sure you want to delete this group?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        groupsList.remove(position);
+                        groupsAdapter.notifyItemRemoved(position);
+                        dialogInterface.dismiss();
+                    }
+                });
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        groupsAdapter.notifyItemChanged(position);
+                        dialogInterface.dismiss();
+                    }
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+            }
+        });
+        itemTouchHelper.attachToRecyclerView(recyclerView);
         //openGroupTask();
         return view;
     }
@@ -76,18 +111,13 @@ public class GroupsFragment extends Fragment {
         View view=getLayoutInflater().inflate(R.layout.activity_createa_group_dialog, null);
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
         alertDialog.setView(view);
+        Button saveButton = view.findViewById(R.id.donebttn);
+        Button cancelButton = view.findViewById(R.id.cancelbttn);
         EditText group_name = view.findViewById(R.id.editgroupname);
         ImageView image_url = view.findViewById(R.id.groupimage);
-        alertDialog.setPositiveButton("Save", (dialogInterface, i) -> {
-
-        });
-        alertDialog.setNegativeButton("Cancel", (dialogInterface, i) -> {
-            // do something when the negative button is clicked
-            dialogInterface.dismiss();
-        });
         AlertDialog alert = alertDialog.create();
         alert.show();
-        alert.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view1 -> {
+        saveButton.setOnClickListener(view1 -> {
             if(!isEmpty(group_name.getText().toString()) && !isEmpty(image_url.toString())){
                 String groupname = group_name.getText().toString();
                 String imageurl = image_url.toString();
@@ -101,6 +131,14 @@ public class GroupsFragment extends Fragment {
             }
 
         });
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alert.dismiss();
+            }
+        });
+
+        alert.show();
 
 
     }

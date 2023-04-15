@@ -20,6 +20,18 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
     private OnTaskItemClickListener onTaskItemClickListener;
     private TaskService taskService;
 
+    private static final int LAYOUT_ONE = 0;
+    private static final int LAYOUT_TWO = 1;
+
+    @Override
+    public int getItemViewType(int position) {
+        Task task = this.taskList.get(position);
+        if (task.getIsComplete())
+            return LAYOUT_ONE;
+        else
+            return LAYOUT_TWO;
+    }
+
     public TaskListAdapter(List<Task> taskList, OnTaskItemClickListener onTaskItemClickListener) {
         this.taskList = taskList;
         this.onTaskItemClickListener = onTaskItemClickListener;
@@ -31,8 +43,14 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
     public TaskListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View taskRecyclerView = inflater.inflate(R.layout.task_recyclerview_item, parent, false);
-        return new TaskListViewHolder(taskRecyclerView);
+        View view;
+
+        if (viewType == LAYOUT_ONE) {
+            view = inflater.inflate(R.layout.task_recyclerview_completeditem, parent, false);
+        } else {
+            view = inflater.inflate(R.layout.task_recyclerview_item, parent, false);
+        }
+        return new TaskListViewHolder(view);
     }
 
     @Override
@@ -44,7 +62,6 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
         holder.RVCheckBox.setChecked(task.getIsComplete());
 
         holder.RVCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            //set your object's last status
             task.setIsComplete(isChecked);
             System.out.println(task.getTaskName());
             notifyItemChanged(position);

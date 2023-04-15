@@ -14,7 +14,11 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -28,6 +32,8 @@ public class TaskView extends AppCompatActivity {
 
     MapView map;
     String taskName;
+    Button markComplete;
+    String uuid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +43,19 @@ public class TaskView extends AppCompatActivity {
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         this.map = findViewById(R.id.MapView);
         this.customizeMap();
+        this.markComplete = findViewById(R.id.TaskDetailsCompleteButton);
 
         Intent intent = getIntent();
         this.taskName = intent.getExtras().getString("taskTitle");
+        this.uuid = intent.getExtras().getString("taskUUID");
         ((TextView) findViewById(R.id.TaskTitleTextView)).setText(intent.getExtras().getString("taskTitle"));
         ((TextView) findViewById(R.id.TaskDetailsDescription)).setText(intent.getExtras().getString("taskDescription"));
         ((TextView) findViewById(R.id.TaskDetailsLocation)).setText("\uD83D\uDCCD " + intent.getExtras().getString("taskLocation"));
+
+        if (intent.getExtras().getBoolean("taskComplete")) {
+            ViewGroup layout = (ViewGroup) this.markComplete.getParent();
+            layout.removeView(this.markComplete);
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -99,15 +112,15 @@ public class TaskView extends AppCompatActivity {
 
     public void onTaskDeleteFloatingButtonClick(View view) {
         new AlertDialog.Builder(this)
-            .setTitle("Warning")
-            .setMessage("Are you sure you want to delete this task?")
-            .setIcon(R.drawable.warning)
-            .setPositiveButton("CONFIRM", (dialogInterface, whichButton) -> {
-                TaskService taskService = new TaskService();
-                taskService.deleteTask(this.taskName);
-                this.finish();
-            })
-            .setNegativeButton(android.R.string.no, null)
-            .show();
+                .setTitle("Warning")
+                .setMessage("Are you sure you want to delete this task?")
+                .setIcon(R.drawable.warning)
+                .setPositiveButton("CONFIRM", (dialogInterface, whichButton) -> {
+                    TaskService taskService = new TaskService();
+                    taskService.deleteTask(this.uuid);
+                    this.finish();
+                })
+                .setNegativeButton(android.R.string.no, null)
+                .show();
     }
 }

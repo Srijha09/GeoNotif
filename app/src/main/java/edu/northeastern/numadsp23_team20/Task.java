@@ -8,6 +8,15 @@ public class Task {
     private String description;
     private LocationItem location;
     private boolean isComplete;
+    private String uuid;
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     public Task() {
         //default constructor
@@ -17,6 +26,14 @@ public class Task {
         this.taskName = taskName;
         this.description = description;
         this.location = location;
+    }
+
+    public Task(String taskName, String description, LocationItem location, String uuid, boolean isComplete) {
+        this.taskName = taskName;
+        this.description = description;
+        this.location = location;
+        this.uuid = uuid;
+        this.isComplete = isComplete;
     }
 
     public String getTaskName() {
@@ -48,7 +65,8 @@ public class Task {
     public String toString() {
         if (this.getLocation() != null)
             return "Task [taskName=" + getTaskName() + ", description=" + getDescription()
-                    + ", location()=" + getLocation().toString() + "]";
+                    + ", location()=" + getLocation().toString()
+                    + ", uuid=" + getUuid() + ", isComplete=" + getIsComplete() + "]";
         else
             return "Task [taskName=" + getTaskName() + ", description=" + getDescription()
                     + "]";

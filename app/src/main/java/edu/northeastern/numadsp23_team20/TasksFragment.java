@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,10 +29,12 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TasksFragment extends Fragment implements OnTaskItemClickListener {
 
+    Context ctx;
     private MapView map;
     private IMapController mapController;
     private ActivityResultLauncher<Intent> addTaskActivityLaunch;
@@ -47,35 +50,38 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View inflatedView = inflater.inflate(R.layout.fragment_tasks, container, false);
-        Context ctx = getContext();
-        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        this.ctx = getContext();
+        Configuration.getInstance().load(this.ctx, PreferenceManager.getDefaultSharedPreferences(this.ctx));
         this.map = inflatedView.findViewById(R.id.TasksMapView);
         this.mapController = this.map.getController();
         this.configureMap();
         RecyclerView tasksRecyclerView = inflatedView.findViewById(R.id.TasksRecyclerView);
+        this.taskList = new ArrayList<>();
         this.taskService = new TaskService();
-        this.taskService.setTaskServiceListener(tasks -> {
-            this.taskList = tasks;
-            for (Task task: tasks) {
-                this.setMapMarker(task);
+        TaskListAdapter taskListAdapter = new TaskListAdapter(this.taskList, this);
+        tasksRecyclerView.setAdapter(taskListAdapter);
+        tasksRecyclerView.setHasFixedSize(true);
+        tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this.ctx));
+        this.taskService.setTaskServiceListener(new TaskService.TaskServiceListener() {
+            @Override
+            public void onTaskLoaded(Task task) {
+                setMapMarker(task);
+                taskList.add(task);
+                taskListAdapter.notifyDataSetChanged();
             }
-            TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this);
-            tasksRecyclerView.setAdapter(taskListAdapter);
-            tasksRecyclerView.setHasFixedSize(true);
-            tasksRecyclerView.setLayoutManager(new LinearLayoutManager(ctx));
         });
         this.taskService.readTasks();
         this.addTaskActivityLaunch = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    Intent data = result.getData();
-                    Bundle intentExtras = data.getExtras();
-                    if (intentExtras.getBoolean("NewTask")) {
-                        this.taskService.readTasks();
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        Bundle intentExtras = data.getExtras();
+                        if (intentExtras.getBoolean("NewTask")) {
+                            this.taskService.readTasks();
+                        }
                     }
-                }
-            });
+                });
         inflatedView.findViewById(R.id.AddTaskButton).setOnClickListener(this::onAddTaskButtonClick);
         return inflatedView;
     }
@@ -88,18 +94,19 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
     @SuppressLint("ClickableViewAccessibility")
     private void configureMap() {
         this.map.setTileSource(TileSourceFactory.MAPNIK);
-        this.mapController.setZoom(16);
+        this.mapController.setZoom(3);
         this.map.setMultiTouchControls(true);
         this.map.setClickable(true);
     }
 
     private Marker getCustomizedMapMarker() {
         Marker mapMarker = new Marker(this.map);
-        Drawable d = ResourcesCompat.getDrawable(getResources(), R.drawable.pin, null);
-        Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
-        Drawable dr = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap,
-                (int) (18.0f * getResources().getDisplayMetrics().density),
-                (int) (18.0f * getResources().getDisplayMetrics().density),
+        Drawable pin_drawable = ResourcesCompat.getDrawable(this.ctx.getResources(), R.drawable.pin, null);
+        ;
+        Bitmap bitmap = ((BitmapDrawable) pin_drawable).getBitmap();
+        Drawable dr = new BitmapDrawable(this.ctx.getResources(), Bitmap.createScaledBitmap(bitmap,
+                (int) (18.0f * this.ctx.getResources().getDisplayMetrics().density),
+                (int) (18.0f * this.ctx.getResources().getDisplayMetrics().density),
                 true));
         mapMarker.setIcon(dr);
         return mapMarker;
@@ -118,6 +125,8 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
             intent.putExtra("taskLocation", task.getLocation().getKey());
             intent.putExtra("taskLatitude", task.getLocation().getLat());
             intent.putExtra("taskLongitude", task.getLocation().getLon());
+            intent.putExtra("taskComplete", task.getIsComplete());
+            intent.putExtra("taskUUID", task.getUuid());
             startActivity(intent);
             return true;
         });
@@ -134,6 +143,8 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
         intent.putExtra("taskLocation", task.getLocation().getKey());
         intent.putExtra("taskLatitude", task.getLocation().getLat());
         intent.putExtra("taskLongitude", task.getLocation().getLon());
+        intent.putExtra("taskComplete", task.getIsComplete());
+        intent.putExtra("taskUUID", task.getUuid());
         startActivity(intent);
     }
 }
