@@ -39,6 +39,7 @@ import org.osmdroid.views.overlay.Marker;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class AddTask extends AppCompatActivity {
 
@@ -115,6 +116,8 @@ public class AddTask extends AppCompatActivity {
         LocationItem location = new LocationItem(this.taskLocationName, this.taskLatitude, this.taskLongitude);
         Task task = new Task(taskTitle, taskDescription, location);
         TaskService taskService = new TaskService();
+        UUID uuid = UUID.randomUUID();
+        task.setUuid(uuid.toString());
         taskService.createTask(task);
         Intent returnIntent = new Intent();
         returnIntent.putExtra("NewTask", true);

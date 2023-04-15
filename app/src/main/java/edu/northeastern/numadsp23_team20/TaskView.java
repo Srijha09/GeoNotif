@@ -33,6 +33,7 @@ public class TaskView extends AppCompatActivity {
     MapView map;
     String taskName;
     Button markComplete;
+    String uuid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,7 @@ public class TaskView extends AppCompatActivity {
 
         Intent intent = getIntent();
         this.taskName = intent.getExtras().getString("taskTitle");
+        this.uuid = intent.getExtras().getString("taskUUID");
         ((TextView) findViewById(R.id.TaskTitleTextView)).setText(intent.getExtras().getString("taskTitle"));
         ((TextView) findViewById(R.id.TaskDetailsDescription)).setText(intent.getExtras().getString("taskDescription"));
         ((TextView) findViewById(R.id.TaskDetailsLocation)).setText("\uD83D\uDCCD " + intent.getExtras().getString("taskLocation"));
@@ -115,7 +117,7 @@ public class TaskView extends AppCompatActivity {
                 .setIcon(R.drawable.warning)
                 .setPositiveButton("CONFIRM", (dialogInterface, whichButton) -> {
                     TaskService taskService = new TaskService();
-                    taskService.deleteTask(this.taskName);
+                    taskService.deleteTask(this.uuid);
                     this.finish();
                 })
                 .setNegativeButton(android.R.string.no, null)

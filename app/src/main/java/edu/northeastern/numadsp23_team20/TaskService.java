@@ -39,12 +39,11 @@ public class TaskService {
 
     public void createTask(Task task) {
         String userId = this.firebaseUser.getUid();
-        UUID uuid = UUID.randomUUID();
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations");
         this.geoFire = new GeoFire(this.ref);
-        this.geoFire.setLocation(uuid.toString(), new GeoLocation(
+        this.geoFire.setLocation(task.getUuid(), new GeoLocation(
                 task.getLocation().getLat(), task.getLocation().getLon()));
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + uuid.toString());
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + task.getUuid());
         this.ref.setValue(task);
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId);
 //        this.ref.addValueEventListener(new ValueEventListener() {
@@ -100,19 +99,17 @@ public class TaskService {
     }
 
     public void editTask(Task task, Task updatedTask) {
-        String userId = this.firebaseUser.getUid();
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + task.getTaskName());
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + task.getUuid());
         this.ref.setValue(updatedTask);
     }
 
-    public void deleteTask(String taskName) {
+    public void deleteTask(String taskUUID) {
         String userId = this.firebaseUser.getUid();
-        System.out.println(taskName);
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/tasks/"
-                + taskName);
+        System.out.println(taskUUID);
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + taskUUID);
         this.ref.removeValue();
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/locations/"
-                + taskName);
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations/"
+                + taskUUID);
         this.ref.removeValue();
     }
 

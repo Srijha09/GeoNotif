@@ -50,6 +50,8 @@ public class EditTask extends AppCompatActivity {
     private String taskLocation;
     private double taskLatitude;
     private double taskLongitude;
+    private boolean isComplete;
+    private String uuid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +86,8 @@ public class EditTask extends AppCompatActivity {
         this.taskLocation = intent.getExtras().getString("taskLocation");
         this.taskLatitude = intent.getExtras().getDouble("taskLatitude");
         this.taskLongitude = intent.getExtras().getDouble("taskLongitude");
+        this.isComplete = intent.getExtras().getBoolean("taskComplete");
+        this.uuid = intent.getExtras().getString("taskUUID");
         LocationItem locationItem = new LocationItem(this.taskLocation, this.taskLatitude, this.taskLongitude);
         this.task = new Task(taskTitle, taskDescription, locationItem);
         this.configureMap();
@@ -152,6 +156,8 @@ public class EditTask extends AppCompatActivity {
                     );
                     Task updatedTask = new Task(this.editTaskTitleValue.getText().toString(),
                             this.editTaskDescriptionValue.getText().toString(), locationItem);
+                    updatedTask.setUuid(this.uuid);
+                    updatedTask.setIsComplete(this.isComplete);
                     TaskService taskService = new TaskService();
                     taskService.editTask(this.task, updatedTask);
                     this.finish();
