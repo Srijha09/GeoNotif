@@ -12,5 +12,4 @@ public class GeoNotif extends Application {
         /* Enable disk persistence  */
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
     }
-
 }
