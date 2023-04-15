@@ -152,7 +152,7 @@ public class LocationService extends Service {
         Notification notification = new NotificationCompat.Builder(this, "LocationServiceChannel")
                 .setContentTitle("Location Service")
                 .setContentText("Location updates are running...")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .build();
 
         startForeground(NOTIFICATION_ID, notification);
@@ -233,7 +233,7 @@ public class LocationService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "TaskNotificationChannel")
-                .setSmallIcon(R.mipmap.ic_geonotif_logo_foreground)
+                .setSmallIcon(R.drawable.ic_stat_namegit)
                 .setContentTitle("You have a task nearby!")
                 .setContentText(task.getTaskName())
                 .setContentIntent(pendingIntent)
