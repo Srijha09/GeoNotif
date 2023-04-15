@@ -233,7 +233,7 @@ public class LocationService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "TaskNotificationChannel")
-                .setSmallIcon(R.drawable.ic_stat_namegit)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle("You have a task nearby!")
                 .setContentText(task.getTaskName())
                 .setContentIntent(pendingIntent)
