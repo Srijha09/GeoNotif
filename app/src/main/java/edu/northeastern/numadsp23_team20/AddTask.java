@@ -60,12 +60,23 @@ public class AddTask extends AppCompatActivity {
     private OnTaskTypeAssigneeItemClickListener onTaskTypeAssigneeItemClickListener;
     private TaskType taskType;
     private String nonPersonalTaskTypeAssignee;
+    private GroupService groupService;
+    private GroupService.GroupServiceListener groupServiceListener;
+    private List<String> groupsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
+        this.groupService = new GroupService();
+        this.groupService.setGroupServiceListener(new GroupService.GroupServiceListener() {
+            @Override
+            public void onUserGroupsLoaded(List<String> groups) {
+                groupsList = groups;
+            }
+        });
+        this.groupService.readGroupsForUser();
         this.taskType = TaskType.PERSONAL;
         this.nonPersonalTaskTypeAssignee = "";
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
@@ -113,17 +124,12 @@ public class AddTask extends AppCompatActivity {
         addTaskTypeRecyclerViewContainer.setVisibility(View.VISIBLE);
         this.taskType = TaskType.GROUP;
         this.nonPersonalTaskTypeAssignee = "";
-        List<String> arrayList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            arrayList.add("RB " + i);
-        }
         onTaskTypeAssigneeItemClickListener = assignee -> {
             taskTypeListAdapter.notifyDataSetChanged();
             nonPersonalTaskTypeAssignee = assignee;
         };
-
         addTaskTypeRecyclerViewContainer.setLayoutManager(new LinearLayoutManager(this));
-        taskTypeListAdapter = new TaskTypeListAdapter(arrayList, onTaskTypeAssigneeItemClickListener);
+        taskTypeListAdapter = new TaskTypeListAdapter(this.groupsList, onTaskTypeAssigneeItemClickListener);
         addTaskTypeRecyclerViewContainer.setAdapter(taskTypeListAdapter);
     }
 

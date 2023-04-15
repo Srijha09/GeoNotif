@@ -22,16 +22,37 @@ public class GroupService {
     private FirebaseUser firebaseUser;
     private FirebaseAuth mAuth;
     private DatabaseReference ref;
+    private GroupServiceListener groupServiceListener;
 
     public GroupService() {
         this.mAuth = FirebaseAuth.getInstance();
         this.firebaseUser = mAuth.getCurrentUser();
     }
 
+    public void setGroupServiceListener(GroupServiceListener groupServiceListener) {
+        this.groupServiceListener = groupServiceListener;
+    }
+
     public void createGroup(Group group) {
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/"
                 + group.getUuid());
         this.ref.setValue(group);
+        for (String participantUUID: group.getGroupParticipants()) {
+            DatabaseReference userGroupsRef = FirebaseDatabase.getInstance().getReference(
+                    "GeoNotif/Users/" + participantUUID + "/Groups");
+            userGroupsRef.get().addOnCompleteListener(userGroups -> {
+                if (!userGroups.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", userGroups.getException());
+                } else {
+                    List<String> groupUUIDs = (List<String>) userGroups.getResult().getValue();
+                    if (groupUUIDs == null || groupUUIDs.isEmpty()) {
+                        groupUUIDs = new ArrayList<>();
+                    }
+                    groupUUIDs.add(group.getUuid());
+                    userGroupsRef.setValue(groupUUIDs);
+                }
+            });
+        }
     }
 
     public void editGroup(Group group, Group updatedGroup) {
@@ -74,5 +95,23 @@ public class GroupService {
                 }
             }
         });
+    }
+
+    public void readGroupsForUser() {
+        String userUUID = this.firebaseUser.getUid();
+        DatabaseReference userGroupsRef = FirebaseDatabase.getInstance().getReference(
+                "GeoNotif/Users/" + userUUID + "/Groups");
+        userGroupsRef.get().addOnCompleteListener(userGroups -> {
+            if (!userGroups.isSuccessful()) {
+                Log.e("firebase", "Error getting data", userGroups.getException());
+            } else {
+                List<String> groupUUIDs = (List<String>) userGroups.getResult().getValue();
+                groupServiceListener.onUserGroupsLoaded(groupUUIDs);
+            }
+        });
+    }
+
+    public interface GroupServiceListener {
+        void onUserGroupsLoaded(List<String> groups);
     }
 }
