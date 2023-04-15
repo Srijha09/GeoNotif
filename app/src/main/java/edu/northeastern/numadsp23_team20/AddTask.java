@@ -147,8 +147,11 @@ public class AddTask extends AppCompatActivity {
             return;
         } else if (!validateTaskDescription(taskDescription)) {
             return;
+        } else if (!validateTaskType()) {
+            Toast.makeText(this, "Group not selected!", Toast.LENGTH_SHORT).show();
+            return;
         } else if (!validateLocation()) {
-            Toast.makeText(this, "Please choose a location", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please choose a location!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -173,8 +176,17 @@ public class AddTask extends AppCompatActivity {
         finish();
     }
 
+    private boolean validateTaskType() {
+        if (this.taskType == TaskType.GROUP && this.nonPersonalTaskTypeAssignee.equals("")) {
+            ((TextView) findViewById(R.id.AddTaskTypeLabel)).setError("Group not selected!");
+            return false;
+        }
+        return true;
+    }
+
     private boolean validateLocation() {
         if (this.taskLocationName == null || this.taskLocationName.isEmpty()) {
+            ((TextView) findViewById(R.id.AddTaskLocationLabel)).setError("Please choose a location!");
             return false;
         }
         return true;
