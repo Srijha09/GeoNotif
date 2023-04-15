@@ -76,7 +76,6 @@ public class AddTask extends AppCompatActivity {
                         setMapMarker(place.getLatLng().latitude, place.getLatLng().longitude);
                         this.addTaskLocationValue.setVisibility(View.VISIBLE);
                         this.addTaskLocationValue.setText("\uD83D\uDCCD " + place.getName());
-                        // System.out.println(place.getAddressComponents());
                         this.taskLocationName = place.getName();
                         this.taskLatitude = place.getLatLng().latitude;
                         this.taskLongitude = place.getLatLng().longitude;
@@ -178,7 +177,6 @@ public class AddTask extends AppCompatActivity {
         this.mapController.setZoom(16);
         this.map.setMultiTouchControls(true);
         this.map.setClickable(true);
-        System.out.println(this.currentUserLocation);
         this.mapController.setCenter(this.currentUserLocation);
     }
 

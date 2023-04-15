@@ -107,6 +107,8 @@ public class TaskView extends AppCompatActivity {
         intent.putExtra("taskLocation", thisIntent.getExtras().getString("taskLocation"));
         intent.putExtra("taskLatitude", thisIntent.getExtras().getDouble("taskLatitude"));
         intent.putExtra("taskLongitude", thisIntent.getExtras().getDouble("taskLongitude"));
+        intent.putExtra("taskComplete", thisIntent.getExtras().getBoolean("taskComplete"));
+        intent.putExtra("taskUUID", thisIntent.getExtras().getString("taskUUID"));
         this.startActivity(intent);
     }
 
