@@ -22,6 +22,8 @@ import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.osmdroid.api.IMapController;
@@ -31,6 +33,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GroupTasksFragment extends Fragment implements OnTaskItemClickListener {
@@ -41,6 +44,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
     private ActivityResultLauncher<Intent> addTaskActivityLaunch;
     private TaskService taskService;
     private List<Task> taskList;
+    private ImageButton settings;
 
 
     @Override
@@ -58,25 +62,36 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         // Set the group name as the text of the TextView
         TextView groupNameTextView = inflatedView.findViewById(R.id.groupName);
         groupNameTextView.setText(groupName);
-
-
+        settings = inflatedView.findViewById(R.id.settings_button);
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // create a new intent to open the new activity
+                Intent intent = new Intent(getContext(), GroupSettingsView.class);
+                intent.putExtra("groupName", groupName);
+                startActivity(intent);
+            }
+        });
         this.ctx = getContext();
         Configuration.getInstance().load(this.ctx, PreferenceManager.getDefaultSharedPreferences(this.ctx));
         this.map = inflatedView.findViewById(R.id.TasksMapView);
         this.mapController = this.map.getController();
         this.configureMap();
         RecyclerView tasksRecyclerView = inflatedView.findViewById(R.id.TasksRecyclerView);
+        this.taskList = new ArrayList<>();
         this.taskService = new TaskService();
-//        this.taskService.setTaskServiceListener(tasks -> {
-//            this.taskList = tasks;
-//            for (Task task: tasks) {
-//                this.setMapMarker(task);
-//            }
-//            TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this);
-//            tasksRecyclerView.setAdapter(taskListAdapter);
-//            tasksRecyclerView.setHasFixedSize(true);
-//            tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this.ctx));
-//        });
+        TaskListAdapter taskListAdapter = new TaskListAdapter(this.taskList, this);
+        tasksRecyclerView.setAdapter(taskListAdapter);
+        tasksRecyclerView.setHasFixedSize(true);
+        tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this.ctx));
+        this.taskService.setTaskServiceListener(new TaskService.TaskServiceListener() {
+            @Override
+            public void onTaskLoaded(Task task) {
+                setMapMarker(task);
+                taskList.add(task);
+                taskListAdapter.notifyDataSetChanged();
+            }
+        });
         this.taskService.readTasks();
         this.addTaskActivityLaunch = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -89,6 +104,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                         }
                     }
                 });
+
         inflatedView.findViewById(R.id.AddTaskButton).setOnClickListener(this::onAddTaskButtonClick);
         return inflatedView;
     }

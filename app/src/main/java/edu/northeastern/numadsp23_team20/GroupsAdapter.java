@@ -49,14 +49,21 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                bundle.putString("groupName", group.getGroupname());
-                GroupTasksFragment grouptasksFragment = new GroupTasksFragment();
-                grouptasksFragment.setArguments(bundle);
-                FragmentTransaction transaction = ((FragmentActivity) context).getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.FrameLayout, grouptasksFragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
+                if(groupsList.size()<2){
+                    Intent intent = new Intent(context, StickItToEm.class);
+                    intent.putExtra("groupName", group.getGroupname());
+                    //intent.putExtra("loggedInUsername", GroupsAdapter.this.currentUser);
+                    context.startActivity(intent);
+                }else {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("groupName", group.getGroupname());
+                    GroupTasksFragment grouptasksFragment = new GroupTasksFragment();
+                    grouptasksFragment.setArguments(bundle);
+                    FragmentTransaction transaction = ((FragmentActivity) context).getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.FrameLayout, grouptasksFragment);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+                }
             }
         });
     }

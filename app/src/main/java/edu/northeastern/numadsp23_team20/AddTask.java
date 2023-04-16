@@ -96,7 +96,7 @@ public class AddTask extends AppCompatActivity {
         this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         this.getCurrentUserLocation();
         this.addTaskLocationValue = findViewById(R.id.AddTaskLocationValue);
-        Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
+        //Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
         this.addressSearchActivity = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
