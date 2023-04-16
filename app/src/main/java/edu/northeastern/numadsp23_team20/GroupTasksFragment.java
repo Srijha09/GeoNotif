@@ -68,6 +68,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
             public void onClick(View v) {
                 // create a new intent to open the new activity
                 Intent intent = new Intent(getContext(), GroupSettingsView.class);
+                intent.putExtra("groupName", groupName);
                 startActivity(intent);
             }
         });
