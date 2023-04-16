@@ -2,6 +2,7 @@ package edu.northeastern.numadsp23_team20;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
@@ -98,6 +99,8 @@ public class EditTask extends AppCompatActivity {
         this.editTaskDescriptionValue = findViewById(R.id.EditTaskDescriptionValue);
         this.editTaskDescriptionValue.setText(taskDescription);
         ((TextView) findViewById(R.id.EditTaskLocationValue)).setText("\uD83D\uDCCD " + taskLocation);
+
+        initialItemData(savedInstanceState);
     }
 
     public void onEditTaskUpdateButtonClick(View view) {
@@ -191,5 +194,36 @@ public class EditTask extends AppCompatActivity {
         this.mapMarker.setPosition(markerPoint);
         this.mapMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         this.map.getOverlays().add(this.mapMarker);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (this.editTaskTitleValue.getText() != null)
+            outState.putString("taskTitle", this.editTaskTitleValue.getText().toString());
+        else
+            outState.putString("taskTitle", "");
+
+        if (this.editTaskTitleValue.getText() != null)
+            outState.putString("taskDesc", this.editTaskTitleValue.getText().toString());
+        else
+            outState.putString("taskDesc", "");
+
+        outState.putString("taskLocation", this.taskLocation);
+        outState.putDouble("taskLatitude", this.taskLatitude);
+        outState.putDouble("taskLongitude", this.taskLongitude);
+        outState.putString("editTaskLocationValue", this.editTaskLocationValue.getText().toString());
+    }
+
+    private void initialItemData(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            this.taskLocation = savedInstanceState.getString("taskLocation");
+            this.taskLatitude = savedInstanceState.getDouble("taskLatitude");
+            this.taskLongitude = savedInstanceState.getDouble("taskLongitude");
+            this.editTaskLocationValue.setText(savedInstanceState.getString("editTaskLocationValue"));
+            if (this.editTaskLocationValue != null) {
+                setMapMarker(this.taskLatitude, this.taskLongitude);
+            }
+        }
     }
 }
