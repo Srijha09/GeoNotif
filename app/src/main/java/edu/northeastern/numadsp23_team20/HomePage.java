@@ -42,6 +42,7 @@ public class HomePage extends AppCompatActivity {
         BottomNavigationView bottomNavigationMenu = findViewById(R.id.BottomNavigationMenu);
         this.setFragment(this.tasksFragment);
         bottomNavigationMenu.setOnItemSelectedListener(item -> {
+            this.currentFragmentTag = item.getTitle().toString();
             this.setFragment(this.getFragment(item.getTitle().toString()));
             return true;
         });
@@ -49,12 +50,16 @@ public class HomePage extends AppCompatActivity {
         if (savedInstanceState != null) {
             // Restore the previously selected fragment
             currentFragmentTag = savedInstanceState.getString("FRAGMENT_TAG");
+            System.out.println("on Create" + currentFragmentTag);
             FragmentManager fragmentManager = getSupportFragmentManager();
-            Fragment fragment = fragmentManager.findFragmentByTag(currentFragmentTag);
+            Fragment fragment = getFragment(currentFragmentTag);
+            System.out.println(fragment);
             if (fragment != null) {
                 fragmentManager.beginTransaction()
-                        .replace(R.id.BottomNavigationMenu, fragment, currentFragmentTag)
+                        .replace(R.id.FrameLayout, fragment, currentFragmentTag)
                         .commit();
+                // Update the current fragment tag to the restored fragment
+                currentFragmentTag = fragment.getTag();
             }
         }
         loadSharedPreferences();
@@ -81,6 +86,7 @@ public class HomePage extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         // Save the tag of the current fragment
         outState.putString("FRAGMENT_TAG", currentFragmentTag);
+        System.out.println(currentFragmentTag);
     }
 
 
@@ -103,15 +109,19 @@ public class HomePage extends AppCompatActivity {
     private Fragment getFragment(String itemTitle) {
         switch (itemTitle) {
             case "Tasks":
+            case TASKS_FRAGMENT_TAG:
                 this.currentFragmentTag = TASKS_FRAGMENT_TAG;
                 return this.tasksFragment;
             case "Groups":
+            case GROUPS_FRAGMENT_TAG:
                 this.currentFragmentTag = GROUPS_FRAGMENT_TAG;
                 return this.groupsFragment;
             case "Friends":
+            case FRIENDS_FRAGMENT_TAG:
                 this.currentFragmentTag = FRIENDS_FRAGMENT_TAG;
                 return this.friendsFragment;
             case "Profile":
+            case PROFILE_FRAGMENT_TAG:
                 this.currentFragmentTag = PROFILE_FRAGMENT_TAG;
                 return this.profileFragment;
         }
