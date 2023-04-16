@@ -57,6 +57,7 @@
                         android:elevation="0dp"
                         app:elevation="0dp"
                         android:src="@android:drawable/ic_menu_edit"
+                        app:tint="@color/black"
                         app:backgroundTint="@color/primary_highlight" />
 
                 </RelativeLayout>
@@ -123,7 +124,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Enable notifications" />
+                    android:text="Enable notifications"
+                    android:textSize="20dp"/>
 
                 <Space
                     android:layout_width="0dp"
@@ -135,7 +137,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    app:thumbTint="@color/primary_highlight" />
+                    app:thumbTint="@color/primary_highlight"
+                    app:trackTint="@color/quantum_grey400"/>
 
             </LinearLayout>
 

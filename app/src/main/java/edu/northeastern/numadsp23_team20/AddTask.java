@@ -2,6 +2,7 @@ package edu.northeastern.numadsp23_team20;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -11,13 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -96,7 +95,7 @@ public class AddTask extends AppCompatActivity {
         this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         this.getCurrentUserLocation();
         this.addTaskLocationValue = findViewById(R.id.AddTaskLocationValue);
-        //Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
+        Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
         this.addressSearchActivity = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -111,6 +110,7 @@ public class AddTask extends AppCompatActivity {
                     }
                 }
         );
+        initialItemData(savedInstanceState);
     }
 
     public void onAddTaskFindLocationButtonClick(View view) {
@@ -223,10 +223,13 @@ public class AddTask extends AppCompatActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
         boolean noCoarseLocationAccess = ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-        if (noFineLocationAccess && noCoarseLocationAccess) {
+        boolean noBackgroundLocationAccess = ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED;
+        if (noFineLocationAccess || noCoarseLocationAccess || noBackgroundLocationAccess) {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION},
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_BACKGROUND_LOCATION},
                     101);
         }
         fusedLocationClient.getLastLocation()
@@ -267,5 +270,46 @@ public class AddTask extends AppCompatActivity {
         this.mapMarker.setPosition(markerPoint);
         this.mapMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         this.map.getOverlays().add(this.mapMarker);
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (((TextView) findViewById(R.id.AddTaskTitleValue)).getText() != null)
+            outState.putString("taskTitle", ((TextView) findViewById(R.id.AddTaskTitleValue)).getText().toString());
+        else
+            outState.putString("taskTitle", "");
+
+        if (((TextView) findViewById(R.id.AddTaskDescriptionValue)).getText() != null)
+            outState.putString("taskDesc", ((TextView) findViewById(R.id.AddTaskDescriptionValue)).getText().toString());
+        else
+            outState.putString("taskDesc", "");
+
+        outState.putString("taskLocationName", this.taskLocationName);
+        outState.putDouble("taskLatitude", this.taskLatitude);
+        outState.putDouble("taskLongitude", this.taskLongitude);
+        outState.putInt("addTaskLocationValueVisibility", this.addTaskLocationValue.getVisibility());
+        outState.putString("addTaskLocationValue", this.addTaskLocationValue.getText().toString());
+        outState.putInt("addTaskTypeRecyclerViewContainerVisibility", addTaskTypeRecyclerViewContainer.getVisibility());
+        outState.putSerializable("taskType", this.taskType);
+    }
+
+    private void initialItemData(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            for (String key : savedInstanceState.keySet()) {
+                System.out.println("GeoNotif Add Task : " + key + " = \"" + savedInstanceState.get(key) + "\"");
+            }
+            this.taskLocationName = savedInstanceState.getString("taskLocationName");
+            this.taskLatitude = savedInstanceState.getDouble("taskLatitude");
+            this.taskLongitude = savedInstanceState.getDouble("taskLongitude");
+            this.addTaskLocationValue.setVisibility(savedInstanceState.getInt("addTaskLocationValueVisibility"));
+            this.addTaskLocationValue.setText(savedInstanceState.getString("addTaskLocationValue"));
+            this.addTaskTypeRecyclerViewContainer.setVisibility(savedInstanceState.getInt("addTaskTypeRecyclerViewContainerVisibility"));
+            this.taskType = (TaskType) savedInstanceState.getSerializable("taskType");
+            if (this.taskLocationName != null) {
+                setMapMarker(this.taskLatitude, this.taskLongitude);
+            }
+        }
     }
 }

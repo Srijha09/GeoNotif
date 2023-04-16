@@ -126,7 +126,6 @@ public class TaskView extends AppCompatActivity implements Serializable {
                         @Override
                         public void onTaskDeleted() {
                             Intent returnIntent = new Intent();
-                            System.out.println("Line 129: " + thisIntent.getExtras().getInt("position"));
                             returnIntent.putExtra("DeletedTask", true);
                             returnIntent.putExtra("DeletedTaskPosition", thisIntent.getExtras().getInt("position"));
                             setResult(Activity.RESULT_OK, returnIntent);

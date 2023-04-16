@@ -62,6 +62,8 @@ public class HomePage extends AppCompatActivity {
     }
 
     private void setSettings() {
+        System.out.println(this.settings.getNotifSetting());
+        System.out.println(this.settings.getNotifSetting().equalsIgnoreCase(GeoNotif.ENABLE_NOTIF_SETTING));
         if (this.settings.getNotifSetting().equalsIgnoreCase(GeoNotif.ENABLE_NOTIF_SETTING)) {
             Intent intent = new Intent(this, LocationService.class);
             startService(intent);
