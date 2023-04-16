@@ -122,6 +122,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
         Marker mapMarker = new Marker(this.map);
         Drawable pin_drawable = ResourcesCompat.getDrawable(this.ctx.getResources(), R.drawable.pin, null);
         ;
+        assert pin_drawable != null;
         Bitmap bitmap = ((BitmapDrawable) pin_drawable).getBitmap();
         Drawable dr = new BitmapDrawable(this.ctx.getResources(), Bitmap.createScaledBitmap(bitmap,
                 (int) (18.0f * this.ctx.getResources().getDisplayMetrics().density),
