@@ -1,6 +1,8 @@
 package edu.northeastern.numadsp23_team20;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +38,13 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
         this.taskList = taskList;
         this.onTaskItemClickListener = onTaskItemClickListener;
         this.taskService = new TaskService();
+
+        TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
+            @Override
+            public void onTaskCreated(String taskUUID) {
+            }
+        };
+        this.taskService.setTaskServiceCreateListener(taskServiceCreateListener);
     }
 
     @NonNull
@@ -59,11 +68,10 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
         holder.RVTaskTitle.setText(task.getTaskName());
         holder.RVTaskType.setText(task.getTaskType());
         holder.RVTaskLocation.setText("\uD83D\uDCCD " + task.getLocation().getKey());
-        System.out.println(task.getTaskName() + ":" + task.getIsComplete());
         holder.RVCheckBox.setChecked(task.getIsComplete());
 
         holder.RVCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            task.setIsComplete(isChecked);
+            this.taskList.get(position).setIsComplete(isChecked);
             notifyItemChanged(position);
             this.taskService.createTask(task);
         });

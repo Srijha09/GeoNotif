@@ -113,7 +113,32 @@ public class TaskView extends AppCompatActivity implements Serializable {
         intent.putExtra("taskLongitude", thisIntent.getExtras().getDouble("taskLongitude"));
         intent.putExtra("taskComplete", thisIntent.getExtras().getBoolean("taskComplete"));
         intent.putExtra("taskUUID", thisIntent.getExtras().getString("taskUUID"));
+        intent.putExtra("taskType", thisIntent.getExtras().getString("taskType"));
         this.startActivity(intent);
+    }
+
+    public void onTaskMarkCompleteButtonClick(View view) {
+        Task task = new Task(thisIntent.getExtras().getString("taskTitle"),
+                thisIntent.getExtras().getString("taskDescription"),
+                new LocationItem(thisIntent.getExtras().getString("taskLocation"),
+                        thisIntent.getExtras().getDouble("taskLatitude"),
+                        thisIntent.getExtras().getDouble("taskLongitude")),
+                thisIntent.getExtras().getString("taskUUID"), true);
+        task.setTaskType(thisIntent.getExtras().getString("taskType"));
+
+        TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
+            @Override
+            public void onTaskCreated(String taskUUID) {
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("EditedTask", true);
+                returnIntent.putExtra("EditedTaskPosition", thisIntent.getExtras().getInt("position"));
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
+            }
+        };
+        TaskService taskService = new TaskService();
+        taskService.setTaskServiceCreateListener(taskServiceCreateListener);
+        taskService.createTask(task);
     }
 
     public void onTaskDeleteFloatingButtonClick(View view) {

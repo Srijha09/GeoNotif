@@ -111,6 +111,10 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
                         Bundle intentExtras = data.getExtras();
                         if (intentExtras.getBoolean("NewTask")) {
                             taskService.readTask(intentExtras.getString("TaskUUID"));
+                            loadingTasks = false;
+                            tasksLoadingSpinner.setVisibility(View.INVISIBLE);
+                            noTasksTextView.setVisibility(View.INVISIBLE);
+                            tasksScrollView.setVisibility(View.VISIBLE);
                         }
                     }
                 });
@@ -119,7 +123,9 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         Bundle intentExtras = data.getExtras();
-                        System.out.println("Line 122: " + intentExtras.getBoolean("DeletedTask") + ", " + intentExtras.getInt("DeletedTaskPosition"));
+                        for (String key : intentExtras.keySet()) {
+                            System.out.println("GeoNotif Add Task : " + key + " = \"" + intentExtras.get(key) + "\"");
+                        }
                         if (intentExtras.getBoolean("DeletedTask")) {
                             taskList.remove(intentExtras.getInt("DeletedTaskPosition"));
                             taskListAdapter.notifyDataSetChanged();
@@ -127,6 +133,13 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
                             tasksLoadingSpinner.setVisibility(View.INVISIBLE);
                             noTasksTextView.setVisibility(View.VISIBLE);
                             tasksScrollView.setVisibility(View.INVISIBLE);
+                        } else if (intentExtras.getBoolean("EditedTask")) {
+                            taskList.get(intentExtras.getInt("EditedTaskPosition")).setIsComplete(true);
+                            taskListAdapter.notifyItemChanged(intentExtras.getInt("EditedTaskPosition"));
+                            loadingTasks = false;
+                            tasksLoadingSpinner.setVisibility(View.INVISIBLE);
+                            noTasksTextView.setVisibility(View.INVISIBLE);
+                            tasksScrollView.setVisibility(View.VISIBLE);
                         }
                     }
                 });
@@ -192,6 +205,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
             intent.putExtra("taskLongitude", task.getLocation().getLon());
             intent.putExtra("taskComplete", task.getIsComplete());
             intent.putExtra("taskUUID", task.getUuid());
+            intent.putExtra("taskType", task.getTaskType());
             startActivity(intent);
             return true;
         });
@@ -210,6 +224,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
         intent.putExtra("taskLongitude", task.getLocation().getLon());
         intent.putExtra("taskComplete", task.getIsComplete());
         intent.putExtra("taskUUID", task.getUuid());
+        intent.putExtra("taskType", task.getTaskType());
         this.viewTaskActivityLaunch.launch(intent);
     }
 }

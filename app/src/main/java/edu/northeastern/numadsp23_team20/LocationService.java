@@ -229,6 +229,7 @@ public class LocationService extends Service {
         intent.putExtra("taskLongitude", task.getLocation().getLon());
         intent.putExtra("taskComplete", task.getIsComplete());
         intent.putExtra("taskUUID", task.getUuid());
+        intent.putExtra("taskType", task.getTaskType());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
