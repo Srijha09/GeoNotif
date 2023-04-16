@@ -50,10 +50,8 @@ public class HomePage extends AppCompatActivity {
         if (savedInstanceState != null) {
             // Restore the previously selected fragment
             currentFragmentTag = savedInstanceState.getString("FRAGMENT_TAG");
-            System.out.println("on Create" + currentFragmentTag);
             FragmentManager fragmentManager = getSupportFragmentManager();
             Fragment fragment = getFragment(currentFragmentTag);
-            System.out.println(fragment);
             if (fragment != null) {
                 fragmentManager.beginTransaction()
                         .replace(R.id.FrameLayout, fragment, currentFragmentTag)
@@ -67,8 +65,6 @@ public class HomePage extends AppCompatActivity {
     }
 
     private void setSettings() {
-        System.out.println(this.settings.getNotifSetting());
-        System.out.println(this.settings.getNotifSetting().equalsIgnoreCase(GeoNotif.ENABLE_NOTIF_SETTING));
         if (this.settings.getNotifSetting().equalsIgnoreCase(GeoNotif.ENABLE_NOTIF_SETTING)) {
             Intent intent = new Intent(this, LocationService.class);
             startService(intent);
@@ -86,7 +82,6 @@ public class HomePage extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         // Save the tag of the current fragment
         outState.putString("FRAGMENT_TAG", currentFragmentTag);
-        System.out.println(currentFragmentTag);
     }
 
 

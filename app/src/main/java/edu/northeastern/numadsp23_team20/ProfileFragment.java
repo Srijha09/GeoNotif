@@ -97,7 +97,8 @@ public class ProfileFragment extends Fragment {
         this.notificationSwitch = view.findViewById(R.id.switch_notifications);
         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(GeoNotif.PREFERENCES, MODE_PRIVATE);
         String notifSetting = sharedPreferences.getString(GeoNotif.NOTIF_SETTING, GeoNotif.ENABLE_NOTIF_SETTING);
-        if (notifSetting == GeoNotif.ENABLE_NOTIF_SETTING) {
+        System.out.println(notifSetting);
+        if (notifSetting.equalsIgnoreCase(GeoNotif.ENABLE_NOTIF_SETTING)) {
             this.notificationSwitch.setChecked(true);
         } else {
             this.notificationSwitch.setChecked(false);
