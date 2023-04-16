@@ -23,6 +23,8 @@ public class TaskService {
     private FirebaseUser firebaseUser;
     private FirebaseAuth mAuth;
     private TaskServiceListener taskServiceListener;
+    private TaskServiceDeleteListener taskServiceDeleteListener;
+    private TaskServiceCreateListener taskServiceCreateListener;
 
     private DatabaseReference ref;
     private GeoFire geoFire;
@@ -32,10 +34,20 @@ public class TaskService {
         this.mAuth = FirebaseAuth.getInstance();
         this.firebaseUser = mAuth.getCurrentUser();
         this.taskServiceListener = null;
+        this.taskServiceDeleteListener = null;
+        this.taskServiceCreateListener = null;
     }
 
     public void setTaskServiceListener(TaskServiceListener taskServiceListener) {
         this.taskServiceListener = taskServiceListener;
+    }
+
+    public void setTaskServiceDeleteListener(TaskServiceDeleteListener taskServiceDeleteListener) {
+        this.taskServiceDeleteListener = taskServiceDeleteListener;
+    }
+
+    public void setTaskServiceCreateListener(TaskServiceCreateListener taskServiceCreateListener) {
+        this.taskServiceCreateListener = taskServiceCreateListener;
     }
 
     public void createTask(Task task) {
@@ -56,6 +68,7 @@ public class TaskService {
                     taskUUIDs = new ArrayList<>();
                 }
                 addUserTaskList(taskUUIDs, task.getUuid());
+                taskServiceCreateListener.onTaskCreated(task.getUuid());
             }
 
             @Override
@@ -74,6 +87,20 @@ public class TaskService {
         this.ref.removeEventListener(this.valueEventListener);
     }
 
+    public void readTask(String taskUUID) {
+        String userId = this.firebaseUser.getUid();
+        this.ref = FirebaseDatabase.getInstance().getReference(
+                "GeoNotif/Tasks/" + taskUUID);
+        this.ref.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.e("firebase", "Error getting data", task.getException());
+            } else {
+                Task t = task.getResult().getValue(Task.class);
+                taskServiceListener.onTaskLoaded(t);
+            }
+        });
+    }
+
     public void readTasks() {
         String userId = this.firebaseUser.getUid();
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Tasks");
@@ -81,6 +108,9 @@ public class TaskService {
             if (!tasks.isSuccessful()) {
                 Log.e("firebase", "Error getting data", tasks.getException());
             } else {
+                if (!tasks.getResult().hasChildren()) {
+                    taskServiceListener.onTaskLoaded(null);
+                }
                 for (DataSnapshot item : tasks.getResult().getChildren()) {
                     String taskUUID = item.getValue().toString();
                     DatabaseReference readRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + taskUUID);
@@ -133,6 +163,7 @@ public class TaskService {
                     taskUUIDs = new ArrayList<>();
                 }
                 removeUserTaskList(taskUUIDs, taskUUID);
+                taskServiceDeleteListener.onTaskDeleted();
             }
 
             @Override
@@ -142,7 +173,15 @@ public class TaskService {
         });
     }
 
+    public interface TaskServiceCreateListener {
+        void onTaskCreated(String taskUUID);
+    }
+
     public interface TaskServiceListener {
         void onTaskLoaded(Task task);
+    }
+
+    public interface TaskServiceDeleteListener {
+        void onTaskDeleted();
     }
 }

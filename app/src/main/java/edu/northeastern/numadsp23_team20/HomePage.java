@@ -21,7 +21,10 @@ public class HomePage extends AppCompatActivity {
     private Fragment friendsFragment;
     private Fragment profileFragment;
 
-    private static final String FRAGMENT_TAG = "my_fragment_tag";
+    private static final String TASKS_FRAGMENT_TAG = "TASKS_FRAGMENT_TAG";
+    private static final String GROUPS_FRAGMENT_TAG = "GROUPS_FRAGMENT_TAG";
+    private static final String FRIENDS_FRAGMENT_TAG = "FRIENDS_FRAGMENT_TAG";
+    private static final String PROFILE_FRAGMENT_TAG = "PROFILE_FRAGMENT_TAG";
     private String currentFragmentTag;
 
     private GeoNotif settings;
@@ -45,7 +48,7 @@ public class HomePage extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             // Restore the previously selected fragment
-            currentFragmentTag = savedInstanceState.getString(FRAGMENT_TAG);
+            currentFragmentTag = savedInstanceState.getString("FRAGMENT_TAG");
             FragmentManager fragmentManager = getSupportFragmentManager();
             Fragment fragment = fragmentManager.findFragmentByTag(currentFragmentTag);
             if (fragment != null) {
@@ -75,7 +78,7 @@ public class HomePage extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         // Save the tag of the current fragment
-        outState.putString(FRAGMENT_TAG, currentFragmentTag);
+        outState.putString("FRAGMENT_TAG", currentFragmentTag);
     }
 
 
@@ -98,12 +101,16 @@ public class HomePage extends AppCompatActivity {
     private Fragment getFragment(String itemTitle) {
         switch (itemTitle) {
             case "Tasks":
+                this.currentFragmentTag = TASKS_FRAGMENT_TAG;
                 return this.tasksFragment;
             case "Groups":
+                this.currentFragmentTag = GROUPS_FRAGMENT_TAG;
                 return this.groupsFragment;
             case "Friends":
+                this.currentFragmentTag = FRIENDS_FRAGMENT_TAG;
                 return this.friendsFragment;
             case "Profile":
+                this.currentFragmentTag = PROFILE_FRAGMENT_TAG;
                 return this.profileFragment;
         }
         return null;

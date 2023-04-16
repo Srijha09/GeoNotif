@@ -21,6 +21,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -166,14 +167,21 @@ public class AddTask extends AppCompatActivity {
             task.setTaskType("Friend task: " + nonPersonalTaskTypeAssignee);
         }
 
+        TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
+            @Override
+            public void onTaskCreated(String taskUUID) {
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("NewTask", true);
+                returnIntent.putExtra("TaskUUID", taskUUID);
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
+            }
+        };
         TaskService taskService = new TaskService();
+        taskService.setTaskServiceCreateListener(taskServiceCreateListener);
         UUID uuid = UUID.randomUUID();
         task.setUuid(uuid.toString());
         taskService.createTask(task);
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra("NewTask", true);
-        setResult(Activity.RESULT_OK, returnIntent);
-        finish();
     }
 
     private boolean validateTaskType() {
