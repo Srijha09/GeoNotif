@@ -123,9 +123,6 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         Bundle intentExtras = data.getExtras();
-                        for (String key : intentExtras.keySet()) {
-                            System.out.println("GeoNotif Add Task : " + key + " = \"" + intentExtras.get(key) + "\"");
-                        }
                         if (intentExtras.getBoolean("DeletedTask")) {
                             taskList.remove(intentExtras.getInt("DeletedTaskPosition"));
                             taskListAdapter.notifyDataSetChanged();
