@@ -50,7 +50,7 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
         // replace String with your data type
         FriendsData data = mData.get(position);
         // set the data to the view holder's views
-        holder.userName.setText(data.getUserName());
+        holder.userName.setText(data.getFullname());
         holder.button.setText(data.getButtonDetails());
 
 
