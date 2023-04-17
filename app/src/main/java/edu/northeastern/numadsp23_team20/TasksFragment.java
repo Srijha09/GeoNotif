@@ -164,6 +164,10 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
 //        UUID taskUuid = UUID.randomUUID();
 //        task.setUuid(taskUuid.toString());
 //        groupService.addTaskToGroup(groupUuid.toString(), task);
+
+        // Reference to get friends of user
+//        FriendService friendService = new FriendService();
+//        friendService.readUserFriends();
     }
 
     @SuppressLint("ClickableViewAccessibility")
