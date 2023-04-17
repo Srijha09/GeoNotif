@@ -58,7 +58,6 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        System.out.println("LocationService - " + "Location service started");
 
         this.mAuth = FirebaseAuth.getInstance();
         this.firebaseUser = mAuth.getCurrentUser();
@@ -73,7 +72,6 @@ public class LocationService extends Service {
         geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
             @Override
             public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
-//                System.out.println("Key: " + dataSnapshot.getKey());
                 DatabaseReference taskRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + dataSnapshot.getKey());
                 taskRef.get().addOnCompleteListener(t -> {
                     if (!t.isSuccessful()) {
@@ -130,7 +128,6 @@ public class LocationService extends Service {
 
             @Override
             public void onGeoQueryReady() {
-                //System.out.println("All initial data has been loaded and events have been fired!");
             }
 
             @Override
@@ -145,7 +142,6 @@ public class LocationService extends Service {
     @SuppressLint("InvalidWakeLockTag")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        System.out.println("LocationService-" + "Location service started");
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LocationServiceWakeLock");
         wakeLock.acquire();
@@ -156,7 +152,7 @@ public class LocationService extends Service {
         Notification notification = new NotificationCompat.Builder(this, "LocationServiceChannel")
                 .setContentTitle("Location Service")
                 .setContentText("Location updates are running...")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .build();
 
         startForeground(NOTIFICATION_ID, notification);
@@ -177,26 +173,19 @@ public class LocationService extends Service {
     private final LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
-//            System.out.println("LocationService" + "Latitude: " + latitude + " Longitude: " + longitude);
-
             geoQuery.setCenter(new GeoLocation(location.getLatitude(), location.getLongitude()));
         }
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-//            System.out.println("LocationService" + "Provider status changed: " + provider + " status: " + status);
         }
 
         @Override
         public void onProviderEnabled(String provider) {
-//            System.out.println("LocationService" + "Provider enabled: " + provider);
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-//            System.out.println("LocationService" + "Provider disabled: " + provider);
         }
     };
 
@@ -240,11 +229,12 @@ public class LocationService extends Service {
         intent.putExtra("taskLongitude", task.getLocation().getLon());
         intent.putExtra("taskComplete", task.getIsComplete());
         intent.putExtra("taskUUID", task.getUuid());
+        intent.putExtra("taskType", task.getTaskType());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "TaskNotificationChannel")
-                .setSmallIcon(R.mipmap.ic_geonotif_logo_foreground)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle("You have a task nearby!")
                 .setContentText(task.getTaskName())
                 .setContentIntent(pendingIntent)

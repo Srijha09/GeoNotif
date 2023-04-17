@@ -2,23 +2,25 @@ package edu.northeastern.numadsp23_team20;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +39,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -53,12 +56,37 @@ public class AddTask extends AppCompatActivity {
     private Marker mapMarker;
     private ActivityResultLauncher<Intent> addressSearchActivity;
     private TextView addTaskLocationValue;
+    private TaskTypeListAdapter taskTypeListAdapter;
+    private OnTaskTypeAssigneeItemClickListener onTaskTypeAssigneeItemClickListener;
+    private TaskType taskType;
+    private String nonPersonalTaskTypeAssignee;
+    private GroupService groupService;
+    private GroupService.GroupServiceListener groupServiceListener;
+    private List<String> groupsList;
+    private RecyclerView addTaskTypeRecyclerViewContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
+        this.addTaskTypeRecyclerViewContainer = findViewById(R.id.AddTaskTypeRecyclerViewContainer);
+        groupsList = new ArrayList<>();
+        onTaskTypeAssigneeItemClickListener = assignee -> {
+            taskTypeListAdapter.notifyDataSetChanged();
+            nonPersonalTaskTypeAssignee = assignee;
+        };
+        this.addTaskTypeRecyclerViewContainer.setLayoutManager(new LinearLayoutManager(this));
+        taskTypeListAdapter = new TaskTypeListAdapter(this.groupsList, onTaskTypeAssigneeItemClickListener);
+        addTaskTypeRecyclerViewContainer.setAdapter(taskTypeListAdapter);
+        this.groupService = new GroupService();
+        this.groupService.setGroupServiceListener(group -> {
+            groupsList.add(group);
+            taskTypeListAdapter.notifyDataSetChanged();
+        });
+        this.groupService.readGroupsForUser();
+        this.taskType = TaskType.PERSONAL;
+        this.nonPersonalTaskTypeAssignee = "";
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
         this.map = findViewById(R.id.AddTaskMapView);
         this.mapMarker = new Marker(this.map);
@@ -76,13 +104,13 @@ public class AddTask extends AppCompatActivity {
                         setMapMarker(place.getLatLng().latitude, place.getLatLng().longitude);
                         this.addTaskLocationValue.setVisibility(View.VISIBLE);
                         this.addTaskLocationValue.setText("\uD83D\uDCCD " + place.getName());
-                        // System.out.println(place.getAddressComponents());
                         this.taskLocationName = place.getName();
                         this.taskLatitude = place.getLatLng().latitude;
                         this.taskLongitude = place.getLatLng().longitude;
                     }
                 }
         );
+        initialItemData(savedInstanceState);
     }
 
     public void onAddTaskFindLocationButtonClick(View view) {
@@ -91,6 +119,18 @@ public class AddTask extends AppCompatActivity {
         Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY,
                 fields).build(this);
         this.addressSearchActivity.launch(intent);
+    }
+
+    public void onAddTaskTypePersonalRadioButtonClick(View view) {
+        addTaskTypeRecyclerViewContainer.setVisibility(View.GONE);
+        this.taskType = TaskType.PERSONAL;
+        this.nonPersonalTaskTypeAssignee = "";
+    }
+
+    public void onAddTaskTypeGroupRadioButtonClick(View view) {
+        addTaskTypeRecyclerViewContainer.setVisibility(View.VISIBLE);
+        this.taskType = TaskType.GROUP;
+        this.nonPersonalTaskTypeAssignee = "";
     }
 
     public void onAddTaskCancelButtonClick(View view) {
@@ -108,25 +148,53 @@ public class AddTask extends AppCompatActivity {
             return;
         } else if (!validateTaskDescription(taskDescription)) {
             return;
+        } else if (!validateTaskType()) {
+            Toast.makeText(this, "Group not selected!", Toast.LENGTH_SHORT).show();
+            return;
         } else if (!validateLocation()) {
-            Toast.makeText(this, "Please choose a location", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please choose a location!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         LocationItem location = new LocationItem(this.taskLocationName, this.taskLatitude, this.taskLongitude);
         Task task = new Task(taskTitle, taskDescription, location);
+
+        if (taskType == TaskType.PERSONAL) {
+            task.setTaskType("Personal task");
+        } else if (taskType == TaskType.GROUP) {
+            task.setTaskType("Group task: " + nonPersonalTaskTypeAssignee);
+        } else {
+            task.setTaskType("Friend task: " + nonPersonalTaskTypeAssignee);
+        }
+
+        TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
+            @Override
+            public void onTaskCreated(String taskUUID) {
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("NewTask", true);
+                returnIntent.putExtra("TaskUUID", taskUUID);
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
+            }
+        };
         TaskService taskService = new TaskService();
+        taskService.setTaskServiceCreateListener(taskServiceCreateListener);
         UUID uuid = UUID.randomUUID();
         task.setUuid(uuid.toString());
         taskService.createTask(task);
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra("NewTask", true);
-        setResult(Activity.RESULT_OK, returnIntent);
-        finish();
+    }
+
+    private boolean validateTaskType() {
+        if (this.taskType == TaskType.GROUP && this.nonPersonalTaskTypeAssignee.equals("")) {
+            ((TextView) findViewById(R.id.AddTaskTypeLabel)).setError("Group not selected!");
+            return false;
+        }
+        return true;
     }
 
     private boolean validateLocation() {
         if (this.taskLocationName == null || this.taskLocationName.isEmpty()) {
+            ((TextView) findViewById(R.id.AddTaskLocationLabel)).setError("Please choose a location!");
             return false;
         }
         return true;
@@ -155,10 +223,13 @@ public class AddTask extends AppCompatActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
         boolean noCoarseLocationAccess = ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-        if (noFineLocationAccess && noCoarseLocationAccess) {
+        boolean noBackgroundLocationAccess = ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED;
+        if (noFineLocationAccess || noCoarseLocationAccess || noBackgroundLocationAccess) {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION},
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_BACKGROUND_LOCATION},
                     101);
         }
         fusedLocationClient.getLastLocation()
@@ -178,7 +249,6 @@ public class AddTask extends AppCompatActivity {
         this.mapController.setZoom(16);
         this.map.setMultiTouchControls(true);
         this.map.setClickable(true);
-        System.out.println(this.currentUserLocation);
         this.mapController.setCenter(this.currentUserLocation);
     }
 
@@ -200,5 +270,46 @@ public class AddTask extends AppCompatActivity {
         this.mapMarker.setPosition(markerPoint);
         this.mapMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         this.map.getOverlays().add(this.mapMarker);
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (((TextView) findViewById(R.id.AddTaskTitleValue)).getText() != null)
+            outState.putString("taskTitle", ((TextView) findViewById(R.id.AddTaskTitleValue)).getText().toString());
+        else
+            outState.putString("taskTitle", "");
+
+        if (((TextView) findViewById(R.id.AddTaskDescriptionValue)).getText() != null)
+            outState.putString("taskDesc", ((TextView) findViewById(R.id.AddTaskDescriptionValue)).getText().toString());
+        else
+            outState.putString("taskDesc", "");
+
+        outState.putString("taskLocationName", this.taskLocationName);
+        outState.putDouble("taskLatitude", this.taskLatitude);
+        outState.putDouble("taskLongitude", this.taskLongitude);
+        outState.putInt("addTaskLocationValueVisibility", this.addTaskLocationValue.getVisibility());
+        outState.putString("addTaskLocationValue", this.addTaskLocationValue.getText().toString());
+        outState.putInt("addTaskTypeRecyclerViewContainerVisibility", addTaskTypeRecyclerViewContainer.getVisibility());
+        outState.putSerializable("taskType", this.taskType);
+    }
+
+    private void initialItemData(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+//            for (String key : savedInstanceState.keySet()) {
+//                System.out.println("GeoNotif Add Task : " + key + " = \"" + savedInstanceState.get(key) + "\"");
+//            }
+            this.taskLocationName = savedInstanceState.getString("taskLocationName");
+            this.taskLatitude = savedInstanceState.getDouble("taskLatitude");
+            this.taskLongitude = savedInstanceState.getDouble("taskLongitude");
+            this.addTaskLocationValue.setVisibility(savedInstanceState.getInt("addTaskLocationValueVisibility"));
+            this.addTaskLocationValue.setText(savedInstanceState.getString("addTaskLocationValue"));
+            this.addTaskTypeRecyclerViewContainer.setVisibility(savedInstanceState.getInt("addTaskTypeRecyclerViewContainerVisibility"));
+            this.taskType = (TaskType) savedInstanceState.getSerializable("taskType");
+            if (this.taskLocationName != null) {
+                setMapMarker(this.taskLatitude, this.taskLongitude);
+            }
+        }
     }
 }

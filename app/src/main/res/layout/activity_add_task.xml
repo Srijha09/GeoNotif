@@ -80,6 +80,52 @@
                 android:textSize="14sp" />
 
             <TextView
+                android:id="@+id/AddTaskTypeLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Task type"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp" />
+
+            <RadioGroup
+                android:id="@+id/AddTaskTypeRadioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/rounded_rectangle"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/AddTaskTypePersonalRadio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="@color/primary"
+                    android:checked="true"
+                    android:onClick="onAddTaskTypePersonalRadioButtonClick"
+                    android:text="Personal" />
+
+                <RadioButton
+                    android:id="@+id/AddTaskTypeGroupRadio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="@color/primary"
+                    android:onClick="onAddTaskTypeGroupRadioButtonClick"
+                    android:text="Group" />
+            </RadioGroup>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/AddTaskTypeRecyclerViewContainer"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="@drawable/custom_edittext"
+                android:padding="5dp"
+                android:visibility="gone" />
+
+            <TextView
                 android:id="@+id/AddTaskLocationLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

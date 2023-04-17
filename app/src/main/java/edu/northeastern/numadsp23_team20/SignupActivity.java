@@ -1,6 +1,7 @@
 package edu.northeastern.numadsp23_team20;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -62,6 +63,9 @@ public class SignupActivity extends AppCompatActivity {
                             FirebaseDatabase.getInstance().getReference("GeoNotif/Users")
                                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(data).
                                     addOnCompleteListener(task1 -> {
+                                        SharedPreferences.Editor editor = this.getSharedPreferences(GeoNotif.PREFERENCES, MODE_PRIVATE).edit();
+                                        editor.putString(GeoNotif.NOTIF_SETTING, GeoNotif.ENABLE_NOTIF_SETTING);
+                                        editor.apply();
                                         Intent intent = new Intent(SignupActivity.this, HomePage.class);
                                         startActivity(intent);
                                         finish();

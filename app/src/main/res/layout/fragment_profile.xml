@@ -54,7 +54,10 @@
                         android:layout_height="50dp"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
-                        android:src="@drawable/ic_baseline_edit_24"
+                        android:elevation="0dp"
+                        app:elevation="0dp"
+                        android:src="@android:drawable/ic_menu_edit"
+                        app:tint="@color/black"
                         app:backgroundTint="@color/primary_highlight" />
 
                 </RelativeLayout>
@@ -62,20 +65,99 @@
             </RelativeLayout>
 
             <LinearLayout
-                android:id="@+id/LinearLayout02"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
                 android:layout_width="match_parent"
-                android:layout_alignParentBottom="true">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Full Name" />
+
+                    <EditText
+                        android:id="@+id/fullnameTextBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:editable="false"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Email" />
+
+                    <EditText
+                        android:id="@+id/emailTextBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:editable="false"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enable notifications"
+                    android:textSize="20dp"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switch_notifications"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    app:thumbTint="@color/primary_highlight"
+                    app:trackTint="@color/quantum_grey400"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/LinearLayout02"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_margin="10dp">
 
                 <Button
                     android:id="@+id/logoutButton"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:textColor="@color/white"
                     android:layout_margin="10dp"
-                    android:text="Logout" />
+                    android:layout_weight="1"
+                    android:text="Logout"
+                    android:textColor="@color/white" />
             </LinearLayout>
 
         </LinearLayout>

@@ -1,6 +1,8 @@
 package edu.northeastern.numadsp23_team20;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +38,13 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
         this.taskList = taskList;
         this.onTaskItemClickListener = onTaskItemClickListener;
         this.taskService = new TaskService();
+
+        TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
+            @Override
+            public void onTaskCreated(String taskUUID) {
+            }
+        };
+        this.taskService.setTaskServiceCreateListener(taskServiceCreateListener);
     }
 
     @NonNull
@@ -57,13 +66,12 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
     public void onBindViewHolder(@NonNull TaskListViewHolder holder, int position) {
         Task task = this.taskList.get(position);
         holder.RVTaskTitle.setText(task.getTaskName());
+        holder.RVTaskType.setText(task.getTaskType());
         holder.RVTaskLocation.setText("\uD83D\uDCCD " + task.getLocation().getKey());
-        System.out.println(task.getTaskName() + ":" + task.getIsComplete());
         holder.RVCheckBox.setChecked(task.getIsComplete());
 
         holder.RVCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            task.setIsComplete(isChecked);
-            System.out.println(task.getTaskName());
+            this.taskList.get(position).setIsComplete(isChecked);
             notifyItemChanged(position);
             this.taskService.createTask(task);
         });
@@ -82,12 +90,14 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
 
         private TextView RVTaskTitle;
         private TextView RVTaskLocation;
+        private TextView RVTaskType;
         public CheckBox RVCheckBox;
 
         public TaskListViewHolder(@NonNull View itemView) {
             super(itemView);
 
             this.RVTaskTitle = itemView.findViewById(R.id.RVTaskTitle);
+            this.RVTaskType = itemView.findViewById(R.id.RVTaskType);
             this.RVTaskLocation = itemView.findViewById(R.id.RVTaskLocation);
             this.RVCheckBox = itemView.findViewById(R.id.checkBox);
             itemView.setOnClickListener(this);

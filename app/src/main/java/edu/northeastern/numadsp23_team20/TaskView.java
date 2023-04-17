@@ -5,6 +5,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -28,17 +29,21 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polygon;
 
-public class TaskView extends AppCompatActivity {
+import java.io.Serializable;
+
+public class TaskView extends AppCompatActivity implements Serializable {
 
     MapView map;
     String taskName;
     Button markComplete;
     String uuid;
+    Intent thisIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_view);
+        this.thisIntent = getIntent();
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         this.map = findViewById(R.id.MapView);
@@ -100,14 +105,40 @@ public class TaskView extends AppCompatActivity {
     }
 
     public void onTaskEditFloatingButtonClick(View view) {
-        Intent thisIntent = getIntent();
         Intent intent = new Intent(this, EditTask.class);
         intent.putExtra("taskTitle", thisIntent.getExtras().getString("taskTitle"));
         intent.putExtra("taskDescription", thisIntent.getExtras().getString("taskDescription"));
         intent.putExtra("taskLocation", thisIntent.getExtras().getString("taskLocation"));
         intent.putExtra("taskLatitude", thisIntent.getExtras().getDouble("taskLatitude"));
         intent.putExtra("taskLongitude", thisIntent.getExtras().getDouble("taskLongitude"));
+        intent.putExtra("taskComplete", thisIntent.getExtras().getBoolean("taskComplete"));
+        intent.putExtra("taskUUID", thisIntent.getExtras().getString("taskUUID"));
+        intent.putExtra("taskType", thisIntent.getExtras().getString("taskType"));
         this.startActivity(intent);
+    }
+
+    public void onTaskMarkCompleteButtonClick(View view) {
+        Task task = new Task(thisIntent.getExtras().getString("taskTitle"),
+                thisIntent.getExtras().getString("taskDescription"),
+                new LocationItem(thisIntent.getExtras().getString("taskLocation"),
+                        thisIntent.getExtras().getDouble("taskLatitude"),
+                        thisIntent.getExtras().getDouble("taskLongitude")),
+                thisIntent.getExtras().getString("taskUUID"), true);
+        task.setTaskType(thisIntent.getExtras().getString("taskType"));
+
+        TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
+            @Override
+            public void onTaskCreated(String taskUUID) {
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("EditedTask", true);
+                returnIntent.putExtra("EditedTaskPosition", thisIntent.getExtras().getInt("position"));
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
+            }
+        };
+        TaskService taskService = new TaskService();
+        taskService.setTaskServiceCreateListener(taskServiceCreateListener);
+        taskService.createTask(task);
     }
 
     public void onTaskDeleteFloatingButtonClick(View view) {
@@ -116,9 +147,19 @@ public class TaskView extends AppCompatActivity {
                 .setMessage("Are you sure you want to delete this task?")
                 .setIcon(R.drawable.warning)
                 .setPositiveButton("CONFIRM", (dialogInterface, whichButton) -> {
+                    TaskService.TaskServiceDeleteListener taskServiceDeleteListener = new TaskService.TaskServiceDeleteListener() {
+                        @Override
+                        public void onTaskDeleted() {
+                            Intent returnIntent = new Intent();
+                            returnIntent.putExtra("DeletedTask", true);
+                            returnIntent.putExtra("DeletedTaskPosition", thisIntent.getExtras().getInt("position"));
+                            setResult(Activity.RESULT_OK, returnIntent);
+                            finish();
+                        }
+                    };
                     TaskService taskService = new TaskService();
+                    taskService.setTaskServiceDeleteListener(taskServiceDeleteListener);
                     taskService.deleteTask(this.uuid);
-                    this.finish();
                 })
                 .setNegativeButton(android.R.string.no, null)
                 .show();
