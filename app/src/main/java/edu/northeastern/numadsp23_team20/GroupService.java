@@ -2,18 +2,13 @@ package edu.northeastern.numadsp23_team20;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +28,15 @@ public class GroupService {
         this.groupServiceListener = groupServiceListener;
     }
 
+    public String getFirebaseUserUID(){
+        return firebaseUser.getUid();
+    }
     public void createGroup(Group group) {
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/"
                 + group.getUuid());
         this.ref.setValue(group);
+        String currentUserUUID = firebaseUser.getUid();
+        group.getGroupParticipants().add(currentUserUUID);
         for (String participantUUID: group.getGroupParticipants()) {
             DatabaseReference userGroupsRef = FirebaseDatabase.getInstance().getReference(
                     "GeoNotif/Users/" + participantUUID + "/Groups");
@@ -72,7 +72,7 @@ public class GroupService {
                 for (DataSnapshot groupChildren : group.getResult().getChildren()) {
                     List<String> groupParticipants = new ArrayList<>();
                     if (groupChildren.getKey().equals("groupParticipants")) {
-                        groupParticipants = (ArrayList) groupChildren.getValue();
+                        groupParticipants = (ArrayList<String>) groupChildren.getValue();
                     }
                     for (String userId : groupParticipants) {
                         DatabaseReference locationRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations");
@@ -127,5 +127,7 @@ public class GroupService {
 
     public interface GroupServiceListener {
         void onUserGroupLoaded(String group);
+
+        void onGroupCreated(Group group);
     }
 }
