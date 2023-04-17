@@ -10,34 +10,18 @@
 
     <RelativeLayout
         android:layout_width="346dp"
-        android:layout_height="250dp">
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/groupimage"
-            android:layout_width="65dp"
-            android:layout_height="62dp"
-            android:layout_marginStart="50dp"
-            android:layout_marginTop="95dp"
-            android:layout_marginEnd="50dp"
-            android:layout_marginBottom="50dp"
-            android:src="@drawable/groups"
-            app:civ_border_color="@color/primary"
-            app:civ_border_width="1dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.122" />
+        android:layout_height="202dp">
 
         <TextView
             android:id="@+id/grpnametxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="125dp"
-            android:layout_marginTop="95dp"
-            android:layout_marginEnd="120dp"
+            android:layout_marginTop="80dp"
+            android:layout_marginStart="20dp"
+            android:gravity="start"
             android:text="Group name"
             android:textColor="@color/primary"
-            android:textSize="18dp"
+            android:textSize="17dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.291"
@@ -50,8 +34,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="115dp"
-            android:layout_marginTop="0dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="100dp"
+            android:fontFamily="sans-serif-medium"
             android:text="Create a group"
             android:textColor="@color/primary"
             android:textSize="18dp"
@@ -64,50 +49,18 @@
 
         <EditText
             android:id="@+id/editgroupname"
-            android:layout_width="134dp"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
-            android:textColor="@color/primary"
-            android:layout_marginStart="125dp"
-            android:layout_marginTop="117dp"
+            android:layout_marginTop="110dp"
+            android:layout_marginStart="20dp"
             android:layout_marginEnd="100dp"
-            android:textAlignment="center"
+            android:textSize="17dp"
+            android:textColor="@color/primary"
             app:layout_constraintEnd_toEndOf="@+id/grpnametxt"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/grpnametxt"
             app:layout_constraintTop_toBottomOf="@+id/grpnametxt" />
 
-        <Button
-            android:id="@+id/donebttn"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="38dp"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="185dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="3dp"
-            android:text="Done"
-            android:textColor="@color/primary_highlight"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.007" />
-
-        <Button
-            android:id="@+id/cancelbttn"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="37dp"
-            android:text="CANCEL"
-            android:textColor="@color/primary_highlight"
-            android:textSize="15dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.987"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.007" />
     </RelativeLayout>
 
 </com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".AddMembersList">
+
+    <Button
+        android:id="@+id/donebttn"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_gravity="end"
+        android:text="Done"
+        android:textColor="@color/primary_highlight" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:text="Add group members"
+        android:textColor="@color/primary"
+        android:textSize="15dp" />
+
+    <Button
+        android:id="@+id/cancelbttn"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:text="CANCEL"
+        android:textColor="@color/primary_highlight"
+        android:textSize="15dp" />
+
+    <androidx.appcompat.widget.SearchView
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:background="#D3D3D3"
+        app:cardCornerRadius="10dp"
+        app:iconifiedByDefault="false"
+        app:queryHint="Search name">
+
+    </androidx.appcompat.widget.SearchView>
+
+
+</RelativeLayout>

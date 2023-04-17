@@ -7,11 +7,20 @@ public class Group {
     private String uuid;
     private String groupName;
     private List<String> groupParticipants;
+    private Integer groupParticipantsNo;
 
-    public Group(String groupName, List<String> groupParticipants) {
-        this.groupName = groupName;
-        this.groupParticipants = groupParticipants;
+    public Group() {
     }
+
+    public Group(String groupName, Integer groupParticipantsNo) {
+        this.groupName = groupName;
+        this.groupParticipantsNo = groupParticipantsNo;
+    }
+
+//    public Group(String groupName, List<String> groupParticipants) {
+//        this.groupName = groupName;
+//        this.groupParticipants = groupParticipants;
+//    }
 
     public String getUuid() {
         return uuid;
@@ -35,5 +44,8 @@ public class Group {
 
     public void setGroupParticipants(List<String> groupParticipants) {
         this.groupParticipants = groupParticipants;
+    }
+    public Integer getGroupParticipantsNo(){
+        return groupParticipants.size();
     }
 }

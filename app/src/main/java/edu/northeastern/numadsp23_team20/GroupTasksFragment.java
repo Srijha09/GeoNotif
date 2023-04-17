@@ -36,7 +36,7 @@ import org.osmdroid.views.overlay.Marker;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GroupTasksFragment extends Fragment implements OnTaskItemClickListener {
+public class GroupTasksFragment extends Fragment {
 
     Context ctx;
     private MapView map;
@@ -72,97 +72,6 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                 startActivity(intent);
             }
         });
-        this.ctx = getContext();
-        Configuration.getInstance().load(this.ctx, PreferenceManager.getDefaultSharedPreferences(this.ctx));
-        this.map = inflatedView.findViewById(R.id.TasksMapView);
-        this.mapController = this.map.getController();
-        this.configureMap();
-        RecyclerView tasksRecyclerView = inflatedView.findViewById(R.id.TasksRecyclerView);
-        this.taskList = new ArrayList<>();
-        this.taskService = new TaskService();
-        TaskListAdapter taskListAdapter = new TaskListAdapter(this.taskList, this);
-        tasksRecyclerView.setAdapter(taskListAdapter);
-        tasksRecyclerView.setHasFixedSize(true);
-        tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this.ctx));
-        this.taskService.setTaskServiceListener(new TaskService.TaskServiceListener() {
-            @Override
-            public void onTaskLoaded(Task task) {
-                setMapMarker(task);
-                taskList.add(task);
-                taskListAdapter.notifyDataSetChanged();
-            }
-        });
-        this.taskService.readTasks();
-        this.addTaskActivityLaunch = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        Bundle intentExtras = data.getExtras();
-                        if (intentExtras.getBoolean("NewTask")) {
-                            this.taskService.readTasks();
-                        }
-                    }
-                });
-
-        inflatedView.findViewById(R.id.AddTaskButton).setOnClickListener(this::onAddTaskButtonClick);
         return inflatedView;
-    }
-
-    public void onAddTaskButtonClick(View view) {
-        Intent intent = new Intent(getContext(), AddTask.class);
-        this.addTaskActivityLaunch.launch(intent);
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private void configureMap() {
-        this.map.setTileSource(TileSourceFactory.MAPNIK);
-        this.mapController.setZoom(16);
-        this.map.setMultiTouchControls(true);
-        this.map.setClickable(true);
-    }
-
-    private Marker getCustomizedMapMarker() {
-        Marker mapMarker = new Marker(this.map);
-        Drawable pin_drawable = ResourcesCompat.getDrawable(this.ctx.getResources(), R.drawable.pin, null);;
-        Bitmap bitmap = ((BitmapDrawable) pin_drawable).getBitmap();
-        Drawable dr = new BitmapDrawable(this.ctx.getResources(), Bitmap.createScaledBitmap(bitmap,
-                (int) (18.0f * this.ctx.getResources().getDisplayMetrics().density),
-                (int) (18.0f * this.ctx.getResources().getDisplayMetrics().density),
-                true));
-        mapMarker.setIcon(dr);
-        return mapMarker;
-    }
-
-    private void setMapMarker(Task task) {
-        GeoPoint markerPoint = new GeoPoint(task.getLocation().getLat(), task.getLocation().getLon());
-        this.mapController.setCenter(markerPoint);
-        Marker mapMarker = this.getCustomizedMapMarker();
-        mapMarker.setPosition(markerPoint);
-        mapMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        mapMarker.setOnMarkerClickListener((marker, mapView) -> {
-            Intent intent = new Intent(getContext(), TaskView.class);
-            intent.putExtra("taskTitle", task.getTaskName());
-            intent.putExtra("taskDescription", task.getDescription());
-            intent.putExtra("taskLocation", task.getLocation().getKey());
-            intent.putExtra("taskLatitude", task.getLocation().getLat());
-            intent.putExtra("taskLongitude", task.getLocation().getLon());
-            startActivity(intent);
-            return true;
-        });
-        this.map.getOverlays().add(mapMarker);
-    }
-
-    @Override
-    public void onTaskItemClick(int position) {
-        System.out.println("Clicked " + position);
-        Task task = this.taskList.get(position);
-        Intent intent = new Intent(getContext(), TaskView.class);
-        intent.putExtra("taskTitle", task.getTaskName());
-        intent.putExtra("taskDescription", task.getDescription());
-        intent.putExtra("taskLocation", task.getLocation().getKey());
-        intent.putExtra("taskLatitude", task.getLocation().getLat());
-        intent.putExtra("taskLongitude", task.getLocation().getLon());
-        startActivity(intent);
     }
 }
