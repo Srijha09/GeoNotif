@@ -2,18 +2,15 @@ package edu.northeastern.numadsp23_team20;
 
 import static android.text.TextUtils.isEmpty;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,7 +19,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -32,15 +28,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
+import java.util.UUID;
 
 public class GroupsFragment extends Fragment {
     private RecyclerView recyclerView;
     private GroupsAdapter groupsAdapter;
+    private GroupService groupService;
     private ArrayList<Group> groupsList;
-    private String current_groups;
     private FirebaseDatabase mDatabase;
     private FirebaseAuth mAuth;
     private DatabaseReference ref;
@@ -58,7 +53,9 @@ public class GroupsFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        groupsList = new ArrayList<>();
+        this.groupsList = new ArrayList<>();
+        this.groupService = new GroupService();
+
         ref = FirebaseDatabase.getInstance().getReference().child("GeoNotif/Groups/");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -80,8 +77,9 @@ public class GroupsFragment extends Fragment {
 //        assert activity != null;
 //        Bundle bundle = activity.getMyData();
 //        current_groups = bundle.getString("current_user");
-        groupsAdapter = new GroupsAdapter(groupsList, getContext());
+        groupsAdapter = new GroupsAdapter(this.groupsList, getContext());
         recyclerView.setAdapter(groupsAdapter);
+
         FloatingActionButton startGroup = view.findViewById(R.id.AddGroupButton);
         startGroup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,11 +141,18 @@ public class GroupsFragment extends Fragment {
         });
         AlertDialog alert = alertDialog.create();
         alert.show();
+        List<String> groupParticipants = new ArrayList<>();
+        String currentUserUUID = groupService.getFirebaseUserUID();
+        groupParticipants.add(currentUserUUID);
         alert.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view1 -> {
             if(!isEmpty(group_name.getText().toString())){
                 String groupname = group_name.getText().toString();
-                Group groups = new Group(groupname, 1);
-                groupsList.add(groups);
+                Group groups = new Group(groupname, groupParticipants);
+                UUID groupUuid = UUID.randomUUID();
+                groups.setUuid(groupUuid.toString());
+                groupService.createGroup(groups);
+                Group group = new Group(groupname, groupParticipants.size());
+                groupsList.add(group);
                 groupsAdapter.notifyDataSetChanged();
                 alert.dismiss();
 
@@ -161,26 +166,24 @@ public class GroupsFragment extends Fragment {
 
     }
 
-    private void extractGroups(Group group){
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/"
-                + group.getUuid());
-        this.ref.setValue(group);
-        for (String participantUUID: group.getGroupParticipants()) {
-            DatabaseReference userGroupsRef = FirebaseDatabase.getInstance().getReference(
-                    "GeoNotif/Users/" + participantUUID + "/Groups");
-            userGroupsRef.get().addOnCompleteListener(userGroups -> {
-                if (!userGroups.isSuccessful()) {
-                    Log.e("firebase", "Error getting data", userGroups.getException());
-                } else {
-                    List<String> groupUUIDs = (List<String>) userGroups.getResult().getValue();
-                    if (groupUUIDs == null || groupUUIDs.isEmpty()) {
-                        groupUUIDs = new ArrayList<>();
-                    }
-                    groupUUIDs.add(group.getUuid());
-                    userGroupsRef.setValue(groupUUIDs);
+    private void extractGroupDB(Group group){
+        this.ref = FirebaseDatabase.getInstance().getReference().child("GeoNotif/Groups/"+group.getUuid());
+        this.ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                groupsList.clear(); // clear the list before adding new data
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Group group = snapshot.getValue(Group.class);
+                    groupsList.add(group);
                 }
-            });
-        }
+                groupsAdapter.notifyDataSetChanged(); // notify the adapter of the data change
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e(TAG, "onCancelled", databaseError.toException());
+            }
+        });
     }
 
     private void openGroupTask() {

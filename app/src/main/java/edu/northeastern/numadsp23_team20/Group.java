@@ -17,10 +17,10 @@ public class Group {
         this.groupParticipantsNo = groupParticipantsNo;
     }
 
-//    public Group(String groupName, List<String> groupParticipants) {
-//        this.groupName = groupName;
-//        this.groupParticipants = groupParticipants;
-//    }
+    public Group(String groupName, List<String> groupParticipants) {
+        this.groupName = groupName;
+        this.groupParticipants = groupParticipants;
+    }
 
     public String getUuid() {
         return uuid;
@@ -46,6 +46,9 @@ public class Group {
         this.groupParticipants = groupParticipants;
     }
     public Integer getGroupParticipantsNo(){
-        return groupParticipants.size();
+        if(groupParticipants!=null) {
+            return groupParticipants.size();
+        }
+        return 1;
     }
 }

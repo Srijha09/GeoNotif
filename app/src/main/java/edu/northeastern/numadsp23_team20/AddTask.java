@@ -60,10 +60,10 @@ public class AddTask extends AppCompatActivity {
     private OnTaskTypeAssigneeItemClickListener onTaskTypeAssigneeItemClickListener;
     private TaskType taskType;
     private String nonPersonalTaskTypeAssignee;
-    private GroupService groupService;
     private GroupService.GroupServiceListener groupServiceListener;
     private List<String> groupsList;
     private RecyclerView addTaskTypeRecyclerViewContainer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,12 +79,11 @@ public class AddTask extends AppCompatActivity {
         this.addTaskTypeRecyclerViewContainer.setLayoutManager(new LinearLayoutManager(this));
         taskTypeListAdapter = new TaskTypeListAdapter(this.groupsList, onTaskTypeAssigneeItemClickListener);
         addTaskTypeRecyclerViewContainer.setAdapter(taskTypeListAdapter);
-        this.groupService = new GroupService();
-        this.groupService.setGroupServiceListener(group -> {
-            groupsList.add(group);
-            taskTypeListAdapter.notifyDataSetChanged();
-        });
-        this.groupService.readGroupsForUser();
+        GroupService groupService = new GroupService();
+//        groupService.setGroupServiceListener(group -> {groupsList.add(group);
+//            taskTypeListAdapter.notifyDataSetChanged();
+//        });
+        groupService.readGroupsForUser();
         this.taskType = TaskType.PERSONAL;
         this.nonPersonalTaskTypeAssignee = "";
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
