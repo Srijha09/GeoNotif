@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -59,27 +60,6 @@ public class FriendsFragment extends Fragment {
 
             mAuth = FirebaseAuth.getInstance();
             firebaseUser = mAuth.getCurrentUser();
-
-            //get entries from the database. Below is dummy data
-            //all_users.add(new FriendsData("Bob", "Follow"));
-            //all_users.add(new FriendsData("Sally", "Follow"));
-            //all_users.add(new FriendsData("Alexa", "Follow"));
-
-
-
-            //get the name of all users.
-            //tHis should be under user.
-            //get al the users and put them inside the all_users list.
-            //intially set all to "follow"
-
-            ////get logged in user
-            //create friends sub child here to add and remove friedsn.
-        //add to friends list IFF friends nto empty Set all to following.
-
-        //now that both lsits are ready, we now set some of the users in all_users to "following"
-        //i they are already in friends. We will need to make this comparison using the unique user id'
-        //so need to add the user ID field to the data.
-        // Get a reference to the "users" node
 
     }
 
@@ -166,7 +146,6 @@ public class FriendsFragment extends Fragment {
         private RecyclerView recyclerView;
         //private  FriendsRecyclerView adapter_all_users;
 
-
         FriendsRecyclerView.OnButtonClickListener listener = new FriendsRecyclerView.OnButtonClickListener() {
             @Override
             public void onButtonClickChange(int position) {
@@ -179,20 +158,27 @@ public class FriendsFragment extends Fragment {
                     friends.remove(datapoint);
 
                     //remove from database (user's friends) too.
-                    DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/"+ firebaseUser.getUid() + "/" + "Friends" );
-                    Query query = usersRef.orderByValue().equalTo(datapoint.getUserID());
-                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    String userId = firebaseUser.getUid();
+                    DatabaseReference userFriendsRef = FirebaseDatabase.getInstance().getReference(
+                            "GeoNotif/Users/" + userId + "/Friends");
+                    userFriendsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                         @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                                String uid = childSnapshot.getKey();
-                                childSnapshot.getRef().removeValue(); // delete the child node
-                            }
-                        }
+                        public void onComplete(@NonNull Task<DataSnapshot> userFriends) {
+                            if (!userFriends.isSuccessful()) {
+                                Log.e("firebase", "Error getting data", userFriends.getException());
+                            } else {
+                                for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
+                                    //get the user IFD
+                                    String userID = childSnapshot.getValue(String.class);
+                                    //Log.d("UserID", userID);
+                                    if (userID.equals(datapoint.getUserID())) {
+                                        //Log.d("I came here", userID);
+                                        childSnapshot.getRef().removeValue(); // delete the child node
+                                        break;
+                                    }
+                                }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            // handle error
+                            }
                         }
                     });
 
@@ -214,6 +200,11 @@ public class FriendsFragment extends Fragment {
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.activity_fragment_tab1, container, false);
 
+            recyclerView = view.findViewById(R.id.recycler_view);
+            adapter_all_users = new FriendsRecyclerView(all_users, listener);
+            recyclerView.setAdapter(adapter_all_users);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
             //get values from database
             DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/");
             usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -229,12 +220,10 @@ public class FriendsFragment extends Fragment {
                             String username = childSnapshot.child("username").getValue(String.class);
                             dataStore = new FriendsData(emailID, fullname, uid, username);
                             all_users.add(dataStore);
+                            adapter_all_users.notifyDataSetChanged();
                         }
                     }
-                    recyclerView = view.findViewById(R.id.recycler_view);
-                    adapter_all_users = new FriendsRecyclerView(all_users, listener);
-                    recyclerView.setAdapter(adapter_all_users);
-                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
 
                 }
 
@@ -277,6 +266,30 @@ public class FriendsFragment extends Fragment {
                 friends.remove(data);
                 adapter_friends.notifyDataSetChanged(); // Notify the adapter that the data has changed
 
+                String userId = firebaseUser.getUid();
+                DatabaseReference userFriendsRef = FirebaseDatabase.getInstance().getReference(
+                        "GeoNotif/Users/" + userId + "/Friends");
+                userFriendsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> userFriends) {
+                        if (!userFriends.isSuccessful()) {
+                            Log.e("firebase", "Error getting data", userFriends.getException());
+                        } else {
+                            for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
+                                //get the user IFD
+                                String userID = childSnapshot.getValue(String.class);
+                                //Log.d("UserID", userID);
+                                if (userID.equals(data.getUserID())) {
+                                    //Log.d("I came here", userID);
+                                    childSnapshot.getRef().removeValue(); // delete the child node
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+                });
+                /*
                 //remove from database (user friends) too.
                 DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/"+ firebaseUser.getUid() + "/" + "Friends" );
                 Query query = usersRef.orderByValue().equalTo(data.getUserID());
@@ -285,6 +298,8 @@ public class FriendsFragment extends Fragment {
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d("snapshot", String.valueOf(dataSnapshot));
+
                         for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                             String uid = childSnapshot.getKey();
                             Log.d("TAG", "Child snapshot key: " + uid + " Value: " + childSnapshot.getValue());
@@ -298,6 +313,8 @@ public class FriendsFragment extends Fragment {
                     }
                 });
 
+                 */
+
             }
         };
 
@@ -306,102 +323,40 @@ public class FriendsFragment extends Fragment {
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.activity_fragment_tab2, container, false);
 
-            DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/"+ firebaseUser.getUid());
-            usersRef.keepSynced(true); // add this line to force a refresh
+            recyclerView = view.findViewById(R.id.recycler_view);
+            adapter_friends = new FriendsRecyclerView(friends, listener);
+            recyclerView.setAdapter(adapter_friends);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-            usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            String userId = firebaseUser.getUid();
+            DatabaseReference userFriendsRef = FirebaseDatabase.getInstance().getReference(
+                    "GeoNotif/Users/" + userId + "/Friends");
+            userFriendsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Log.d("data", String.valueOf(dataSnapshot));
-                    /*
-                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                        //get the user IFD
-                        String userID = childSnapshot.child("uid").getValue(String.class);
-
-                        //add that person to friends
-                        for (int i = 0; i < all_users.size(); i++) {
-                            if (userID.equals(all_users.get(i).getUserID())) {
-                                all_users.get(i).setButtonDetails("following");
-                                friends.add(all_users.get(i));
-                                adapter_all_users.notifyDataSetChanged(); // Notify the adapter that the data has changed
-                                break;
-                            }
-                        }
-                    }
-
-
-                     */
-
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    // Handle errors here
-                }
-            });
-
-
-            /*
-            DatabaseReference friendsRef = usersRef.child("Friends");
-
-            friendsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        Log.d("I came here", "test");
-
+                public void onComplete(@NonNull Task<DataSnapshot> userFriends) {
+                    if (!userFriends.isSuccessful()) {
+                        Log.d("firebase", "Error getting data", userFriends.getException());
                     } else {
-                        Log.d("data", String.valueOf(dataSnapshot));
-                        Log.d("I never came here", "test");
-
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    // Handle errors here
-                }
-            });
-             */
-
-
-            /*
-            usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.hasChild("Friends")) {
-                        Log.d("I came here", "test");
-                        for (DataSnapshot childSnapshot : dataSnapshot.child("Friends").getChildren()) {
+                        for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
                             //get the user IFD
                             String userID = childSnapshot.getValue(String.class);
-                            Log.d("userId", userID);
+
                             //add that person to friends
                             for (int i = 0; i < all_users.size(); i++) {
                                 if (userID.equals(all_users.get(i).getUserID())) {
                                     all_users.get(i).setButtonDetails("following");
                                     friends.add(all_users.get(i));
-                                    Log.d("added", all_users.get(i).getUserID());
                                     adapter_all_users.notifyDataSetChanged(); // Notify the adapter that the data has changed
+                                    adapter_friends.notifyDataSetChanged(); // Notify the adapter that the data has changed
                                     break;
                                 }
                             }
                         }
-                    } else {
-                        Log.d("I never came here", "test");
 
                     }
                 }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    // Handle errors here
-                }
             });
-             */
 
-            recyclerView = view.findViewById(R.id.recycler_view);
-            adapter_friends = new FriendsRecyclerView(friends, listener);
-            recyclerView.setAdapter(adapter_friends);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
             // Check if the saved instance state is not null
             if (savedInstanceState != null) {
