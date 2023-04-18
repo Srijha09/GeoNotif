@@ -36,7 +36,7 @@ import org.osmdroid.views.overlay.Marker;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GroupTasksFragment extends Fragment {
+public class GroupTasksFragment extends Fragment implements GroupSettingsView.GroupNameChangedListener{
 
     Context ctx;
     private MapView map;
@@ -45,6 +45,7 @@ public class GroupTasksFragment extends Fragment {
     private TaskService taskService;
     private List<Task> taskList;
     private ImageButton settings;
+    private String groupName;
 
 
     @Override
@@ -58,7 +59,10 @@ public class GroupTasksFragment extends Fragment {
 
         View inflatedView = inflater.inflate(R.layout.fragment_group_tasks, container, false);
         assert getArguments() != null;
-        String groupName = getArguments().getString("groupName");
+        String groupId = getArguments().getString("groupUUID");
+        groupName = getArguments().getString("groupName");
+        ArrayList<String> groupParticipants = getArguments().getStringArrayList("groupParticipants");
+        Integer groupParticipantsNo = getArguments().getInt("groupParticipantsNo");
         // Set the group name as the text of the TextView
         TextView groupNameTextView = inflatedView.findViewById(R.id.groupName);
         groupNameTextView.setText(groupName);
@@ -68,10 +72,26 @@ public class GroupTasksFragment extends Fragment {
             public void onClick(View v) {
                 // create a new intent to open the new activity
                 Intent intent = new Intent(getContext(), GroupSettingsView.class);
+                intent.putExtra("groupUUID", groupId);
                 intent.putExtra("groupName", groupName);
+                intent.putExtra("groupParticipantsNo", groupParticipantsNo);
+                intent.putExtra("groupParticipants", groupParticipants);
                 startActivity(intent);
             }
         });
         return inflatedView;
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof GroupSettingsView) {
+            ((GroupSettingsView) context).setGroupNameChangedListener(this);
+        }
+    }
+
+    @Override
+    public void onGroupNameChanged(String newGroupName) {
+        this.groupName = newGroupName;
     }
 }

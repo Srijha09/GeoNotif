@@ -1,10 +1,12 @@
 package edu.northeastern.numadsp23_team20;
 
+import static android.app.Activity.RESULT_OK;
 import static android.text.TextUtils.isEmpty;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,6 +41,8 @@ public class GroupsFragment extends Fragment {
     private GroupsAdapter groupsAdapter;
     private GroupService groupService;
     private ArrayList<Group> groupsList;
+    private ArrayList<String> groupParticipants;
+    private String groupname;
     private FirebaseDatabase mDatabase;
     private FirebaseAuth mAuth;
     private DatabaseReference ref;
@@ -67,11 +71,13 @@ public class GroupsFragment extends Fragment {
                 groupsList.clear(); // clear the list before adding new data
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Group group = snapshot.getValue(Group.class);
-                    if (group!=null && group.getGroupParticipants().contains(currentUserUid)) {
+                    if (group != null && group.getGroupParticipants().contains(currentUserUid)) {
                         groupsList.add(group);
                     }
                 }
-                groupsAdapter.notifyDataSetChanged(); // notify the adapter of the data change
+                groupsAdapter.notifyDataSetChanged();// notify the adapter of the data change
+                System.out.println(groupsList);
+
             }
 
             @Override
@@ -108,6 +114,7 @@ public class GroupsFragment extends Fragment {
                         deleteGroupFromDatabase(groupsList.get(position));
                         groupsList.remove(position);
                         groupsAdapter.notifyItemRemoved(position);
+
                         dialogInterface.dismiss();
                     }
                 });
@@ -123,7 +130,6 @@ public class GroupsFragment extends Fragment {
             }
         });
         itemTouchHelper.attachToRecyclerView(recyclerView);
-        System.out.println(groupsList);
         return view;
     }
 
@@ -144,12 +150,12 @@ public class GroupsFragment extends Fragment {
         });
         AlertDialog alert = alertDialog.create();
         alert.show();
-        List<String> groupParticipants = new ArrayList<>();
+        ArrayList<String> groupParticipants = new ArrayList<>();
         String currentUserUUID = groupService.getFirebaseUserUID();
         groupParticipants.add(currentUserUUID);
         alert.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view1 -> {
             if(!isEmpty(group_name.getText().toString())){
-                String groupname = group_name.getText().toString();
+                groupname = group_name.getText().toString();
                 Group groups = new Group(groupname, groupParticipants);
                 UUID groupUuid = UUID.randomUUID();
                 groups.setUuid(groupUuid.toString());
@@ -166,33 +172,12 @@ public class GroupsFragment extends Fragment {
 
         });
         alert.show();
-
     }
 
-    private void extractGroupDB(Group group){
-        this.ref = FirebaseDatabase.getInstance().getReference().child("GeoNotif/Groups/"+group.getUuid());
-        this.ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                groupsList.clear(); // clear the list before adding new data
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Group group = snapshot.getValue(Group.class);
-                    groupsList.add(group);
-                }
-                groupsAdapter.notifyDataSetChanged(); // notify the adapter of the data change
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e(TAG, "onCancelled", databaseError.toException());
-            }
-        });
-    }
-
-    public List<Group> getGroupsList() {
-        return this.groupsList;
-    }
-
+//    public void updateGroupName(int position, String newGroupName) {
+//        group.setGroupName(newGroupName);
+//        groupsAdapter.notifyItemChanged(position);
+//    }
 
 
     public void deleteGroupFromDatabase(Group group) {

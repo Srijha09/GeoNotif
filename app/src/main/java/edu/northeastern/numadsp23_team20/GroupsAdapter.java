@@ -3,6 +3,7 @@ package edu.northeastern.numadsp23_team20;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder> {
     private final ArrayList<Group> groupsList;
@@ -50,13 +52,17 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
             @Override
             public void onClick(View view) {
                 if(groupsList.size()<2){
-                    Intent intent = new Intent(context, StickItToEm.class);
+                    Intent intent = new Intent(context, AddMembers.class);
                     intent.putExtra("groupName", group.getGroupName());
                     //intent.putExtra("loggedInUsername", GroupsAdapter.this.currentUser);
                     context.startActivity(intent);
                 }else {
                     Bundle bundle = new Bundle();
+                    bundle.putString("groupUUID", group.getUuid());
                     bundle.putString("groupName", group.getGroupName());
+
+                    bundle.putStringArrayList("groupParticipants", group.getGroupParticipants());
+                    bundle.putInt("groupParticipantsNo", group.getGroupParticipants().size());
                     GroupTasksFragment grouptasksFragment = new GroupTasksFragment();
                     grouptasksFragment.setArguments(bundle);
                     FragmentTransaction transaction = ((FragmentActivity) context).getSupportFragmentManager().beginTransaction();
