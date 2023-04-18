@@ -151,7 +151,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
         // Reference to create group and add task to group
 
 //        GroupService groupService = new GroupService();
-//        List<String> groupParticipants = new ArrayList<>();
+//        ArrayList<String> groupParticipants = new ArrayList<>();
 //        groupParticipants.add("0807XrhHnbYCitusNryNuiFhaRB2");
 //        groupParticipants.add("MCusNMtwr7hNW7e5xg6Un4tEpfu2");
 //        Group group = new Group("Group 1", groupParticipants);

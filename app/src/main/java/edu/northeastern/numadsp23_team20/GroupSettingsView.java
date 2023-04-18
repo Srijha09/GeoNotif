@@ -73,9 +73,10 @@ public class GroupSettingsView extends AppCompatActivity {
 //            if (groupNameChangedListener != null) {
 //                groupNameChangedListener.onGroupNameChanged(newGroupName);
 //            }
-            Group updatedGroup = new Group(newGroupName, groupParticipantsNo);
+            Group updatedGroup = new Group(newGroupName, groupParticipants);
+            group.setUuid(groupID);
             updatedGroup.setUuid(groupID);
-            //groupService.editGroup(group, updatedGroup);
+            groupService.editGroup(group, updatedGroup);
             alert.dismiss();
         });
     }
