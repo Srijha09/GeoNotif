@@ -80,9 +80,19 @@ public class AddTask extends AppCompatActivity {
         taskTypeListAdapter = new TaskTypeListAdapter(this.groupsList, onTaskTypeAssigneeItemClickListener);
         addTaskTypeRecyclerViewContainer.setAdapter(taskTypeListAdapter);
         GroupService groupService = new GroupService();
-//        groupService.setGroupServiceListener(group -> {groupsList.add(group);
-//            taskTypeListAdapter.notifyDataSetChanged();
-//        });
+        groupService.setGroupServiceListener(new GroupService.GroupServiceListener() {
+
+            @Override
+            public void onUserGroupLoaded(String group) {
+                groupsList.add(group);
+                taskTypeListAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onGroupCreated(Group group) {
+
+            }
+        });
         groupService.readGroupsForUser();
         this.taskType = TaskType.PERSONAL;
         this.nonPersonalTaskTypeAssignee = "";
