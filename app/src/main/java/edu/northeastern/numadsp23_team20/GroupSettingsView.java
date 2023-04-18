@@ -22,32 +22,27 @@ public class GroupSettingsView extends AppCompatActivity {
     private Button edit;
     private GroupService groupService;
     private Group group;
+    private String groupID;
     private String groupName;
-    private int numParticipants;
+    private Integer groupParticipantsNo;
+    private ArrayList<String> groupParticipants;
+    private GroupNameChangedListener groupNameChangedListener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_settings_view);
         Intent intent = getIntent();
+        groupID = intent.getStringExtra("groupUUID");
         String groupName = intent.getStringExtra("groupName");
+        groupParticipants = intent.getStringArrayListExtra("groupParticipants");
+        groupParticipantsNo = intent.getIntExtra("groupParticipantsNo", 1);
+        System.out.println(groupParticipantsNo);
         // Set the group name as the text of the TextView
         TextView groupNameTextView = findViewById(R.id.groupName);
         groupNameTextView.setText(groupName);
         groupService = new GroupService();
-        GroupsFragment groupsFragment = new GroupsFragment();
-        List<Group> groupsList = groupsFragment.getGroupsList();
         // Find the group with the matching name in groupsList
-        System.out.println(groupsList);
-        System.out.println(groupName);
-        for (Group g : groupsList) {
-            if (g.getGroupName().equals(groupName)) {
-                group = g;
-                numParticipants = g.getGroupParticipants().size();
-                break;
-            }
-        }
-        groupService = new GroupService();
-        this.group = new Group(groupName, numParticipants);
+        this.group = new Group(groupName, groupParticipants);
         edit = findViewById(R.id.donebttn);
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,24 +65,27 @@ public class GroupSettingsView extends AppCompatActivity {
         });
         AlertDialog alert = alertDialog.create();
         alert.show();
-        List<String> groupParticipants = new ArrayList<>();
-        String currentUserUUID = groupService.getFirebaseUserUID();
-        groupParticipants.add(currentUserUUID);
 
         alert.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view1 -> {
-            String newGroupName = group_name.getText().toString().trim();
-            if (newGroupName.isEmpty()) {
-                group_name.setError("Group name cannot be empty");
-            } else {
-                // Create a new Group object with the updated group name
-                Group updatedGroup = new Group(newGroupName, groupParticipants);
-                GroupService groupService = new GroupService();
-                groupService.editGroup(group, updatedGroup);
-                alert.dismiss();
-            }
+            String newGroupName = group_name.getText().toString();
+            TextView groupNameTextView = findViewById(R.id.groupName);
+            groupNameTextView.setText(newGroupName);
+//            if (groupNameChangedListener != null) {
+//                groupNameChangedListener.onGroupNameChanged(newGroupName);
+//            }
+            Group updatedGroup = new Group(newGroupName, groupParticipantsNo);
+            updatedGroup.setUuid(groupID);
+            //groupService.editGroup(group, updatedGroup);
+            alert.dismiss();
         });
     }
 
+    public void setGroupNameChangedListener(GroupNameChangedListener listener) {
+        this.groupNameChangedListener = listener;
+    }
 
+    public interface GroupNameChangedListener {
+        void onGroupNameChanged(String newGroupName);
+    }
 
 }
