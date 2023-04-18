@@ -29,6 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class GroupsFragment extends Fragment {
@@ -55,7 +56,8 @@ public class GroupsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         this.groupsList = new ArrayList<>();
         this.groupService = new GroupService();
-
+        mAuth = FirebaseAuth.getInstance();
+        String currentUserUid = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
         ref = FirebaseDatabase.getInstance().getReference().child("GeoNotif/Groups/");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -63,7 +65,9 @@ public class GroupsFragment extends Fragment {
                 groupsList.clear(); // clear the list before adding new data
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Group group = snapshot.getValue(Group.class);
-                    groupsList.add(group);
+                    if (group!=null && group.getGroupParticipants().contains(currentUserUid)) {
+                        groupsList.add(group);
+                    }
                 }
                 groupsAdapter.notifyDataSetChanged(); // notify the adapter of the data change
             }
@@ -73,10 +77,6 @@ public class GroupsFragment extends Fragment {
                 Log.e(TAG, "onCancelled", databaseError.toException());
             }
         });
-//        ChooseChat activity = (ChooseChat) getActivity();
-//        assert activity != null;
-//        Bundle bundle = activity.getMyData();
-//        current_groups = bundle.getString("current_user");
         groupsAdapter = new GroupsAdapter(this.groupsList, getContext());
         recyclerView.setAdapter(groupsAdapter);
 
@@ -120,7 +120,7 @@ public class GroupsFragment extends Fragment {
             }
         });
         itemTouchHelper.attachToRecyclerView(recyclerView);
-        //openGroupTask();
+        System.out.println(groupsList);
         return view;
     }
 
@@ -186,29 +186,8 @@ public class GroupsFragment extends Fragment {
         });
     }
 
-    private void openGroupTask() {
-
-//        mDatabase = FirebaseDatabase.getInstance();
-//        mDatabase.getReference().child("Groups").addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.exists()) {
-//                    for (DataSnapshot d : dataSnapshot.getChildren()) {
-//                        Groups user = new Groups(d.getKey().toUpperCase(Locale.ROOT));
-//                        if (!current_groups.equals(d.getKey())) {
-//                            groupsList.add(user);
-//                        }
-//                    }
-//                }
-//                groupsAdapter.notifyDataSetChanged();
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
+    public List<Group> getGroupsList() {
+        return this.groupsList;
     }
 
 
