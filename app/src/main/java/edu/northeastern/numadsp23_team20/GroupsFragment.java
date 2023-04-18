@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -103,6 +105,7 @@ public class GroupsFragment extends Fragment {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        deleteGroupFromDatabase(groupsList.get(position));
                         groupsList.remove(position);
                         groupsAdapter.notifyItemRemoved(position);
                         dialogInterface.dismiss();
@@ -191,4 +194,71 @@ public class GroupsFragment extends Fragment {
     }
 
 
+
+    public void deleteGroupFromDatabase(Group group) {
+        DatabaseReference groupsRef = FirebaseDatabase.getInstance().getReference(
+                "GeoNotif/Groups/");
+
+        //delete the group from Groups
+        groupsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> groupNames) {
+                if (!groupNames.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", groupNames.getException());
+                } else {
+                    for (DataSnapshot childSnapshot : groupNames.getResult().getChildren()) {
+                        String uid = childSnapshot.child("uuid").getValue(String.class);
+                        if (uid.equals(group.getUuid())) {
+                            childSnapshot.getRef().removeValue(); // delete the child node
+                            break;
+                        }
+                    }
+
+                }
+            }
+        });
+
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference(
+                "GeoNotif/Users/");
+
+        //detete the group from each user
+        usersRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> groupNames) {
+                if (!groupNames.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", groupNames.getException());
+                } else {
+                    for (DataSnapshot childSnapshot : groupNames.getResult().getChildren()) {
+                        String uid = childSnapshot.child("uid").getValue(String.class);
+                        if (group.getGroupParticipants().contains(uid)) {
+                            DatabaseReference groupInsideUsers = FirebaseDatabase.getInstance().getReference(
+                                    "GeoNotif/Users/" + uid + "/Groups");
+                            groupInsideUsers.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DataSnapshot> groupNames2) {
+                                    if (!groupNames2.isSuccessful()) {
+                                        Log.e("firebase", "Error getting data", groupNames2.getException());
+                                    } else {
+                                        for (DataSnapshot childSnapshot : groupNames2.getResult().getChildren()) {
+                                            String uid = childSnapshot.getValue(String.class);
+                                            if (uid.equals(group.getUuid())) {
+                                                //Log.d("I came here", userID);
+                                                childSnapshot.getRef().removeValue(); // delete the child node
+                                                break;
+                                            }
+                                        }
+
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                }
+            }
+        });
+
+
+
+    }
 }

@@ -65,8 +65,6 @@ public class FriendsFragment extends Fragment {
 
             mAuth = FirebaseAuth.getInstance();
             firebaseUser = mAuth.getCurrentUser();
-
-
     }
 
     @Override
