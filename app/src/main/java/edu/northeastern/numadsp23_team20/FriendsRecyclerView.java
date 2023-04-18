@@ -51,12 +51,6 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
         holder.userName.setText(data.getFullname());
         holder.button.setText(data.getButtonDetails());
 
-
-        // Load the image into the ImageView using Glide
-        //Glide.with(holder.itemView.getContext())
-        //.load(data.getImageUrl())
-        //.into(holder.photoImageView);
-
         data.getImageUrl().getDownloadUrl().addOnSuccessListener(downloadUrl -> {
             if (holder.itemView.getContext() == null) {
             } else {

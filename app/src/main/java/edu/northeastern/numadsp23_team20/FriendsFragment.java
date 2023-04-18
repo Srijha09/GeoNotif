@@ -55,6 +55,7 @@ public class FriendsFragment extends Fragment {
     static FirebaseUser firebaseUser;
     FirebaseAuth mAuth;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +82,28 @@ public class FriendsFragment extends Fragment {
         outState.putParcelableArrayList("friends", friends);
     }
 
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            // Restore the tab position
+            int tabPosition = savedInstanceState.getInt("tab_position");
+            mTabLayout.getTabAt(tabPosition).select();
+
+            // Restore the list of all users
+            all_users = savedInstanceState.getParcelableArrayList("all_users");
+
+            // Restore the list of friends
+            friends = savedInstanceState.getParcelableArrayList("friends");
+
+            // Update the adapters
+            adapter_all_users.notifyDataSetChanged();
+            adapter_friends.notifyDataSetChanged();
+        }
+    }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -94,7 +117,7 @@ public class FriendsFragment extends Fragment {
         mViewPager.setAdapter(pagerAdapter);
         mTabLayout.setupWithViewPager(mViewPager);
 
-        /*
+
         // Check if the saved instance state is not null
         if (savedInstanceState != null) {
             // Restore the tab position
@@ -104,7 +127,6 @@ public class FriendsFragment extends Fragment {
             friends = savedInstanceState.getParcelableArrayList("friends");
         }
 
-         */
 
 
         return view;
@@ -194,8 +216,11 @@ public class FriendsFragment extends Fragment {
                     datapoint.setButtonDetails("Following");
                     friends.add(datapoint);
                     //add to database (user's friends)  too.
-                    DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/"+ firebaseUser.getUid() + "/" + "Friends" ).child("uid");
-                    usersRef.setValue(datapoint.getUserID());
+                    DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/"+ firebaseUser.getUid() + "/" + "Friends" );
+                    String newFriendKey = usersRef.push().getKey();
+                    //String newFriendKey = "uid";
+                    usersRef.child(newFriendKey).setValue(datapoint.getUserID());
+
 
                 }
                 adapter_friends.notifyDataSetChanged(); // Notify the adapter that the data has changed
@@ -207,11 +232,14 @@ public class FriendsFragment extends Fragment {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.activity_fragment_tab1, container, false);
+            setRetainInstance(true);
 
             recyclerView = view.findViewById(R.id.recycler_view);
             adapter_all_users = new FriendsRecyclerView(all_users, listener);
             recyclerView.setAdapter(adapter_all_users);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+
 
             storage = FirebaseStorage.getInstance();
             storageRef = storage.getReference();
@@ -248,13 +276,13 @@ public class FriendsFragment extends Fragment {
             });
 
 
-            /*
+
             // Check if the saved instance state is not null
             if (savedInstanceState != null) {
                 all_users = savedInstanceState.getParcelableArrayList("all_users");
                 adapter_all_users.notifyDataSetChanged();
             }
-             */
+
 
             return view;
         }
@@ -311,7 +339,7 @@ public class FriendsFragment extends Fragment {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.activity_fragment_tab2, container, false);
-
+            setRetainInstance(true);
             recyclerView = view.findViewById(R.id.recycler_view);
             adapter_friends = new FriendsRecyclerView(friends, listener);
             recyclerView.setAdapter(adapter_friends);
@@ -347,13 +375,13 @@ public class FriendsFragment extends Fragment {
             });
 
 
-            /*
+
             // Check if the saved instance state is not null
             if (savedInstanceState != null) {
                 friends = savedInstanceState.getParcelableArrayList("friends");
                 adapter_friends.notifyDataSetChanged();
             }
-             */
+
 
             return view;
         }

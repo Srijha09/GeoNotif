@@ -31,8 +31,12 @@ public class FriendsData implements Parcelable {
     }
 
     protected FriendsData(Parcel in) {
+        emailID = in.readString();
+        fullName = in.readString();
+        userID = in.readString();
         userName = in.readString();
         buttonDetails = in.readString();
+        //pathReference = in.readString();
     }
 
     public static final Creator<FriendsData> CREATOR = new Creator<FriendsData>() {
@@ -85,6 +89,9 @@ public class FriendsData implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel parcel, int i) {
+        parcel.writeString(emailID);
+        parcel.writeString(fullName);
+        parcel.writeString(userID);
         parcel.writeString(userName);
         parcel.writeString(buttonDetails);
     }
