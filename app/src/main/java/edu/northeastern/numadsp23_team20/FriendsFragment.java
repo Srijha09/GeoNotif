@@ -28,6 +28,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
@@ -39,6 +41,8 @@ public class FriendsFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private static FriendsRecyclerView.OnButtonClickListener mListener;
 
+    static FirebaseStorage storage;
+    static StorageReference storageRef;
 
     private static ArrayList<FriendsData> all_users;
     private static ArrayList<FriendsData> friends;
@@ -60,6 +64,7 @@ public class FriendsFragment extends Fragment {
 
             mAuth = FirebaseAuth.getInstance();
             firebaseUser = mAuth.getCurrentUser();
+
 
     }
 
@@ -89,6 +94,7 @@ public class FriendsFragment extends Fragment {
         mViewPager.setAdapter(pagerAdapter);
         mTabLayout.setupWithViewPager(mViewPager);
 
+        /*
         // Check if the saved instance state is not null
         if (savedInstanceState != null) {
             // Restore the tab position
@@ -97,6 +103,8 @@ public class FriendsFragment extends Fragment {
             all_users = savedInstanceState.getParcelableArrayList("all_users");
             friends = savedInstanceState.getParcelableArrayList("friends");
         }
+
+         */
 
 
         return view;
@@ -205,6 +213,9 @@ public class FriendsFragment extends Fragment {
             recyclerView.setAdapter(adapter_all_users);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+            storage = FirebaseStorage.getInstance();
+            storageRef = storage.getReference();
+
             //get values from database
             DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/");
             usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -218,7 +229,8 @@ public class FriendsFragment extends Fragment {
                             String emailID = childSnapshot.child("emailId").getValue(String.class);
                             String fullname = childSnapshot.child("fullname").getValue(String.class);
                             String username = childSnapshot.child("username").getValue(String.class);
-                            dataStore = new FriendsData(emailID, fullname, uid, username);
+                            StorageReference pathReference = storageRef.child("profileImages/" + uid + "/profile.jpg");
+                            dataStore = new FriendsData(emailID, fullname, uid, username, pathReference);
                             all_users.add(dataStore);
                             adapter_all_users.notifyDataSetChanged();
                         }
@@ -236,11 +248,13 @@ public class FriendsFragment extends Fragment {
             });
 
 
+            /*
             // Check if the saved instance state is not null
             if (savedInstanceState != null) {
                 all_users = savedInstanceState.getParcelableArrayList("all_users");
                 adapter_all_users.notifyDataSetChanged();
             }
+             */
 
             return view;
         }
@@ -289,31 +303,6 @@ public class FriendsFragment extends Fragment {
                         }
                     }
                 });
-                /*
-                //remove from database (user friends) too.
-                DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/"+ firebaseUser.getUid() + "/" + "Friends" );
-                Query query = usersRef.orderByValue().equalTo(data.getUserID());
-                Log.d("TAG", "Query string: " + query.toString());
-
-                query.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.d("snapshot", String.valueOf(dataSnapshot));
-
-                        for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                            String uid = childSnapshot.getKey();
-                            Log.d("TAG", "Child snapshot key: " + uid + " Value: " + childSnapshot.getValue());
-                            childSnapshot.getRef().removeValue(); // delete the child node
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        // handle error
-                    }
-                });
-
-                 */
 
             }
         };
@@ -358,11 +347,13 @@ public class FriendsFragment extends Fragment {
             });
 
 
+            /*
             // Check if the saved instance state is not null
             if (savedInstanceState != null) {
                 friends = savedInstanceState.getParcelableArrayList("friends");
                 adapter_friends.notifyDataSetChanged();
             }
+             */
 
             return view;
         }

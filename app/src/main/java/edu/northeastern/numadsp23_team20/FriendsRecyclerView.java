@@ -41,8 +41,6 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
     }
 
 
-
-
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
@@ -58,8 +56,20 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
         //Glide.with(holder.itemView.getContext())
         //.load(data.getImageUrl())
         //.into(holder.photoImageView);
-        //Picasso.get().load(data.getImageUrl()).into(holder.photoImageView);
 
+        data.getImageUrl().getDownloadUrl().addOnSuccessListener(downloadUrl -> {
+            if (holder.itemView.getContext() == null) {
+            } else {
+                Glide.with(holder.itemView.getContext())
+                        .load(downloadUrl)
+                        .circleCrop()
+                        .into(holder.photoImageView);
+
+            }
+        });
+
+
+        //Picasso.get().load(data.getImageUrl()).into(holder.photoImageView);
 
 
     }
@@ -76,7 +86,7 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
 
     // Provide a reference to the views for each data item
     public class ViewHolder extends RecyclerView.ViewHolder {
-        //public ImageView photoImageView;
+        public ImageView photoImageView;
         public TextView userName;
 
         public Button button;
@@ -84,7 +94,7 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
         public ViewHolder(View view, OnButtonClickListener listener) {
             super(view);
 
-            //photoImageView = itemView.findViewById(R.id.photo_of_user);
+            photoImageView = itemView.findViewById(R.id.photo_of_user);
             userName = view.findViewById(R.id.name_of_person);
             button = view.findViewById(R.id.follow_button);
 
@@ -96,7 +106,6 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
                 }
             });
         }
-
 
 
     }
