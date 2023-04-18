@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.storage.StorageReference;
+
 public class FriendsData implements Parcelable {
 
     //private String imageUrl;
@@ -15,14 +17,17 @@ public class FriendsData implements Parcelable {
     private String userName;
     private String buttonDetails;
 
+    private StorageReference pathReference;
+
     //intialize the variables of our link object.
-    public FriendsData(String emailID, String fullName, String userID, String userName) {
+    public FriendsData(String emailID, String fullName, String userID, String userName, StorageReference pathReference) {
         //this.imageUrl = imageURL;
         this.emailID = emailID;
         this.fullName = fullName;
         this.userID = userID;
         this.userName = userName;
         this.buttonDetails = "Follow";
+        this.pathReference = pathReference;
     }
 
     protected FriendsData(Parcel in) {
@@ -68,11 +73,10 @@ public class FriendsData implements Parcelable {
         this.buttonDetails = buttonDetails;
     }
 
-    /*
-    public String getImageUrl() {
-        return imageUrl;
+    public StorageReference getImageUrl() {
+        return pathReference;
     }
-     */
+
 
     @Override
     public int describeContents() {
