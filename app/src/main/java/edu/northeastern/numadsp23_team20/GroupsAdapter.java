@@ -93,7 +93,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                         int position = getLayoutPosition();
                         if (position != RecyclerView.NO_POSITION) {
 
-                            listener.onItemClick(position);
+                            listener.onItemClick(v, position);
                         }
                     }
                 }

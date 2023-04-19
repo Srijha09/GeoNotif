@@ -1,5 +1,7 @@
 package edu.northeastern.numadsp23_team20;
 
+import android.view.View;
+
 public class Groups implements ItemClickListener{
     String groupname;
     Integer participants_no;
@@ -21,5 +23,5 @@ public class Groups implements ItemClickListener{
 
 
     @Override
-    public void onItemClick(int position) {}
+    public void onItemClick(View v, int position) {}
 }

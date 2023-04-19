@@ -5,6 +5,14 @@ import java.util.List;
 
 public class User {
     public String fullname, username, emailId, uid;
+    private String buttonDetails="Add";
+
+    public String getButtonDetails() {
+        return buttonDetails;
+    }
+    public void setButtonDetails(String buttonDetails) {
+        this.buttonDetails = buttonDetails;
+    }
 
     public List<String> getTasks() {
         return tasks;

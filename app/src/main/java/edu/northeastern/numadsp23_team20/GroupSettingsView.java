@@ -20,6 +20,7 @@ import java.util.UUID;
 
 public class GroupSettingsView extends AppCompatActivity {
     private Button edit;
+    private Button deleteBttn;
     private GroupService groupService;
     private Group group;
     private String groupID;
@@ -55,9 +56,19 @@ public class GroupSettingsView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), AddMembersList.class);
-                intent.putExtra("groupName", group.getGroupName());
+                intent.putExtra("groupUUID", groupID);
+                intent.putExtra("groupName", groupName);
+                intent.putExtra("groupParticipantsNo", groupParticipantsNo);
+                intent.putExtra("groupParticipants", groupParticipants);
                 //intent.putExtra("loggedInUsername", GroupsAdapter.this.currentUser);
                 startActivity(intent);
+            }
+        });
+        deleteBttn = findViewById(R.id.deletegrp_bttn);
+        deleteBttn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editGroupAlertDialog(group);
             }
         });
     }

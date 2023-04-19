@@ -174,10 +174,6 @@ public class GroupsFragment extends Fragment {
         alert.show();
     }
 
-//    public void updateGroupName(int position, String newGroupName) {
-//        group.setGroupName(newGroupName);
-//        groupsAdapter.notifyItemChanged(position);
-//    }
 
 
     public void deleteGroupFromDatabase(Group group) {
@@ -242,8 +238,5 @@ public class GroupsFragment extends Fragment {
                 }
             }
         });
-
-
-
     }
 }
