@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-public class AddMembers extends AppCompatActivity {
+public class AddNewMembersPage extends AppCompatActivity {
     private ImageButton settings;
 
     @Override

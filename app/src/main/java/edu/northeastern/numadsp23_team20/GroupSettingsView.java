@@ -50,6 +50,16 @@ public class GroupSettingsView extends AppCompatActivity {
                 editGroupAlertDialog(group);
             }
         });
+        Button addMember = findViewById(R.id.addmember_bttn);
+        addMember.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), AddMembersList.class);
+                intent.putExtra("groupName", group.getGroupName());
+                //intent.putExtra("loggedInUsername", GroupsAdapter.this.currentUser);
+                startActivity(intent);
+            }
+        });
     }
 
     public void editGroupAlertDialog(Group group) {

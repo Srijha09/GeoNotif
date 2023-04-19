@@ -63,7 +63,7 @@ public class GroupsFragment extends Fragment {
         this.groupsList = new ArrayList<>();
         this.groupService = new GroupService();
         mAuth = FirebaseAuth.getInstance();
-        String currentUserUid = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
+        String currentUserUid = mAuth.getCurrentUser().getUid();
         ref = FirebaseDatabase.getInstance().getReference().child("GeoNotif/Groups/");
         ref.addValueEventListener(new ValueEventListener() {
             @Override

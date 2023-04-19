@@ -97,7 +97,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
                     noTasksTextView.setVisibility(View.INVISIBLE);
                     tasksScrollView.setVisibility(View.VISIBLE);
                 }
-                setMapMarker(task);
+                //setMapMarker(task);
                 taskList.add(task);
                 taskListAdapter.notifyDataSetChanged();
             }
@@ -178,41 +178,41 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
         this.map.setClickable(true);
     }
 
-    private Marker getCustomizedMapMarker() {
-        Marker mapMarker = new Marker(this.map);
-        Drawable pin_drawable = ResourcesCompat.getDrawable(this.ctx.getResources(), R.drawable.pin, null);
-        // assert pin_drawable != null;
-        Bitmap bitmap = ((BitmapDrawable) pin_drawable).getBitmap();
-        Drawable dr = new BitmapDrawable(this.ctx.getResources(), Bitmap.createScaledBitmap(bitmap,
-                (int) (18.0f * this.ctx.getResources().getDisplayMetrics().density),
-                (int) (18.0f * this.ctx.getResources().getDisplayMetrics().density),
-                true));
-        mapMarker.setIcon(dr);
-        return mapMarker;
-    }
+//    private Marker getCustomizedMapMarker() {
+//        Marker mapMarker = new Marker(this.map);
+//        Drawable pin_drawable = ResourcesCompat.getDrawable(this.ctx.getResources(), R.drawable.pin, null);
+//        // assert pin_drawable != null;
+//        Bitmap bitmap = ((BitmapDrawable) pin_drawable).getBitmap();
+//        Drawable dr = new BitmapDrawable(this.ctx.getResources(), Bitmap.createScaledBitmap(bitmap,
+//                (int) (18.0f * this.ctx.getResources().getDisplayMetrics().density),
+//                (int) (18.0f * this.ctx.getResources().getDisplayMetrics().density),
+//                true));
+//        mapMarker.setIcon(dr);
+//        return mapMarker;
+//    }
 
-    private void setMapMarker(Task task) {
-        GeoPoint markerPoint = new GeoPoint(task.getLocation().getLat(), task.getLocation().getLon());
-        this.mapController.setCenter(markerPoint);
-        Marker mapMarker = this.getCustomizedMapMarker();
-        mapMarker.setPosition(markerPoint);
-        mapMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        mapMarker.setOnMarkerClickListener((marker, mapView) -> {
-            Intent intent = new Intent(getContext(), TaskView.class);
-            intent.putExtra("taskTitle", task.getTaskName());
-            intent.putExtra("taskDescription", task.getDescription());
-            intent.putExtra("taskLocation", task.getLocation().getKey());
-            intent.putExtra("taskLatitude", task.getLocation().getLat());
-            intent.putExtra("taskLongitude", task.getLocation().getLon());
-            intent.putExtra("taskComplete", task.getIsComplete());
-            intent.putExtra("taskUUID", task.getUuid());
-            intent.putExtra("taskType", task.getTaskType());
-            intent.putExtra("taskTypeString", task.getTaskTypeString());
-            startActivity(intent);
-            return true;
-        });
-        this.map.getOverlays().add(mapMarker);
-    }
+//    private void setMapMarker(Task task) {
+//        GeoPoint markerPoint = new GeoPoint(task.getLocation().getLat(), task.getLocation().getLon());
+//        this.mapController.setCenter(markerPoint);
+//        Marker mapMarker = this.getCustomizedMapMarker();
+//        mapMarker.setPosition(markerPoint);
+//        mapMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+//        mapMarker.setOnMarkerClickListener((marker, mapView) -> {
+//            Intent intent = new Intent(getContext(), TaskView.class);
+//            intent.putExtra("taskTitle", task.getTaskName());
+//            intent.putExtra("taskDescription", task.getDescription());
+//            intent.putExtra("taskLocation", task.getLocation().getKey());
+//            intent.putExtra("taskLatitude", task.getLocation().getLat());
+//            intent.putExtra("taskLongitude", task.getLocation().getLon());
+//            intent.putExtra("taskComplete", task.getIsComplete());
+//            intent.putExtra("taskUUID", task.getUuid());
+//            intent.putExtra("taskType", task.getTaskType());
+//            intent.putExtra("taskTypeString", task.getTaskTypeString());
+//            startActivity(intent);
+//            return true;
+//        });
+//        this.map.getOverlays().add(mapMarker);
+//    }
 
     @Override
     public void onTaskItemClick(int position) {

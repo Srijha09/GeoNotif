@@ -3,11 +3,9 @@ package edu.northeastern.numadsp23_team20;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,7 +14,6 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder> {
     private final ArrayList<Group> groupsList;
@@ -52,7 +49,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
             @Override
             public void onClick(View view) {
                 if(groupsList.size()<2){
-                    Intent intent = new Intent(context, AddMembers.class);
+                    Intent intent = new Intent(context, AddNewMembersPage.class);
                     intent.putExtra("groupName", group.getGroupName());
                     //intent.putExtra("loggedInUsername", GroupsAdapter.this.currentUser);
                     context.startActivity(intent);
