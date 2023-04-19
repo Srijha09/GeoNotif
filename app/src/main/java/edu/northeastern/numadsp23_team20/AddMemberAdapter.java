@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +21,7 @@ public class AddMemberAdapter extends RecyclerView.Adapter<AddMemberAdapter.View
     private ArrayList<User> memberList;
     private ItemClickListener listener;
     private final Context context;
+    private int clickedPosition = RecyclerView.NO_POSITION;
     //String currentGroup;
 
     //Creating the constructor
@@ -47,7 +50,13 @@ public class AddMemberAdapter extends RecyclerView.Adapter<AddMemberAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         User user = memberList.get(position);
-        holder.username.setText(user.getFullname());
+        holder.username.setText(user.getUsername());
+        holder.addButton.setText("ADD");
+
+        // If the current item's position matches the clicked position, update the ImageButton
+        if (position == clickedPosition) {
+            holder.addButton.setText("ADDED");
+        }
     }
 
     @Override
@@ -58,11 +67,13 @@ public class AddMemberAdapter extends RecyclerView.Adapter<AddMemberAdapter.View
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView username;
+        public Button addButton;
         public ViewHolder(@NonNull View itemView, final ItemClickListener listener) {
             super(itemView);
 
             username = itemView.findViewById(R.id.name_of_person);
-            itemView.setOnClickListener(new View.OnClickListener() {
+            addButton = itemView.findViewById(R.id.add_button);
+            addButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (listener != null) {
