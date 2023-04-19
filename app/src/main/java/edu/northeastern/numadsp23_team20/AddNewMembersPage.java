@@ -24,9 +24,13 @@ public class AddNewMembersPage extends AppCompatActivity {
         setContentView(R.layout.activity_add_members);
         Intent intent = new Intent();
         groupID = intent.getStringExtra("groupUUID");
+        System.out.println(groupID);
         groupName = intent.getStringExtra("groupName");
+        System.out.println(groupName);
         groupParticipants = intent.getStringArrayListExtra("groupParticipants");
+        System.out.println(groupParticipants);
         groupParticipantsNo = intent.getIntExtra("groupParticipantsNo", 1);
+        System.out.println(groupParticipantsNo);
         // Set the group name as the text of the TextView
         TextView groupNameTextView = findViewById(R.id.groupName);
         groupNameTextView.setText(groupName);

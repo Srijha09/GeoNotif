@@ -54,7 +54,6 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                     intent.putExtra("groupUUID", group.getUuid());
                     intent.putExtra("groupParticipantsNo", group.getGroupParticipantsNo());
                     intent.putExtra("groupParticipants", group.getGroupParticipants());
-                    //intent.putExtra("loggedInUsername", GroupsAdapter.this.currentUser);
                     context.startActivity(intent);
                 }else {
                     Bundle bundle = new Bundle();
