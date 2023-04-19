@@ -31,7 +31,7 @@ public class AddMembersList extends AppCompatActivity {
     private SearchView searchView;
     private RecyclerView recyclerView;
     private AddMemberAdapter memberAdapter;
-    private ArrayList<User> memberList;
+    private static ArrayList<User> memberList;
     private String currentuser;
     private FirebaseDatabase mDatabase;
     private FirebaseAuth mAuth;
@@ -40,10 +40,7 @@ public class AddMembersList extends AppCompatActivity {
 
     static User dataStore;
     static FirebaseUser firebaseUser;
-
-    static List<String> friendsUI = new ArrayList<>();
-
-
+    private static List<String> friendsUI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +64,9 @@ public class AddMembersList extends AppCompatActivity {
         recyclerView = findViewById(R.id.members_list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        this.memberList = new ArrayList<>();
+        memberList = new ArrayList<>();
+        memberAdapter = new AddMemberAdapter(memberList, getApplicationContext());
+        recyclerView.setAdapter(memberAdapter);
 
         //User user1 = new User("Rutu");
         //User user2 = new User("Rahul");
@@ -75,6 +74,7 @@ public class AddMembersList extends AppCompatActivity {
         //memberList.add(user2);
 
         //fetch friends user IDs.
+        friendsUI = new ArrayList<String>();
         mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
         String userId = firebaseUser.getUid();
@@ -90,41 +90,46 @@ public class AddMembersList extends AppCompatActivity {
                         //get the user IFD
                         String userID = childSnapshot.getValue(String.class);
                         friendsUI.add(userID);
+                        Log.d("friends", String.valueOf(friendsUI.size()));
                     }
 
                 }
             }
         });
+
+
 
         //fetch details of the userIDs in friends array
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/");
-        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // Loop through all child nodes of "users"
-                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                    String uid = childSnapshot.child("uid").getValue(String.class);
 
-                    if (friendsUI.contains(uid)) {
-                        String emailID = childSnapshot.child("emailId").getValue(String.class);
-                        String fullname = childSnapshot.child("fullname").getValue(String.class);
-                        String username = childSnapshot.child("username").getValue(String.class);
-                        dataStore = new User(fullname, username, emailID, uid);
-                        memberList.add(dataStore);
+        usersRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> userFriends) {
+                if (!userFriends.isSuccessful()) {
+                    Log.d("firebase", "Error getting data", userFriends.getException());
+                } else {
+                    for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
+                        String uid = childSnapshot.child("uid").getValue(String.class);
+
+                        for (int i = 0; i < friendsUI.size(); i++) {
+                            if (uid.equals(friendsUI.get(i))) {
+                                String emailID = childSnapshot.child("emailId").getValue(String.class);
+                                String fullname = childSnapshot.child("fullname").getValue(String.class);
+                                String username = childSnapshot.child("username").getValue(String.class);
+                                dataStore = new User(fullname, username, emailID, uid);
+                                memberList.add(dataStore);
+                                Log.d("memberList", String.valueOf(memberList.size()));
+                                break;
+                            }
+                        }
                     }
+                    memberAdapter.notifyDataSetChanged(); // Notify the adapter that the data has changed
+
                 }
-
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Handle errors her
-                Log.d("FirebaseError", databaseError.getMessage());
-
             }
         });
 
+        /*
         User user1 = new User("Rutu");
         User user2 = new User("Rahul");
         User user3 = new User("Srijha");
@@ -133,9 +138,8 @@ public class AddMembersList extends AppCompatActivity {
         memberList.add(user2);
         memberList.add(user3);
         memberList.add(user4);
+         */
 
-        memberAdapter = new AddMemberAdapter(this.memberList, getApplicationContext());
-        recyclerView.setAdapter(memberAdapter);
 
     }
 
