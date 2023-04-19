@@ -207,6 +207,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
             intent.putExtra("taskComplete", task.getIsComplete());
             intent.putExtra("taskUUID", task.getUuid());
             intent.putExtra("taskType", task.getTaskType());
+            intent.putExtra("taskTypeString", task.getTaskTypeString());
             startActivity(intent);
             return true;
         });
@@ -226,6 +227,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
         intent.putExtra("taskComplete", task.getIsComplete());
         intent.putExtra("taskUUID", task.getUuid());
         intent.putExtra("taskType", task.getTaskType());
+        intent.putExtra("taskTypeString", task.getTaskTypeString());
         this.viewTaskActivityLaunch.launch(intent);
     }
 }

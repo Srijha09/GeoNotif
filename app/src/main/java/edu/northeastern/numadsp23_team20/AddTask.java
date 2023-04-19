@@ -104,7 +104,7 @@ public class AddTask extends AppCompatActivity {
         this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         this.getCurrentUserLocation();
         this.addTaskLocationValue = findViewById(R.id.AddTaskLocationValue);
-        //Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
+        Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
         this.addressSearchActivity = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -169,11 +169,14 @@ public class AddTask extends AppCompatActivity {
         Task task = new Task(taskTitle, taskDescription, location);
 
         if (taskType == TaskType.PERSONAL) {
-            task.setTaskType("Personal task");
+            task.setTaskType(TaskType.PERSONAL.toString());
+            task.setTaskTypeString("Personal task");
         } else if (taskType == TaskType.GROUP) {
-            task.setTaskType("Group task: " + nonPersonalTaskTypeAssignee);
+            task.setTaskType(TaskType.GROUP.toString());
+            task.setTaskTypeString("Group task: " + nonPersonalTaskTypeAssignee);
         } else {
-            task.setTaskType("Friend task: " + nonPersonalTaskTypeAssignee);
+            task.setTaskType(TaskType.FRIEND.toString());
+            task.setTaskTypeString("Friend task: " + nonPersonalTaskTypeAssignee);
         }
 
         TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
