@@ -48,16 +48,18 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(groupsList.size()<2){
+                if(group.getGroupParticipantsNo()<2){
                     Intent intent = new Intent(context, AddNewMembersPage.class);
                     intent.putExtra("groupName", group.getGroupName());
+                    intent.putExtra("groupUUID", group.getUuid());
+                    intent.putExtra("groupParticipantsNo", group.getGroupParticipantsNo());
+                    intent.putExtra("groupParticipants", group.getGroupParticipants());
                     //intent.putExtra("loggedInUsername", GroupsAdapter.this.currentUser);
                     context.startActivity(intent);
                 }else {
                     Bundle bundle = new Bundle();
                     bundle.putString("groupUUID", group.getUuid());
                     bundle.putString("groupName", group.getGroupName());
-
                     bundle.putStringArrayList("groupParticipants", group.getGroupParticipants());
                     bundle.putInt("groupParticipantsNo", group.getGroupParticipants().size());
                     GroupTasksFragment grouptasksFragment = new GroupTasksFragment();
