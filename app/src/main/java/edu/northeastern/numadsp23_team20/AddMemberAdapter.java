@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class AddMemberAdapter extends RecyclerView.Adapter<AddMemberAdapter.ViewHolder> {
-    private final ArrayList<User> memberList;
+    private ArrayList<User> memberList;
     private ItemClickListener listener;
     private final Context context;
     //String currentGroup;
@@ -29,6 +29,11 @@ public class AddMemberAdapter extends RecyclerView.Adapter<AddMemberAdapter.View
 
     public void setOnItemClickListener(ItemClickListener listener) {
         this.listener = listener;
+    }
+
+    public void setFilteredList(ArrayList<User> filteredList){
+        this.memberList = filteredList;
+        notifyDataSetChanged();
     }
 
     @NonNull

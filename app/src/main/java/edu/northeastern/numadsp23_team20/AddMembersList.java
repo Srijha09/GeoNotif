@@ -44,7 +44,7 @@ public class AddMembersList extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                //filterList(newText);
+                filterList(newText);
                 return true;
             }
         });
@@ -54,25 +54,29 @@ public class AddMembersList extends AppCompatActivity {
         this.memberList = new ArrayList<>();
         User user1 = new User("Rutu");
         User user2 = new User("Rahul");
+        User user3 = new User("Srijha");
+        User user4 = new User("Eshwar");
         memberList.add(user1);
         memberList.add(user2);
+        memberList.add(user3);
+        memberList.add(user4);
         memberAdapter = new AddMemberAdapter(this.memberList, getApplicationContext());
         recyclerView.setAdapter(memberAdapter);
     }
 
-//    public void filterList(String text){
-//        ArrayList<User> filteredList = new ArrayList<>();
-//        for(User user: memberList){
-//            if(user.getUsername().toLowerCase(Locale.ROOT).contains(text.toLowerCase(Locale.ROOT))){
-//                filteredList.add(user);
-//            }
-//        }
-//
-//        if (filteredList.isEmpty()){
-//            Toast.makeText(this, "No data found", Toast.LENGTH_SHORT).show();
-//        }else{
-//            memberAdapter.setFilteredList(filteredList);
-//        }
-//    }
+    public void filterList(String text){
+        ArrayList<User> filteredList = new ArrayList<>();
+        for(User user: memberList){
+            if(user.getUsername().toLowerCase(Locale.ROOT).contains(text.toLowerCase(Locale.ROOT))){
+                filteredList.add(user);
+            }
+        }
+
+        if (filteredList.isEmpty()){
+            Toast.makeText(this, "No data found", Toast.LENGTH_SHORT).show();
+        }else{
+            memberAdapter.setFilteredList(filteredList);
+        }
+    }
 
 }
