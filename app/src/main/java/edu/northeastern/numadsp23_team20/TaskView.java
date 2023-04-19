@@ -114,6 +114,7 @@ public class TaskView extends AppCompatActivity implements Serializable {
         intent.putExtra("taskComplete", thisIntent.getExtras().getBoolean("taskComplete"));
         intent.putExtra("taskUUID", thisIntent.getExtras().getString("taskUUID"));
         intent.putExtra("taskType", thisIntent.getExtras().getString("taskType"));
+        intent.putExtra("taskTypeString", thisIntent.getExtras().getString("taskTypeString"));
         this.startActivity(intent);
     }
 
@@ -125,6 +126,7 @@ public class TaskView extends AppCompatActivity implements Serializable {
                         thisIntent.getExtras().getDouble("taskLongitude")),
                 thisIntent.getExtras().getString("taskUUID"), true);
         task.setTaskType(thisIntent.getExtras().getString("taskType"));
+        task.setTaskTypeString(thisIntent.getExtras().getString("taskTypeString"));
 
         TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
             @Override

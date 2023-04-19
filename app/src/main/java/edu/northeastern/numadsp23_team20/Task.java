@@ -12,6 +12,8 @@ public class Task {
 
     private String taskType;
 
+    private String taskTypeString;
+
     public String getUuid() {
         return uuid;
     }
@@ -88,5 +90,13 @@ public class Task {
 
     public void setTaskType(String taskType) {
         this.taskType = taskType;
+    }
+
+    public String getTaskTypeString() {
+        return taskTypeString;
+    }
+
+    public void setTaskTypeString(String taskTypeString) {
+        this.taskTypeString = taskTypeString;
     }
 }
