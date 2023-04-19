@@ -7,12 +7,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class AddMembersList extends AppCompatActivity {
 
@@ -42,7 +44,7 @@ public class AddMembersList extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                filterList(newText);
+                //filterList(newText);
                 return true;
             }
         });
@@ -58,5 +60,19 @@ public class AddMembersList extends AppCompatActivity {
         recyclerView.setAdapter(memberAdapter);
     }
 
+//    public void filterList(String text){
+//        ArrayList<User> filteredList = new ArrayList<>();
+//        for(User user: memberList){
+//            if(user.getUsername().toLowerCase(Locale.ROOT).contains(text.toLowerCase(Locale.ROOT))){
+//                filteredList.add(user);
+//            }
+//        }
+//
+//        if (filteredList.isEmpty()){
+//            Toast.makeText(this, "No data found", Toast.LENGTH_SHORT).show();
+//        }else{
+//            memberAdapter.setFilteredList(filteredList);
+//        }
+//    }
 
 }
