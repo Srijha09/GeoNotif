@@ -1,5 +1,6 @@
 package edu.northeastern.numadsp23_team20;
 
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,16 +8,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.squareup.picasso.Picasso;
 
-import java.text.BreakIterator;
 import java.util.List;
-
-import edu.northeastern.numadsp23_team20.R;
+import java.util.UUID;
 
 public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerView.ViewHolder> {
 
@@ -29,6 +26,7 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
     public FriendsRecyclerView(List<FriendsData> data, OnButtonClickListener listener) {
         mData = data;
         mListener = listener;
+
     }
 
     // Create new views (invoked by the layout manager)
@@ -73,6 +71,7 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
     public int getItemCount() {
         return mData.size();
     }
+
 
     public interface OnButtonClickListener {
         void onButtonClickChange(int position);
