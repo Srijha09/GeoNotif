@@ -219,7 +219,6 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                             grouptaskList.add(addTask);
                             taskListAdapter.notifyDataSetChanged(); // Notify the adapter that the data has changed
 
-
                         }
                     }
 
@@ -250,7 +249,11 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
     @Override
     public void onTaskItemClick(int position) {
         Task task = this.grouptaskList.get(position);
-        Intent intent = new Intent(getContext(), TaskView.class);
+        Intent intent = new Intent(getContext(), GroupTaskView.class);
+        intent.putExtra("groupId", groupId);
+        intent.putExtra("groupName", groupName);
+        intent.putExtra("groupParticipants", groupParticipants);
+
         intent.putExtra("position", position);
         intent.putExtra("taskTitle", task.getTaskName());
         intent.putExtra("taskDescription", task.getDescription());
@@ -264,102 +267,102 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         this.viewTaskActivityLaunch.launch(intent);
     }
 
-    public void addGroupTask(edu.northeastern.numadsp23_team20.Task taskObject) {
-        //add task specific group node
-        DatabaseReference groupsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupId + "/Tasks");
-        String newTaskKey = groupsRef.push().getKey();
-        groupsRef.child(newTaskKey).setValue(taskObject.getUuid());
-
-        //add task to Tasks
-        DatabaseReference taskRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + taskObject.getUuid());
-        taskRef.setValue(taskObject);
-
-        //add it under the specific user
-        String userId = firebaseUser.getUid();
-        DatabaseReference taskRefs = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Tasks");
-        String newTaskKey2 = taskRefs.push().getKey();
-        taskRefs.child(newTaskKey2).setValue(taskObject.getUuid());
-    }
-
-
-    public void deleteGroupTask(Task taskObject) {
-
-        //delete from groups
-        DatabaseReference groupsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupId + "/Tasks");
-
-        groupsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
-                if (!userFriends.isSuccessful()) {
-                    Log.e("firebase", "Error getting data", userFriends.getException());
-                } else {
-                    for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
-                        //get the user IFD
-                        String taskId = childSnapshot.getValue(String.class);
-                        //Log.d("UserID", userID);
-                        if (taskId.equals(taskObject.getUuid())) {
-                            //Log.d("I came here", userID);
-                            childSnapshot.getRef().removeValue(); // delete the child node
-                            break;
-                        }
-                    }
-
-                }
-            }
-        });
-
-
-        //delete from tasks
-        DatabaseReference groupsRef2 = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/");
-
-        groupsRef2.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
-                if (!userFriends.isSuccessful()) {
-                    Log.e("firebase", "Error getting data", userFriends.getException());
-                } else {
-                    for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
-                        //get the user IFD
-                        String taskId = childSnapshot.child("uuid").getValue(String.class);
-                        //Log.d("UserID", userID);
-                        if (taskId.equals(taskObject.getUuid())) {
-                            //Log.d("I came here", userID);
-                            childSnapshot.getRef().removeValue(); // delete the child node
-                            break;
-                        }
-                    }
-
-                }
-            }
-        });
-
-
-        //delete from user tasks
-        String userId = firebaseUser.getUid();
-        DatabaseReference taskRefs = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Tasks");
-        taskRefs.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
-                if (!userFriends.isSuccessful()) {
-                    Log.e("firebase", "Error getting data", userFriends.getException());
-                } else {
-                    for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
-                        //get the user IFD
-                        String taskId = childSnapshot.getValue(String.class);
-                        //Log.d("UserID", userID);
-                        if (taskId.equals(taskObject.getUuid())) {
-                            //Log.d("I came here", userID);
-                            childSnapshot.getRef().removeValue(); // delete the child node
-                            break;
-                        }
-                    }
-
-                }
-            }
-        });
-
-
-    }
+//    public void addGroupTask(edu.northeastern.numadsp23_team20.Task taskObject) {
+//        //add task specific group node
+//        DatabaseReference groupsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupId + "/Tasks");
+//        String newTaskKey = groupsRef.push().getKey();
+//        groupsRef.child(newTaskKey).setValue(taskObject.getUuid());
+//
+//        //add task to Tasks
+//        DatabaseReference taskRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + taskObject.getUuid());
+//        taskRef.setValue(taskObject);
+//
+//        //add it under the specific user
+//        String userId = firebaseUser.getUid();
+//        DatabaseReference taskRefs = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Tasks");
+//        String newTaskKey2 = taskRefs.push().getKey();
+//        taskRefs.child(newTaskKey2).setValue(taskObject.getUuid());
+//    }
+//
+//
+//    public void deleteGroupTask(Task taskObject) {
+//
+//        //delete from groups
+//        DatabaseReference groupsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupId + "/Tasks");
+//
+//        groupsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
+//                if (!userFriends.isSuccessful()) {
+//                    Log.e("firebase", "Error getting data", userFriends.getException());
+//                } else {
+//                    for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
+//                        //get the user IFD
+//                        String taskId = childSnapshot.getValue(String.class);
+//                        //Log.d("UserID", userID);
+//                        if (taskId.equals(taskObject.getUuid())) {
+//                            //Log.d("I came here", userID);
+//                            childSnapshot.getRef().removeValue(); // delete the child node
+//                            break;
+//                        }
+//                    }
+//
+//                }
+//            }
+//        });
+//
+//
+//        //delete from tasks
+//        DatabaseReference groupsRef2 = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/");
+//
+//        groupsRef2.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
+//                if (!userFriends.isSuccessful()) {
+//                    Log.e("firebase", "Error getting data", userFriends.getException());
+//                } else {
+//                    for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
+//                        //get the user IFD
+//                        String taskId = childSnapshot.child("uuid").getValue(String.class);
+//                        //Log.d("UserID", userID);
+//                        if (taskId.equals(taskObject.getUuid())) {
+//                            //Log.d("I came here", userID);
+//                            childSnapshot.getRef().removeValue(); // delete the child node
+//                            break;
+//                        }
+//                    }
+//
+//                }
+//            }
+//        });
+//
+//
+//        //delete from user tasks
+//        String userId = firebaseUser.getUid();
+//        DatabaseReference taskRefs = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Tasks");
+//        taskRefs.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
+//                if (!userFriends.isSuccessful()) {
+//                    Log.e("firebase", "Error getting data", userFriends.getException());
+//                } else {
+//                    for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
+//                        //get the user IFD
+//                        String taskId = childSnapshot.getValue(String.class);
+//                        //Log.d("UserID", userID);
+//                        if (taskId.equals(taskObject.getUuid())) {
+//                            //Log.d("I came here", userID);
+//                            childSnapshot.getRef().removeValue(); // delete the child node
+//                            break;
+//                        }
+//                    }
+//
+//                }
+//            }
+//        });
+//
+//
+//    }
 
 }
 

@@ -81,11 +81,14 @@ public class TaskService {
 
     //adding new group Tasks.
     public void createGroupTask(Task task, String groupID, ArrayList<String> groupParticipants) {
-        String userId = this.firebaseUser.getUid();
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations");
-        this.geoFire = new GeoFire(this.ref);
-        this.geoFire.setLocation(task.getUuid(), new GeoLocation(
-                task.getLocation().getLat(), task.getLocation().getLon()));
+        //String userId = this.firebaseUser.getUid();
+        //adding the location for each group user
+        for(String userId : groupParticipants) {
+            this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations");
+            this.geoFire = new GeoFire(this.ref);
+            this.geoFire.setLocation(task.getUuid(), new GeoLocation(
+                    task.getLocation().getLat(), task.getLocation().getLon()));
+        }
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + task.getUuid());
         this.ref.setValue(task);
         //adding new tasks to a group
@@ -206,6 +209,20 @@ public class TaskService {
                 updatedTask.getLocation().getLat(), updatedTask.getLocation().getLon()));
     }
 
+    public void editGroupTask(Task task, Task updatedTask, String groupId, ArrayList<String> groupParticipants) {
+        //String userId = this.firebaseUser.getUid();
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/Tasks/" + updatedTask.getUuid());
+        this.ref.setValue(updatedTask);
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + updatedTask.getUuid());
+        this.ref.setValue(updatedTask);
+        for(String userId:groupParticipants) {
+            this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations");
+            this.geoFire = new GeoFire(this.ref);
+            this.geoFire.setLocation(updatedTask.getUuid(), new GeoLocation(
+                    updatedTask.getLocation().getLat(), updatedTask.getLocation().getLon()));
+        }
+    }
+
 
 
     public void removeUserTaskList(List<String> tasks, String uuid) {
@@ -260,12 +277,14 @@ public class TaskService {
     }
 
     public void deleteGroupTask(String taskUUID, String groupID, ArrayList<String> groupParticipants) {
-        String userId = this.firebaseUser.getUid();
+        //String userId = this.firebaseUser.getUid();
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + taskUUID);
         this.ref.removeValue();
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations/"
-                + taskUUID);
-        this.ref.removeValue();
+        for (String userid:groupParticipants) {
+            this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userid + "/Locations/"
+                    + taskUUID);
+            this.ref.removeValue();
+        }
 
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID + "/Tasks");
         this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
