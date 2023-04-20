@@ -1,6 +1,7 @@
 package edu.northeastern.numadsp23_team20;
 import com.google.android.gms.tasks.OnCompleteListener;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 
@@ -10,7 +11,10 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +31,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
@@ -40,7 +46,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
     private IMapController mapController;
     private ActivityResultLauncher<Intent> addTaskActivityLaunch;
     private TaskService taskService;
-    private List<Task> grouptaskList;
+    private List<edu.northeastern.numadsp23_team20.Task> grouptaskList;
     private boolean loadingTasks;
     private ProgressBar tasksLoadingSpinner;
     private TextView noTasksTextView;
@@ -51,14 +57,12 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
 
     static FirebaseUser firebaseUser;
     FirebaseAuth mAuth;
-    private static ArrayList<edu.northeastern.numadsp23_team20.Task> groupTasks;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
-        groupTasks = new ArrayList<edu.northeastern.numadsp23_team20.Task>();
     }
 
     @Override
@@ -88,7 +92,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         this.grouptaskList = new ArrayList<>();
         this.taskService = new TaskService();
         LocationItem locationItem = new LocationItem("Fenway park", 42.3467, -71.0972);
-        Task task1 = new Task("Fenway test task", "Fenway test task description",
+        edu.northeastern.numadsp23_team20.Task task1 = new edu.northeastern.numadsp23_team20.Task("Fenway test task", "Fenway test task description",
                 locationItem);
         UUID taskUuid = UUID.randomUUID();
         task1.setUuid(taskUuid.toString());
@@ -155,16 +159,21 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                             String locationKey = childSnapshot.child("location").child("key").getValue(String.class);
                             double locationLat = childSnapshot.child("location").child("lat").getValue(Double.class);
                             double locationLon = childSnapshot.child("location").child("lon").getValue(Double.class);
+                            
                             LocationItem location = new LocationItem(locationKey,locationLat, locationLon);
 
                             edu.northeastern.numadsp23_team20.Task addTask =  new edu.northeastern.numadsp23_team20.Task(taskName, description, location, uuid, isComplete);
-                            groupTasks.add(addTask);
+                            grouptaskList.add(addTask);
+                            taskListAdapter.notifyDataSetChanged(); // Notify the adapter that the data has changed
+
+
                         }
                     }
 
                 }
             }
         });
+
 
         return inflatedView;
 
