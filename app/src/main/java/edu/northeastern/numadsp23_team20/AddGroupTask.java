@@ -1,5 +1,7 @@
 package edu.northeastern.numadsp23_team20;
 
+import static edu.northeastern.numadsp23_team20.GroupTasksFragment.firebaseUser;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -25,12 +27,19 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -61,7 +70,10 @@ public class AddGroupTask extends AppCompatActivity {
     private TaskType taskType;
     private String nonPersonalTaskTypeAssignee;
     private GroupService.GroupServiceListener groupServiceListener;
+    private String groupID;
+    private String groupName;
     private List<String> groupsList;
+    private ArrayList<String> groupParticipants;
     private RecyclerView addTaskTypeRecyclerViewContainer;
 
 
@@ -69,29 +81,18 @@ public class AddGroupTask extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_group_task);
-
+        Intent intent = getIntent();
+        groupID = intent.getStringExtra("groupUUID");
+        groupName = intent.getStringExtra("groupName");
+        groupParticipants = intent.getStringArrayListExtra("groupParticipants");
+        //this.addTaskTypeRecyclerViewContainer = findViewById(R.id.AddTaskTypeRecyclerViewContainer);
         groupsList = new ArrayList<>();
         onTaskTypeAssigneeItemClickListener = assignee -> {
             taskTypeListAdapter.notifyDataSetChanged();
             nonPersonalTaskTypeAssignee = assignee;
         };
 
-        GroupService groupService = new GroupService();
-        groupService.setGroupServiceListener(new GroupService.GroupServiceListener() {
-
-            @Override
-            public void onUserGroupLoaded(String group) {
-                groupsList.add(group);
-               // taskTypeListAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onGroupCreated(Group group) {
-
-            }
-        });
-        groupService.readGroupsForUser();
-        this.taskType = TaskType.PERSONAL;
+        this.taskType = TaskType.GROUP;
         this.nonPersonalTaskTypeAssignee = "";
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
         this.map = findViewById(R.id.AddTaskMapView);
@@ -127,18 +128,6 @@ public class AddGroupTask extends AppCompatActivity {
         this.addressSearchActivity.launch(intent);
     }
 
-//    public void onAddTaskTypePersonalRadioButtonClick(View view) {
-//        addTaskTypeRecyclerViewContainer.setVisibility(View.GONE);
-//        this.taskType = TaskType.PERSONAL;
-//        this.nonPersonalTaskTypeAssignee = "";
-//    }
-//
-//    public void onAddTaskTypeGroupRadioButtonClick(View view) {
-//        addTaskTypeRecyclerViewContainer.setVisibility(View.VISIBLE);
-//        this.taskType = TaskType.GROUP;
-//        this.nonPersonalTaskTypeAssignee = "";
-//    }
-
     public void onAddTaskCancelButtonClick(View view) {
         Intent returnIntent = new Intent();
         returnIntent.putExtra("NewTask", false);
@@ -154,6 +143,8 @@ public class AddGroupTask extends AppCompatActivity {
             return;
         } else if (!validateTaskDescription(taskDescription)) {
             return;
+        } else if (!validateTaskType()) {
+            return;
         } else if (!validateLocation()) {
             Toast.makeText(this, "Please choose a location!", Toast.LENGTH_SHORT).show();
             return;
@@ -161,6 +152,11 @@ public class AddGroupTask extends AppCompatActivity {
 
         LocationItem location = new LocationItem(this.taskLocationName, this.taskLatitude, this.taskLongitude);
         Task task = new Task(taskTitle, taskDescription, location);
+
+        if (taskType == TaskType.GROUP) {
+            task.setTaskType(TaskType.GROUP.toString());
+            task.setTaskTypeString("Group task: " + nonPersonalTaskTypeAssignee);
+        }
 
         TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
             @Override
@@ -176,7 +172,14 @@ public class AddGroupTask extends AppCompatActivity {
         taskService.setTaskServiceCreateListener(taskServiceCreateListener);
         UUID uuid = UUID.randomUUID();
         task.setUuid(uuid.toString());
-        taskService.createTask(task);
+        taskService.createGroupTask(task, groupID, groupParticipants);
+    }
+
+    private boolean validateTaskType() {
+        if (this.taskType == TaskType.GROUP && this.nonPersonalTaskTypeAssignee.equals("")) {
+            return true;
+        }
+        return false;
     }
 
     private boolean validateLocation() {
@@ -299,4 +302,6 @@ public class AddGroupTask extends AppCompatActivity {
             }
         }
     }
+
+
 }

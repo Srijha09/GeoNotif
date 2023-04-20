@@ -56,6 +56,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
     private GroupTasksAdapter taskListAdapter;
     private ImageButton settings;
     private String groupName;
+    private ArrayList<String> groupParticipants;
 
     static FirebaseUser firebaseUser;
     FirebaseAuth mAuth;
@@ -76,7 +77,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         assert getArguments() != null;
         groupId = getArguments().getString("groupUUID");
         groupName = getArguments().getString("groupName");
-        ArrayList<String> groupParticipants = getArguments().getStringArrayList("groupParticipants");
+        groupParticipants = getArguments().getStringArrayList("groupParticipants");
         Integer groupParticipantsNo = getArguments().getInt("groupParticipantsNo");
         // Set the group name as the text of the TextView
         TextView groupNameTextView = inflatedView.findViewById(R.id.groupName);
@@ -94,12 +95,12 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         this.tasksScrollView = inflatedView.findViewById(R.id.TasksScrollView);
         this.grouptaskList = new ArrayList<>();
         this.taskService = new TaskService();
-        LocationItem locationItem = new LocationItem("Fenway park", 42.3467, -71.0972);
-        Task task1 = new Task("Fenway test task", "Fenway test task description",
-                locationItem);
-        UUID taskUuid = UUID.randomUUID();
-        task1.setUuid(taskUuid.toString());
-        grouptaskList.add(task1);
+//        LocationItem locationItem = new LocationItem("Fenway park", 42.3467, -71.0972);
+//        Task task1 = new Task("Fenway test task", "Fenway test task description",
+//                locationItem);
+//        UUID taskUuid = UUID.randomUUID();
+//        task1.setUuid(taskUuid.toString());
+//        grouptaskList.add(task1);
 
         this.taskListAdapter = new GroupTasksAdapter(this.grouptaskList, (OnTaskItemClickListener) this);
         tasksRecyclerView.setAdapter(taskListAdapter);
@@ -190,6 +191,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         });
         //query all the tasks
         //fetch the tasks where the group name is the current group name
+        String newGroupName1 = "Group task: " + "";
         String newGroupName = "Group task: " + groupName;
         DatabaseReference userFriendsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/");
         userFriendsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
@@ -201,7 +203,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                     for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
                         String groupName = childSnapshot.child("taskTypeString").getValue(String.class);
 
-                        if (groupName!=null && groupName.equals(newGroupName)) {
+                        if (groupName!=null && (groupName.equals(newGroupName) || groupName.equals(newGroupName1))) {
                             String description = childSnapshot.child("description").getValue(String.class);
                             Boolean isComplete = childSnapshot.child("isComplete").getValue(Boolean.class);
                             String taskName = childSnapshot.child("taskName").getValue(String.class);
@@ -230,6 +232,9 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
 
     public void onAddTaskButtonClick(View view) {
         Intent intent = new Intent(getContext(), AddGroupTask.class);
+        intent.putExtra("groupUUID", groupId);
+        intent.putExtra("groupName", groupName);
+        intent.putExtra("groupParticipants", groupParticipants);
         this.addTaskActivityLaunch.launch(intent);
     }
 
