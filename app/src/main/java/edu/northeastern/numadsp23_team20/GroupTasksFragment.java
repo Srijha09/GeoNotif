@@ -159,7 +159,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                             String locationKey = childSnapshot.child("location").child("key").getValue(String.class);
                             double locationLat = childSnapshot.child("location").child("lat").getValue(Double.class);
                             double locationLon = childSnapshot.child("location").child("lon").getValue(Double.class);
-                            
+
                             LocationItem location = new LocationItem(locationKey,locationLat, locationLon);
 
                             edu.northeastern.numadsp23_team20.Task addTask =  new edu.northeastern.numadsp23_team20.Task(taskName, description, location, uuid, isComplete);

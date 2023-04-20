@@ -56,6 +56,11 @@ public class FriendsFragment extends Fragment {
     static FirebaseUser firebaseUser;
     FirebaseAuth mAuth;
 
+    private static ArrayList<String> userIds;
+
+    private static ArrayList<String> friendsIds;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,6 +68,9 @@ public class FriendsFragment extends Fragment {
 
         all_users = new ArrayList<>();
         friends = new ArrayList<>();
+
+        userIds = new ArrayList<>();
+        friendsIds = new ArrayList<>();
 
         mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
@@ -163,6 +171,7 @@ public class FriendsFragment extends Fragment {
                 if (datapoint.getButtonDetails().equals("Following")) {
                     datapoint.setButtonDetails("Follow");
                     friends.remove(datapoint);
+                    friendsIds.remove(datapoint.getUserID());
 
                     //remove from database (user's friends) too.
                     String userId = firebaseUser.getUid();
@@ -191,12 +200,15 @@ public class FriendsFragment extends Fragment {
 
                 } else {
                     datapoint.setButtonDetails("Following");
-                    friends.add(datapoint);
-                    //add to database (user's friends)  too.
-                    DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + firebaseUser.getUid() + "/" + "Friends");
-                    String newFriendKey = usersRef.push().getKey();
-                    //String newFriendKey = "uid";
-                    usersRef.child(newFriendKey).setValue(datapoint.getUserID());
+                    if (!friendsIds.contains(datapoint.getUserID())) {
+                        friends.add(datapoint);
+                        friendsIds.add(datapoint.getUserID());
+                        //add to database (user's friends)  too.
+                        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + firebaseUser.getUid() + "/" + "Friends");
+                        String newFriendKey = usersRef.push().getKey();
+                        //String newFriendKey = "uid";
+                        usersRef.child(newFriendKey).setValue(datapoint.getUserID());
+                    }
 
 
                 }
@@ -224,7 +236,6 @@ public class FriendsFragment extends Fragment {
             recyclerView.setAdapter(adapter_all_users);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-
             storage = FirebaseStorage.getInstance();
             storageRef = storage.getReference();
 
@@ -243,8 +254,11 @@ public class FriendsFragment extends Fragment {
                             String username = childSnapshot.child("username").getValue(String.class);
                             StorageReference pathReference = storageRef.child("profileImages/" + uid + "/profile.jpg");
                             dataStore = new FriendsData(emailID, fullname, uid, username, pathReference);
-                            all_users.add(dataStore);
-                            adapter_all_users.notifyDataSetChanged();
+                            if (!userIds.contains(dataStore.getUserID())) {
+                                all_users.add(dataStore);
+                                userIds.add(dataStore.getUserID());
+                                adapter_all_users.notifyDataSetChanged();
+                            }
 
                         }
                     }
@@ -285,7 +299,7 @@ public class FriendsFragment extends Fragment {
                     }
                 }
                 friends.remove(data);
-
+                friendsIds.remove(data.getUserID());
                 adapter_friends.notifyDataSetChanged(); // Notify the adapter that the data has changed
 
                 String userId = firebaseUser.getUid();
@@ -352,11 +366,13 @@ public class FriendsFragment extends Fragment {
                             for (int i = 0; i < all_users.size(); i++) {
                                 if (userID.equals(all_users.get(i).getUserID())) {
                                     all_users.get(i).setButtonDetails("following");
-                                    friends.add(all_users.get(i));
-
-                                    adapter_all_users.notifyDataSetChanged(); // Notify the adapter that the data has changed
-                                    adapter_friends.notifyDataSetChanged(); // Notify the adapter that the data has changed
-                                    break;
+                                    if (!friendsIds.contains(all_users.get(i).getUserID())) {
+                                        friends.add(all_users.get(i));
+                                        friendsIds.add(all_users.get(i).getUserID());
+                                        adapter_all_users.notifyDataSetChanged(); // Notify the adapter that the data has changed
+                                        adapter_friends.notifyDataSetChanged(); // Notify the adapter that the data has changed
+                                        break;
+                                    }
                                 }
                             }
                         }
