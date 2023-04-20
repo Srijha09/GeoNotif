@@ -3,15 +3,22 @@ package edu.northeastern.numadsp23_team20;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,19 +32,27 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
-public class AddMembersList extends AppCompatActivity {
+public class AddMembersList extends AppCompatActivity{
 
     private SearchView searchView;
     private RecyclerView recyclerView;
     private AddMemberAdapter memberAdapter;
     private static ArrayList<User> memberList;
+    private String groupID;
+    private String user_id;
+    private String groupName;
+    private Integer groupParticipantsNo;
+    private ArrayList<String> groupParticipants;
     private String currentuser;
     private FirebaseDatabase mDatabase;
     private FirebaseAuth mAuth;
     private DatabaseReference ref;
     private final String TAG="AddMembersList";
-
+    private static AddMemberAdapter.OnButtonClickListener listener;
+    private Button cancelBttn;
+    private Button doneBttn;
     static User dataStore;
     static FirebaseUser firebaseUser;
     private static List<String> friendsUI;
@@ -46,7 +61,74 @@ public class AddMembersList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_members_list);
+        Intent intent = getIntent();
+        groupID = intent.getStringExtra("groupUUID");
+        String groupName = intent.getStringExtra("groupName");
+        groupParticipants = intent.getStringArrayListExtra("groupParticipants");
+        groupParticipantsNo = intent.getIntExtra("groupParticipantsNo", 1);
+        cancelBttn = findViewById(R.id.cancelbttn);
+        if (groupParticipantsNo < 2) {
+            cancelBttn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), AddNewMembersPage.class);
+                    intent.putExtra("groupUUID", groupID);
+                    intent.putExtra("groupName", groupName);
+                    intent.putExtra("groupParticipantsNo", groupParticipantsNo);
+                    intent.putExtra("groupParticipants", groupParticipants);
+                    //intent.putExtra("groupName", groupName);
+                    startActivity(intent);
+                }
+            });
+        }else{
+            cancelBttn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), GroupSettingsView.class);
+                    intent.putExtra("groupUUID", groupID);
+                    intent.putExtra("groupName", groupName);
+                    intent.putExtra("groupParticipantsNo", groupParticipantsNo);
+                    intent.putExtra("groupParticipants", groupParticipants);
+                    //intent.putExtra("groupName", groupName);
+                    startActivity(intent);
+                }
+            });
+        }
 
+        doneBttn = findViewById(R.id.donebttn);
+        if(groupParticipantsNo < 2 || groupParticipantsNo==2)  {
+            doneBttn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), GroupSettingsView.class);
+                    intent.putExtra("groupUUID", groupID);
+                    intent.putExtra("groupName", groupName);
+                    intent.putExtra("groupParticipantsNo", groupParticipantsNo);
+                    intent.putExtra("groupParticipants", groupParticipants);
+                    //intent.putExtra("groupName", groupName);
+                    startActivity(intent);
+                }
+            });
+        }else{
+            doneBttn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("groupUUID", groupID);
+                    bundle.putString("groupName", groupName);
+                    bundle.putStringArrayList("groupParticipants", groupParticipants);
+                    bundle.putInt("groupParticipantsNo", groupParticipantsNo);
+                    GroupTasksFragment grouptasksFragment = new GroupTasksFragment();
+                    grouptasksFragment.setArguments(bundle);
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.FrameLayout, grouptasksFragment);
+                    transaction.addToBackStack(null);
+                    if (!getSupportFragmentManager().isStateSaved()) { // Add check for isStateSaved()
+                        transaction.commit();
+                    }
+                }
+            });
+        }
         searchView = findViewById(R.id.searchView);
         searchView.clearFocus();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -65,13 +147,80 @@ public class AddMembersList extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         memberList = new ArrayList<>();
-        memberAdapter = new AddMemberAdapter(memberList, getApplicationContext());
+
+        listener = position -> {
+            User datapoint = memberList.get(position);
+            if (datapoint.getButtonDetails().equals("Add")) {
+                datapoint.setButtonDetails("Added");
+                //get the uid of the user
+                user_id = datapoint.getUid();
+                //add the user uid to the groupParticipants of group
+                DatabaseReference groupParticipantsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" +
+                        groupID + "/groupParticipants");
+                DatabaseReference  groupParticipantsNoRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" +
+                                groupID).getRef().child("groupParticipantsNo");
+                // add the user UID to the group participants list
+                // set the value of the next available integer key to the new participant ID
+                // add the new participant ID to the groupParticipants list
+                groupParticipantsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        boolean userExists = false;
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            if (Objects.equals(snapshot.getValue(), user_id)) {
+                                userExists = true;
+                                break;
+                            }
+                        }
+                        if (!userExists) {
+                            // get the current number of participants in the group
+                            int numParticipants = (int) dataSnapshot.getChildrenCount();
+                            groupParticipants.add(user_id);
+                            // set the value of the next available integer key to the new participant ID
+                            groupParticipantsRef.child(String.valueOf(numParticipants)).setValue(user_id)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            // update the UI and notify the adapter that the data has changed
+                                            memberList.get(position).setButtonDetails("Added");
+
+                                            groupParticipantsNoRef.setValue(numParticipants + 1);
+                                            memberAdapter.notifyDataSetChanged();
+                                            Toast.makeText(getApplicationContext(), "User Added", Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            // handle the failure to add the user to the group participants list
+                                            Toast.makeText(getApplicationContext(), "Failed to add user", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        } else {
+                            // handle the case where the user already exists in the group
+                            Toast.makeText(getApplicationContext(), "User already exists in the group", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        // handle the error
+                        Toast.makeText(getApplicationContext(), "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            else{
+                if(groupParticipants.contains(user_id)) {
+                    datapoint.setButtonDetails("Added");
+                }
+            }
+            memberAdapter.notifyDataSetChanged(); // Notify the adapter that the data has changed
+        };
+        memberAdapter = new AddMemberAdapter(memberList, listener);
         recyclerView.setAdapter(memberAdapter);
 
-        //User user1 = new User("Rutu");
-        //User user2 = new User("Rahul");
-        //memberList.add(user1);
-        //memberList.add(user2);
+
 
         //fetch friends user IDs.
         friendsUI = new ArrayList<String>();
@@ -96,9 +245,6 @@ public class AddMembersList extends AppCompatActivity {
                 }
             }
         });
-
-
-
         //fetch details of the userIDs in friends array
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/");
 
@@ -127,21 +273,10 @@ public class AddMembersList extends AppCompatActivity {
 
                 }
             }
+
         });
-
-        /*
-        User user1 = new User("Rutu");
-        User user2 = new User("Rahul");
-        User user3 = new User("Srijha");
-        User user4 = new User("Eshwar");
-        memberList.add(user1);
-        memberList.add(user2);
-        memberList.add(user3);
-        memberList.add(user4);
-         */
-
-
     }
+
 
     public void filterList(String text){
         ArrayList<User> filteredList = new ArrayList<>();
