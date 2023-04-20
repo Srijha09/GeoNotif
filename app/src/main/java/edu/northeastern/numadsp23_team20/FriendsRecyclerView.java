@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.ObjectKey;
 
 import java.util.List;
 import java.util.UUID;
@@ -49,12 +50,14 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
         holder.userName.setText(data.getFullname());
         holder.button.setText(data.getButtonDetails());
 
+
         data.getImageUrl().getDownloadUrl().addOnSuccessListener(downloadUrl -> {
             if (holder.itemView.getContext() == null) {
             } else {
                 Glide.with(holder.itemView.getContext())
                         .load(downloadUrl)
                         .circleCrop()
+                        .signature(new ObjectKey(data.getUserID()))
                         .into(holder.photoImageView);
 
             }
