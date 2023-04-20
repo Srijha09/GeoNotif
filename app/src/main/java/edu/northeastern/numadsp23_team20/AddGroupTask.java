@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import edu.northeastern.numadsp23_team20.BuildConfig;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
@@ -42,7 +44,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public class AddTask extends AppCompatActivity {
+public class AddGroupTask extends AppCompatActivity {
 
     private MapView map;
     private IMapController mapController;
@@ -66,24 +68,21 @@ public class AddTask extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_task);
+        setContentView(R.layout.activity_add_group_task);
 
-        this.addTaskTypeRecyclerViewContainer = findViewById(R.id.AddTaskTypeRecyclerViewContainer);
         groupsList = new ArrayList<>();
         onTaskTypeAssigneeItemClickListener = assignee -> {
             taskTypeListAdapter.notifyDataSetChanged();
             nonPersonalTaskTypeAssignee = assignee;
         };
-        this.addTaskTypeRecyclerViewContainer.setLayoutManager(new LinearLayoutManager(this));
-        taskTypeListAdapter = new TaskTypeListAdapter(this.groupsList, onTaskTypeAssigneeItemClickListener);
-        addTaskTypeRecyclerViewContainer.setAdapter(taskTypeListAdapter);
+
         GroupService groupService = new GroupService();
         groupService.setGroupServiceListener(new GroupService.GroupServiceListener() {
 
             @Override
             public void onUserGroupLoaded(String group) {
                 groupsList.add(group);
-                taskTypeListAdapter.notifyDataSetChanged();
+               // taskTypeListAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -102,7 +101,7 @@ public class AddTask extends AppCompatActivity {
         this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         this.getCurrentUserLocation();
         this.addTaskLocationValue = findViewById(R.id.AddTaskLocationValue);
-        //Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
+        Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
         this.addressSearchActivity = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -128,17 +127,17 @@ public class AddTask extends AppCompatActivity {
         this.addressSearchActivity.launch(intent);
     }
 
-    public void onAddTaskTypePersonalRadioButtonClick(View view) {
-        addTaskTypeRecyclerViewContainer.setVisibility(View.GONE);
-        this.taskType = TaskType.PERSONAL;
-        this.nonPersonalTaskTypeAssignee = "";
-    }
-
-    public void onAddTaskTypeGroupRadioButtonClick(View view) {
-        addTaskTypeRecyclerViewContainer.setVisibility(View.VISIBLE);
-        this.taskType = TaskType.GROUP;
-        this.nonPersonalTaskTypeAssignee = "";
-    }
+//    public void onAddTaskTypePersonalRadioButtonClick(View view) {
+//        addTaskTypeRecyclerViewContainer.setVisibility(View.GONE);
+//        this.taskType = TaskType.PERSONAL;
+//        this.nonPersonalTaskTypeAssignee = "";
+//    }
+//
+//    public void onAddTaskTypeGroupRadioButtonClick(View view) {
+//        addTaskTypeRecyclerViewContainer.setVisibility(View.VISIBLE);
+//        this.taskType = TaskType.GROUP;
+//        this.nonPersonalTaskTypeAssignee = "";
+//    }
 
     public void onAddTaskCancelButtonClick(View view) {
         Intent returnIntent = new Intent();
@@ -155,9 +154,6 @@ public class AddTask extends AppCompatActivity {
             return;
         } else if (!validateTaskDescription(taskDescription)) {
             return;
-        } else if (!validateTaskType()) {
-            Toast.makeText(this, "Group not selected!", Toast.LENGTH_SHORT).show();
-            return;
         } else if (!validateLocation()) {
             Toast.makeText(this, "Please choose a location!", Toast.LENGTH_SHORT).show();
             return;
@@ -165,17 +161,6 @@ public class AddTask extends AppCompatActivity {
 
         LocationItem location = new LocationItem(this.taskLocationName, this.taskLatitude, this.taskLongitude);
         Task task = new Task(taskTitle, taskDescription, location);
-
-        if (taskType == TaskType.PERSONAL) {
-            task.setTaskType(TaskType.PERSONAL.toString());
-            task.setTaskTypeString("Personal task");
-        } else if (taskType == TaskType.GROUP) {
-            task.setTaskType(TaskType.GROUP.toString());
-            task.setTaskTypeString("Group task: " + nonPersonalTaskTypeAssignee);
-        } else {
-            task.setTaskType(TaskType.FRIEND.toString());
-            task.setTaskTypeString("Friend task: " + nonPersonalTaskTypeAssignee);
-        }
 
         TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
             @Override
@@ -192,14 +177,6 @@ public class AddTask extends AppCompatActivity {
         UUID uuid = UUID.randomUUID();
         task.setUuid(uuid.toString());
         taskService.createTask(task);
-    }
-
-    private boolean validateTaskType() {
-        if (this.taskType == TaskType.GROUP && this.nonPersonalTaskTypeAssignee.equals("")) {
-            ((TextView) findViewById(R.id.AddTaskTypeLabel)).setError("Group not selected!");
-            return false;
-        }
-        return true;
     }
 
     private boolean validateLocation() {
