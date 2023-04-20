@@ -55,9 +55,9 @@ public class GroupTaskView extends AppCompatActivity implements Serializable {
         this.markComplete = findViewById(R.id.TaskDetailsCompleteButton);
 
         Intent intent = getIntent();
-        groupId = intent.getExtras().getString("groupUUID");
-        groupName = intent.getExtras().getString("groupName");
-        groupParticipants = intent.getExtras().getStringArrayList("groupParticipants");
+        this.groupId = intent.getExtras().getString("groupUUID");
+        this.groupName = intent.getExtras().getString("groupName");
+        this.groupParticipants = intent.getExtras().getStringArrayList("groupParticipants");
         this.taskName = intent.getExtras().getString("taskTitle");
         this.uuid = intent.getExtras().getString("taskUUID");
         ((TextView) findViewById(R.id.TaskTitleTextView)).setText(intent.getExtras().getString("taskTitle"));
@@ -112,7 +112,10 @@ public class GroupTaskView extends AppCompatActivity implements Serializable {
     }
 
     public void onTaskEditFloatingButtonClick(View view) {
-        Intent intent = new Intent(this, EditTask.class);
+        Intent intent = new Intent(this, EditGroupTask.class);
+        intent.putExtra("groupId", thisIntent.getExtras().getString("groupId"));
+        intent.putExtra("groupName", thisIntent.getExtras().getString("groupName"));
+        intent.putExtra("groupParticipants", thisIntent.getExtras().getStringArrayList("groupParticipants"));
         intent.putExtra("taskTitle", thisIntent.getExtras().getString("taskTitle"));
         intent.putExtra("taskDescription", thisIntent.getExtras().getString("taskDescription"));
         intent.putExtra("taskLocation", thisIntent.getExtras().getString("taskLocation"));
