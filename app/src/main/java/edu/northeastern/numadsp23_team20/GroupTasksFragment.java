@@ -277,14 +277,14 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
     }
 
 
-    public void deleteGroupTask(edu.northeastern.numadsp23_team20.Task taskObject) {
+    public void deleteGroupTask(Task taskObject) {
 
         //delete from groups
         DatabaseReference groupsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupId + "/Tasks");
 
         groupsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DataSnapshot> userFriends) {
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
                 if (!userFriends.isSuccessful()) {
                     Log.e("firebase", "Error getting data", userFriends.getException());
                 } else {
@@ -309,7 +309,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
 
         groupsRef2.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DataSnapshot> userFriends) {
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
                 if (!userFriends.isSuccessful()) {
                     Log.e("firebase", "Error getting data", userFriends.getException());
                 } else {
@@ -334,7 +334,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         DatabaseReference taskRefs = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Tasks");
         taskRefs.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DataSnapshot> userFriends) {
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
                 if (!userFriends.isSuccessful()) {
                     Log.e("firebase", "Error getting data", userFriends.getException());
                 } else {
