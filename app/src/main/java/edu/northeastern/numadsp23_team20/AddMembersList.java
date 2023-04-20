@@ -121,7 +121,7 @@ public class AddMembersList extends AppCompatActivity{
                     GroupTasksFragment grouptasksFragment = new GroupTasksFragment();
                     grouptasksFragment.setArguments(bundle);
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.FrameLayout, grouptasksFragment);
+                    transaction.replace(R.id.FrameLayout3, grouptasksFragment);
                     transaction.addToBackStack(null);
                     if (!getSupportFragmentManager().isStateSaved()) { // Add check for isStateSaved()
                         transaction.commit();

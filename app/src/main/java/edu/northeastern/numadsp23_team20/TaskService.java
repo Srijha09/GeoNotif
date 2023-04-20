@@ -1,5 +1,6 @@
 package edu.northeastern.numadsp23_team20;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -109,7 +110,7 @@ public class TaskService {
                 Log.e("firebase", "Error getting data", tasks.getException());
             } else {
                 if (!tasks.getResult().hasChildren()) {
-                    taskServiceListener.onTaskLoaded(null);
+                    taskServiceListener.onTaskLoaded((Task) null);
                 }
                 for (DataSnapshot item : tasks.getResult().getChildren()) {
                     String taskUUID = item.getValue().toString();
@@ -179,6 +180,9 @@ public class TaskService {
 
     public interface TaskServiceListener {
         void onTaskLoaded(Task task);
+
+        @SuppressLint("NotifyDataSetChanged")
+        void onTaskLoaded(com.google.android.gms.tasks.Task task);
     }
 
     public interface TaskServiceDeleteListener {

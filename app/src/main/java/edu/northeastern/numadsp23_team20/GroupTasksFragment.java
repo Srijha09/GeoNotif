@@ -2,13 +2,14 @@ package edu.northeastern.numadsp23_team20;
 import com.google.android.gms.tasks.OnCompleteListener;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
-import com.google.android.gms.tasks.Task;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -45,8 +46,9 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
     private MapView map;
     private IMapController mapController;
     private ActivityResultLauncher<Intent> addTaskActivityLaunch;
+    private ActivityResultLauncher<Intent> viewTaskActivityLaunch;
     private TaskService taskService;
-    private List<edu.northeastern.numadsp23_team20.Task> grouptaskList;
+    private List<Task> grouptaskList;
     private boolean loadingTasks;
     private ProgressBar tasksLoadingSpinner;
     private TextView noTasksTextView;
@@ -92,7 +94,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         this.grouptaskList = new ArrayList<>();
         this.taskService = new TaskService();
         LocationItem locationItem = new LocationItem("Fenway park", 42.3467, -71.0972);
-        edu.northeastern.numadsp23_team20.Task task1 = new edu.northeastern.numadsp23_team20.Task("Fenway test task", "Fenway test task description",
+        Task task1 = new Task("Fenway test task", "Fenway test task description",
                 locationItem);
         UUID taskUuid = UUID.randomUUID();
         task1.setUuid(taskUuid.toString());
@@ -102,28 +104,75 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         tasksRecyclerView.setAdapter(taskListAdapter);
         tasksRecyclerView.setHasFixedSize(true);
         tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this.ctx));
-//        this.taskService.setTaskServiceListener(new TaskService.TaskServiceListener() {
-//            @SuppressLint("NotifyDataSetChanged")
-//            @Override
-//            public void onTaskLoaded(Task task) {
-//                if (task == null) {
-//                    loadingTasks = false;
-//                    tasksLoadingSpinner.setVisibility(View.INVISIBLE);
-//                    noTasksTextView.setVisibility(View.VISIBLE);
-//                    tasksScrollView.setVisibility(View.INVISIBLE);
-//                    return;
-//                }
-//                if (loadingTasks) {
-//                    loadingTasks = false;
-//                    tasksLoadingSpinner.setVisibility(View.INVISIBLE);
-//                    noTasksTextView.setVisibility(View.INVISIBLE);
-//                    tasksScrollView.setVisibility(View.VISIBLE);
-//                }
-//                //setMapMarker(task);
-//                grouptaskList.add(task);
-//                taskListAdapter.notifyDataSetChanged();
-//            }
-//        });
+        this.taskService.setTaskServiceListener(new TaskService.TaskServiceListener() {
+
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onTaskLoaded(Task task) {
+                if (task == null) {
+                    loadingTasks = false;
+                    tasksLoadingSpinner.setVisibility(View.INVISIBLE);
+                    noTasksTextView.setVisibility(View.VISIBLE);
+                    tasksScrollView.setVisibility(View.INVISIBLE);
+                    return;
+                }
+                if (loadingTasks) {
+                    loadingTasks = false;
+                    tasksLoadingSpinner.setVisibility(View.INVISIBLE);
+                    noTasksTextView.setVisibility(View.INVISIBLE);
+                    tasksScrollView.setVisibility(View.VISIBLE);
+                }
+                //setMapMarker(task);
+                grouptaskList.add(task);
+                taskListAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onTaskLoaded(com.google.android.gms.tasks.Task task) {
+
+            }
+
+        });
+
+
+        //this.taskService.readTasks();
+        this.addTaskActivityLaunch = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        Bundle intentExtras = data.getExtras();
+                        if (intentExtras.getBoolean("NewTask")) {
+                            taskService.readTask(intentExtras.getString("TaskUUID"));
+                            loadingTasks = false;
+                            tasksLoadingSpinner.setVisibility(View.INVISIBLE);
+                            noTasksTextView.setVisibility(View.INVISIBLE);
+                            tasksScrollView.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+        this.viewTaskActivityLaunch = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        Bundle intentExtras = data.getExtras();
+                        if (intentExtras.getBoolean("DeletedTask")) {
+                            grouptaskList.remove(intentExtras.getInt("DeletedTaskPosition"));
+                            taskListAdapter.notifyDataSetChanged();
+                            loadingTasks = false;
+                            tasksLoadingSpinner.setVisibility(View.INVISIBLE);
+                            noTasksTextView.setVisibility(View.VISIBLE);
+                            tasksScrollView.setVisibility(View.INVISIBLE);
+                        } else if (intentExtras.getBoolean("EditedTask")) {
+                            grouptaskList.get(intentExtras.getInt("EditedTaskPosition")).setIsComplete(true);
+                            taskListAdapter.notifyItemChanged(intentExtras.getInt("EditedTaskPosition"));
+                            loadingTasks = false;
+                            tasksLoadingSpinner.setVisibility(View.INVISIBLE);
+                            noTasksTextView.setVisibility(View.INVISIBLE);
+                            tasksScrollView.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
 
         settings = inflatedView.findViewById(R.id.settings_button);
         settings.setOnClickListener(new View.OnClickListener() {
@@ -144,13 +193,14 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         DatabaseReference userFriendsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/");
         userFriendsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DataSnapshot> userFriends) {
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
                 if (!userFriends.isSuccessful()) {
                     Log.e("firebase", "Error getting data", userFriends.getException());
                 } else {
                     for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
                         String groupName = childSnapshot.child("taskTypeString").getValue(String.class);
-                        if (groupName.equals(newGroupName)) {
+
+                        if (groupName!=null && groupName.equals(newGroupName)) {
                             String description = childSnapshot.child("description").getValue(String.class);
                             Boolean isComplete = childSnapshot.child("isComplete").getValue(Boolean.class);
                             String taskName = childSnapshot.child("taskName").getValue(String.class);
@@ -162,7 +212,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                             
                             LocationItem location = new LocationItem(locationKey,locationLat, locationLon);
 
-                            edu.northeastern.numadsp23_team20.Task addTask =  new edu.northeastern.numadsp23_team20.Task(taskName, description, location, uuid, isComplete);
+                            Task addTask =  new Task(taskName, description, location, uuid, isComplete);
                             grouptaskList.add(addTask);
                             taskListAdapter.notifyDataSetChanged(); // Notify the adapter that the data has changed
 
@@ -173,10 +223,13 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                 }
             }
         });
-
-
+        inflatedView.findViewById(R.id.AddTaskButton).setOnClickListener(this::onAddTaskButtonClick);
         return inflatedView;
+    }
 
+    public void onAddTaskButtonClick(View view) {
+        Intent intent = new Intent(getContext(), AddGroupTask.class);
+        this.addTaskActivityLaunch.launch(intent);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -190,19 +243,19 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
 
     @Override
     public void onTaskItemClick(int position) {
-//        Task task = this.grouptaskList.get(position);
-//        Intent intent = new Intent(getContext(), TaskView.class);
-//        intent.putExtra("position", position);
-//        intent.putExtra("taskTitle", task.getTaskName());
-//        intent.putExtra("taskDescription", task.getDescription());
-//        intent.putExtra("taskLocation", task.getLocation().getKey());
-//        intent.putExtra("taskLatitude", task.getLocation().getLat());
-//        intent.putExtra("taskLongitude", task.getLocation().getLon());
-//        intent.putExtra("taskComplete", task.getIsComplete());
-//        intent.putExtra("taskUUID", task.getUuid());
-//        intent.putExtra("taskType", task.getTaskType());
-//        intent.putExtra("taskTypeString", task.getTaskTypeString());
-//        this.viewTaskActivityLaunch.launch(intent);
+        Task task = this.grouptaskList.get(position);
+        Intent intent = new Intent(getContext(), TaskView.class);
+        intent.putExtra("position", position);
+        intent.putExtra("taskTitle", task.getTaskName());
+        intent.putExtra("taskDescription", task.getDescription());
+        intent.putExtra("taskLocation", task.getLocation().getKey());
+        intent.putExtra("taskLatitude", task.getLocation().getLat());
+        intent.putExtra("taskLongitude", task.getLocation().getLon());
+        intent.putExtra("taskComplete", task.getIsComplete());
+        intent.putExtra("taskUUID", task.getUuid());
+        intent.putExtra("taskType", task.getTaskType());
+        intent.putExtra("taskTypeString", task.getTaskTypeString());
+        this.viewTaskActivityLaunch.launch(intent);
     }
 
 
