@@ -61,6 +61,12 @@ public class AddMembersList extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_members_list);
+        //getting current user
+        mAuth = FirebaseAuth.getInstance();
+        firebaseUser = mAuth.getCurrentUser();
+        String userId = firebaseUser.getUid();
+
+        System.out.println(firebaseUser);
         Intent intent = getIntent();
         groupID = intent.getStringExtra("groupUUID");
         String groupName = intent.getStringExtra("groupName");
@@ -183,7 +189,6 @@ public class AddMembersList extends AppCompatActivity{
                                         public void onSuccess(Void aVoid) {
                                             // update the UI and notify the adapter that the data has changed
                                             memberList.get(position).setButtonDetails("Added");
-
                                             groupParticipantsNoRef.setValue(numParticipants + 1);
                                             memberAdapter.notifyDataSetChanged();
                                             Toast.makeText(getApplicationContext(), "User Added", Toast.LENGTH_SHORT).show();
@@ -196,12 +201,31 @@ public class AddMembersList extends AppCompatActivity{
                                             Toast.makeText(getApplicationContext(), "Failed to add user", Toast.LENGTH_SHORT).show();
                                         }
                                     });
+                            for (String participantUUID: groupParticipants) {
+                                if (!userId.equals(participantUUID)) {
+                                    DatabaseReference userGroupsRef = FirebaseDatabase.getInstance().getReference(
+                                            "GeoNotif/Users/" + participantUUID + "/Groups");
+                                    userGroupsRef.get().addOnCompleteListener(userGroups -> {
+                                        if (!userGroups.isSuccessful()) {
+                                            Log.e("firebase", "Error getting data", userGroups.getException());
+                                        } else {
+                                            List<String> groupUUIDs = (List<String>) userGroups.getResult().getValue();
+                                            if (groupUUIDs == null || groupUUIDs.isEmpty()) {
+                                                groupUUIDs = new ArrayList<>();
+                                            }
+                                            if (!groupUUIDs.contains(groupID)) { // check if group ID already exists in the list
+                                                groupUUIDs.add(groupID);
+                                                userGroupsRef.setValue(groupUUIDs);
+                                            }
+                                        }
+                                    });
+                                }
+                            }
                         } else {
                             // handle the case where the user already exists in the group
                             Toast.makeText(getApplicationContext(), "User already exists in the group", Toast.LENGTH_SHORT).show();
                         }
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         // handle the error
@@ -209,7 +233,6 @@ public class AddMembersList extends AppCompatActivity{
                     }
                 });
             }
-
             else{
                 if(groupParticipants.contains(user_id)) {
                     datapoint.setButtonDetails("Added");
@@ -219,15 +242,17 @@ public class AddMembersList extends AppCompatActivity{
         };
         memberAdapter = new AddMemberAdapter(memberList, listener);
         recyclerView.setAdapter(memberAdapter);
-        System.out.println(groupParticipants);
+        System.out.println("Participants:"+groupParticipants);
+        //adding the group uid to each participant
+
+        System.out.println(userId);
+
 
 
 
         //fetch friends user IDs.
         friendsUI = new ArrayList<String>();
-        mAuth = FirebaseAuth.getInstance();
-        firebaseUser = mAuth.getCurrentUser();
-        String userId = firebaseUser.getUid();
+
         DatabaseReference userFriendsRef = FirebaseDatabase.getInstance().getReference(
                 "GeoNotif/Users/" + userId + "/Friends");
         userFriendsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
@@ -248,7 +273,6 @@ public class AddMembersList extends AppCompatActivity{
         });
         //fetch details of the userIDs in friends array
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/");
-
         usersRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> userFriends) {
