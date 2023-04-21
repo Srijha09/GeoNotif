@@ -93,7 +93,7 @@ public class AddGroupTask extends AppCompatActivity {
         };
 
         this.taskType = TaskType.GROUP;
-        this.nonPersonalTaskTypeAssignee = "";
+        this.nonPersonalTaskTypeAssignee = groupName;
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
         this.map = findViewById(R.id.AddTaskMapView);
         this.mapMarker = new Marker(this.map);

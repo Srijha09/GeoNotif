@@ -20,6 +20,7 @@ public class HomePage extends AppCompatActivity {
     private Fragment groupsFragment;
     private Fragment friendsFragment;
     private Fragment profileFragment;
+    private FragmentManager fragmentManager;
 
     private static final String TASKS_FRAGMENT_TAG = "TASKS_FRAGMENT_TAG";
     private static final String GROUPS_FRAGMENT_TAG = "GROUPS_FRAGMENT_TAG";
@@ -50,7 +51,7 @@ public class HomePage extends AppCompatActivity {
         if (savedInstanceState != null) {
             // Restore the previously selected fragment
             currentFragmentTag = savedInstanceState.getString("FRAGMENT_TAG");
-            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager = getSupportFragmentManager();
             Fragment fragment = getFragment(currentFragmentTag);
             if (fragment != null) {
                 fragmentManager.beginTransaction()
@@ -99,6 +100,13 @@ public class HomePage extends AppCompatActivity {
                             Manifest.permission.ACCESS_BACKGROUND_LOCATION},
                     101);
         }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+
     }
 
     private Fragment getFragment(String itemTitle) {

@@ -3,8 +3,11 @@ package edu.northeastern.numadsp23_team20;
 import static android.text.TextUtils.isEmpty;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,14 +23,14 @@ import java.util.UUID;
 
 public class GroupSettingsView extends AppCompatActivity {
     private Button edit;
-    private Button deleteBttn;
+    private Button leaveBttn;
     private GroupService groupService;
     private Group group;
     private String groupID;
     private String groupName;
     private Integer groupParticipantsNo;
     private ArrayList<String> groupParticipants;
-    private GroupNameChangedListener groupNameChangedListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,11 +67,11 @@ public class GroupSettingsView extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        deleteBttn = findViewById(R.id.deletegrp_bttn);
-        deleteBttn.setOnClickListener(new View.OnClickListener() {
+        leaveBttn = findViewById(R.id.leave_bttn);
+        leaveBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editGroupAlertDialog(group);
+                leaveGroupAlertDialog();
             }
         });
     }
@@ -102,12 +105,23 @@ public class GroupSettingsView extends AppCompatActivity {
         });
     }
 
-    public void setGroupNameChangedListener(GroupNameChangedListener listener) {
-        this.groupNameChangedListener = listener;
+    public void leaveGroupAlertDialog(){
+        new AlertDialog.Builder(this)
+                .setTitle("Warning")
+                .setMessage("Are you sure you want to leave this group?")
+                .setIcon(R.drawable.warning)
+                .setPositiveButton("CONFIRM", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        groupService.leaveGroup(groupID);
+                        finish();
+
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null)
+                .show();
+
     }
 
-    public interface GroupNameChangedListener {
-        void onGroupNameChanged(String newGroupName);
-    }
 
 }

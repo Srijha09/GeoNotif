@@ -22,7 +22,7 @@ public class AddNewMembersPage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_members);
-        Intent intent = new Intent();
+        Intent intent = getIntent();
         groupID = intent.getStringExtra("groupUUID");
         System.out.println(groupID);
         groupName = intent.getStringExtra("groupName");

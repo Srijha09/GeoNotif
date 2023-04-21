@@ -2,13 +2,17 @@ package edu.northeastern.numadsp23_team20;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +22,7 @@ public class GroupService {
     private FirebaseAuth mAuth;
     private DatabaseReference ref;
     private GroupServiceListener groupServiceListener;
+    private ValueEventListener valueEventListener;
 
     public GroupService() {
         this.mAuth = FirebaseAuth.getInstance();
@@ -60,6 +65,61 @@ public class GroupService {
         System.out.println(group.getUuid());
         this.ref.setValue(updatedGroup);
     }
+
+    public void leaveGroup(String groupID){
+        String userId = this.firebaseUser.getUid();
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID);
+        this.ref.child("groupParticipants").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<String> groupParticipants = new ArrayList<>();
+                groupParticipants = (List<String>) dataSnapshot.getValue();
+                // Handle the case where there are no group participants
+                if (groupParticipants == null || groupParticipants.isEmpty()) {
+                    groupParticipants = new ArrayList<>();
+                }
+                // Find the index of the participant to remove
+                int indexToRemove = groupParticipants.indexOf(userId);
+                // Remove the participant from the list
+                if (indexToRemove >= 0) {
+                    groupParticipants.remove(indexToRemove);
+                }
+                // Update the group participants list in the database
+                ref.child("groupParticipants").setValue(groupParticipants);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle errors here
+            }
+        });
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId);
+        this.ref.child("Groups").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<String> groupUUIDs = new ArrayList<>();
+                groupUUIDs = (List<String>) dataSnapshot.getValue();
+                // Handle the case where there are no group participants
+                if (groupUUIDs == null || groupUUIDs.isEmpty()) {
+                    groupUUIDs = new ArrayList<>();
+                }
+                // Find the index of the participant to remove
+                int indexToRemove = groupUUIDs.indexOf(groupID);
+                // Remove the participant from the list
+                if (indexToRemove >= 0) {
+                    groupUUIDs.remove(indexToRemove);
+                }
+                // Update the group participants list in the database
+                ref.child("Groups").setValue(groupUUIDs);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
+    }
+
 
     public void addTaskToGroup(String groupUuid, Task task) {
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/"

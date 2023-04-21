@@ -11,7 +11,9 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -102,6 +104,8 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
 //        task1.setUuid(taskUuid.toString());
 //        grouptaskList.add(task1);
 
+        //pass filtered list based on groupID) and pass the filtered list here
+        //create another recycler
         this.taskListAdapter = new GroupTasksAdapter(this.grouptaskList, (OnTaskItemClickListener) this);
         tasksRecyclerView.setAdapter(taskListAdapter);
         tasksRecyclerView.setHasFixedSize(true);
@@ -245,6 +249,14 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         this.map.setClickable(true);
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if(!groupParticipants.contains(firebaseUser)){
+            FragmentManager manager = getChildFragmentManager();
+            manager.popBackStackImmediate();
+        }
+    }
 
     @Override
     public void onTaskItemClick(int position) {

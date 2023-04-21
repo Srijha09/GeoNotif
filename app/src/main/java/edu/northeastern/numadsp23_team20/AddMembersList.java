@@ -219,6 +219,7 @@ public class AddMembersList extends AppCompatActivity{
         };
         memberAdapter = new AddMemberAdapter(memberList, listener);
         recyclerView.setAdapter(memberAdapter);
+        System.out.println(groupParticipants);
 
 
 
@@ -258,7 +259,7 @@ public class AddMembersList extends AppCompatActivity{
                         String uid = childSnapshot.child("uid").getValue(String.class);
 
                         for (int i = 0; i < friendsUI.size(); i++) {
-                            if (uid.equals(friendsUI.get(i))) {
+                            if (uid != null && uid.equals(friendsUI.get(i))) {
                                 String emailID = childSnapshot.child("emailId").getValue(String.class);
                                 String fullname = childSnapshot.child("fullname").getValue(String.class);
                                 String username = childSnapshot.child("username").getValue(String.class);

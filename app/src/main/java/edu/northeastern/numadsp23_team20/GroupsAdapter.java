@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder> {
     private final ArrayList<Group> groupsList;
     private ItemClickListener listener;
-    private final Context context;
+    private Context context;
     //String currentGroup;
 
     //Creating the constructor
