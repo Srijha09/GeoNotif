@@ -115,7 +115,6 @@ public class GroupSettingsView extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         groupService.leaveGroup(groupID);
                         finish();
-
                     }
                 })
                 .setNegativeButton(android.R.string.no, null)

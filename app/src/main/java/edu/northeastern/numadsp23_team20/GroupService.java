@@ -1,5 +1,6 @@
 package edu.northeastern.numadsp23_team20;
 
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -68,8 +69,8 @@ public class GroupService {
 
     public void leaveGroup(String groupID){
         String userId = this.firebaseUser.getUid();
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID);
-        this.ref.child("groupParticipants").addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference groupsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID);
+        groupsRef.child("groupParticipants").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<String> groupParticipants = new ArrayList<>();
@@ -85,7 +86,7 @@ public class GroupService {
                     groupParticipants.remove(indexToRemove);
                 }
                 // Update the group participants list in the database
-                ref.child("groupParticipants").setValue(groupParticipants);
+                groupsRef.child("groupParticipants").setValue(groupParticipants);
             }
 
             @Override
@@ -93,8 +94,8 @@ public class GroupService {
                 // Handle errors here
             }
         });
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId);
-        this.ref.child("Groups").addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference userGroupref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId);
+        userGroupref.child("Groups").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<String> groupUUIDs = new ArrayList<>();
@@ -110,7 +111,7 @@ public class GroupService {
                     groupUUIDs.remove(indexToRemove);
                 }
                 // Update the group participants list in the database
-                ref.child("Groups").setValue(groupUUIDs);
+                userGroupref.child("Groups").setValue(groupUUIDs);
             }
 
             @Override

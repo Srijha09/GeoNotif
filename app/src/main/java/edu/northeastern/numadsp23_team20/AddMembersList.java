@@ -102,7 +102,7 @@ public class AddMembersList extends AppCompatActivity{
         }
 
         doneBttn = findViewById(R.id.donebttn);
-        if(groupParticipantsNo < 2 || groupParticipantsNo==2)  {
+        if(groupParticipantsNo < 2)  {
             doneBttn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -127,11 +127,12 @@ public class AddMembersList extends AppCompatActivity{
                     GroupTasksFragment grouptasksFragment = new GroupTasksFragment();
                     grouptasksFragment.setArguments(bundle);
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.FrameLayout3, grouptasksFragment);
+                    transaction.replace(R.id.FrameLayout2, grouptasksFragment);
                     transaction.addToBackStack(null);
                     if (!getSupportFragmentManager().isStateSaved()) { // Add check for isStateSaved()
                         transaction.commit();
                     }
+                    finish();
                 }
             });
         }
