@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
@@ -59,7 +60,7 @@ public class EditTask extends AppCompatActivity {
         setContentView(R.layout.activity_edit_task);
 
         this.editTaskLocationValue = findViewById(R.id.EditTaskLocationValue);
-        //Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
+        Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
         this.addressSearchActivity = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {

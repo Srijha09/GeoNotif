@@ -212,8 +212,8 @@ public class TaskService {
 
     public void editGroupTask(Task task, Task updatedTask, String groupId, ArrayList<String> groupParticipants) {
         //String userId = this.firebaseUser.getUid();
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/Tasks/" + updatedTask.getUuid());
-        this.ref.setValue(updatedTask);
+//        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/Tasks/" + updatedTask.getUuid());
+//        this.ref.setValue(updatedTask);
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + updatedTask.getUuid());
         this.ref.setValue(updatedTask);
         for(String userId:groupParticipants) {
@@ -224,28 +224,10 @@ public class TaskService {
         }
     }
 
-
-
     public void removeUserTaskList(List<String> tasks, String uuid) {
         tasks.remove(uuid);
         String userId = this.firebaseUser.getUid();
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Tasks");
-        this.ref.setValue(tasks);
-        this.ref.removeEventListener(this.valueEventListener);
-    }
-
-    //remove a task uuid from Groups Node
-    public void removeGroupTaskList(List<String> tasks, String uuid, String groupID) {
-        tasks.remove(uuid);
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID + "/Tasks");
-        this.ref.setValue(tasks);
-        this.ref.removeEventListener(this.valueEventListener);
-    }
-
-    //remove task uuid from each user in the group
-    public void removeUserGroupTaskList(List<String> tasks, String uuid, String userID) {
-        tasks.remove(uuid);
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userID + "/Tasks");
         this.ref.setValue(tasks);
         this.ref.removeEventListener(this.valueEventListener);
     }
@@ -277,143 +259,156 @@ public class TaskService {
         });
     }
 
+    //remove a task uuid from Groups Node
+    public void removeGroupTaskList(List<String> tasks, String uuid, String groupID) {
+        tasks.remove(uuid);
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID + "/Tasks");
+        this.ref.setValue(tasks);
+        this.ref.removeEventListener(this.valueEventListener);
+    }
+
+    //remove task uuid from each user in the group
+    public void removeUserGroupTaskList(List<String> tasks, String uuid, String userID) {
+        tasks.remove(uuid);
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userID + "/Tasks");
+        this.ref.setValue(tasks);
+        this.ref.removeEventListener(this.valueEventListener);
+    }
+
+    public void deleteGroupTask(String taskUUID, String groupID, ArrayList<String> groupParticipants) {
+        //String userId = this.firebaseUser.getUid();
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + taskUUID);
+        this.ref.removeValue();
+        for (String userid:groupParticipants) {
+            this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userid + "/Locations/"
+                    + taskUUID);
+            this.ref.removeValue();
+        }
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID + "/Tasks");
+        this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> taskUUIDs = new ArrayList<>();
+                taskUUIDs = (List<String>) snapshot.getValue();
+                if (taskUUIDs == null || taskUUIDs.isEmpty()) {
+                    taskUUIDs = new ArrayList<>();
+                }
+                removeGroupTaskList(taskUUIDs, taskUUID, groupID);
+                taskServiceDeleteListener.onTaskDeleted();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        for (String userid:groupParticipants) {
+            this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userid + "/Tasks");
+            this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    List<String> taskUUIDs = new ArrayList<>();
+                    taskUUIDs = (List<String>) snapshot.getValue();
+                    if (taskUUIDs == null || taskUUIDs.isEmpty()) {
+                        taskUUIDs = new ArrayList<>();
+                    }
+                    removeUserGroupTaskList(taskUUIDs, taskUUID,userid);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+    }
+
 //    public void deleteGroupTask(String taskUUID, String groupID, ArrayList<String> groupParticipants) {
-//        //String userId = this.firebaseUser.getUid();
-//        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + taskUUID);
-//        this.ref.removeValue();
-//        for (String userid:groupParticipants) {
-//            this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userid + "/Locations/"
-//                    + taskUUID);
-//            this.ref.removeValue();
-//        }
 //
-//        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID + "/Tasks");
-//        this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
+//        //delete from groups
+//        DatabaseReference groupsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID + "/Tasks");
+//
+//        groupsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
 //            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                List<String> taskUUIDs = new ArrayList<>();
-//                taskUUIDs = (List<String>) snapshot.getValue();
-//                if (taskUUIDs == null || taskUUIDs.isEmpty()) {
-//                    taskUUIDs = new ArrayList<>();
+//            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
+//                if (!userFriends.isSuccessful()) {
+//                    Log.e("firebase", "Error getting data", userFriends.getException());
+//                } else {
+//                    for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
+//                        //get the user IFD
+//                        String taskId = childSnapshot.getValue(String.class);
+//                        //Log.d("UserID", userID);
+//                        if (taskId.equals(taskUUID)) {
+//                            //Log.d("I came here", userID);
+//                            childSnapshot.getRef().removeValue(); // delete the child node
+//                            break;
+//                        }
+//
+//                    }
+//
 //                }
-//                removeGroupTaskList(taskUUIDs, taskUUID, groupID);
-//                taskServiceDeleteListener.onTaskDeleted();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
 //            }
 //        });
 //
-//        for (String userid:groupParticipants) {
-//            this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userid + "/Tasks");
-//            this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                    List<String> taskUUIDs = new ArrayList<>();
-//                    taskUUIDs = (List<String>) snapshot.getValue();
-//                    if (taskUUIDs == null || taskUUIDs.isEmpty()) {
-//                        taskUUIDs = new ArrayList<>();
+//
+//        //delete from tasks
+//        DatabaseReference groupsRef2 = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/");
+//
+//        groupsRef2.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
+//                if (!userFriends.isSuccessful()) {
+//                    Log.e("firebase", "Error getting data", userFriends.getException());
+//                } else {
+//                    for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
+//                        //get the user IFD
+//                        String taskId = childSnapshot.child("uuid").getValue(String.class);
+//                        //Log.d("UserID", userID);
+//                        if (taskId.equals(taskUUID)) {
+//                            //Log.d("I came here", userID);
+//                            childSnapshot.getRef().removeValue(); // delete the child node
+//                            break;
+//                        }
 //                    }
-//                    removeUserGroupTaskList(taskUUIDs, taskUUID,userid);
-//                    taskServiceDeleteListener.onTaskDeleted();
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError error) {
 //
 //                }
-//            });
-//        }
+//            }
+//        });
+//
+//
+//        //delete from user tasks
+//        String userId = firebaseUser.getUid();
+//        DatabaseReference taskRefs = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Tasks");
+//        taskRefs.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
+//                if (!userFriends.isSuccessful()) {
+//                    Log.e("firebase", "Error getting data", userFriends.getException());
+//                } else {
+//                    for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
+//                        //get the user IFD
+//                        String taskId = childSnapshot.getValue(String.class);
+//                        //Log.d("UserID", userID);
+//                        if (taskId.equals(taskUUID)) {
+//                            //Log.d("I came here", userID);
+//                            childSnapshot.getRef().removeValue(); // delete the child node
+//                            //taskServiceDeleteListener.onTaskDeleted();
+//                            break;
+//                        }
+//                    }
+//
+//                }
+//            }
+//        });
+//
+//        //delete from participants
+//        //delete from location
+//        //remove from recycler view
+//
+//        //go back to the previous page. TaskServiceDeleteListyener.
+//
+//
 //    }
-
-    public void deleteGroupTask(String taskUUID, String groupID, ArrayList<String> groupParticipants) {
-
-        //delete from groups
-        DatabaseReference groupsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID + "/Tasks");
-
-        groupsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
-                if (!userFriends.isSuccessful()) {
-                    Log.e("firebase", "Error getting data", userFriends.getException());
-                } else {
-                    for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
-                        //get the user IFD
-                        String taskId = childSnapshot.getValue(String.class);
-                        //Log.d("UserID", userID);
-                        if (taskId.equals(taskUUID)) {
-                            //Log.d("I came here", userID);
-                            childSnapshot.getRef().removeValue(); // delete the child node
-                            break;
-                        }
-
-                    }
-
-                }
-            }
-        });
-
-
-        //delete from tasks
-        DatabaseReference groupsRef2 = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/");
-
-        groupsRef2.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
-                if (!userFriends.isSuccessful()) {
-                    Log.e("firebase", "Error getting data", userFriends.getException());
-                } else {
-                    for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
-                        //get the user IFD
-                        String taskId = childSnapshot.child("uuid").getValue(String.class);
-                        //Log.d("UserID", userID);
-                        if (taskId.equals(taskUUID)) {
-                            //Log.d("I came here", userID);
-                            childSnapshot.getRef().removeValue(); // delete the child node
-                            break;
-                        }
-                    }
-
-                }
-            }
-        });
-
-
-        //delete from user tasks
-        String userId = firebaseUser.getUid();
-        DatabaseReference taskRefs = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Tasks");
-        taskRefs.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
-                if (!userFriends.isSuccessful()) {
-                    Log.e("firebase", "Error getting data", userFriends.getException());
-                } else {
-                    for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
-                        //get the user IFD
-                        String taskId = childSnapshot.getValue(String.class);
-                        //Log.d("UserID", userID);
-                        if (taskId.equals(taskUUID)) {
-                            //Log.d("I came here", userID);
-                            childSnapshot.getRef().removeValue(); // delete the child node
-                            //taskServiceDeleteListener.onTaskDeleted();
-                            break;
-                        }
-                    }
-
-                }
-            }
-        });
-
-        //delete from participants
-        //delete from location
-        //remove from recycler view
-
-        //go back to the previous page. TaskServiceDeleteListyener.
-
-
-    }
 
     public interface TaskServiceCreateListener {
         void onTaskCreated(String taskUUID);
