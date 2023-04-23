@@ -109,7 +109,7 @@ public class GroupSettingsView extends AppCompatActivity {
 
             Group updatedGroup = group;
             updatedGroup.setGroupName(newGroupName);
-            this.groupService.editGroup(group, updatedGroup);
+            this.groupService.editGroupName(updatedGroup.getUuid(), updatedGroup.getGroupName());
             alert.dismiss();
         });
     }
