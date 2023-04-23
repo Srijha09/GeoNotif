@@ -31,8 +31,6 @@ public class FriendService {
                 if (!userFriends.isSuccessful()) {
                     Log.e("firebase", "Error getting data", userFriends.getException());
                 } else {
-                    System.out.println("User friends: " + userFriends.getResult());
-
                 }
             }
         });

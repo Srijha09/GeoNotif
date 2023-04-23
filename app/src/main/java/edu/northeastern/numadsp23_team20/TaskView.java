@@ -57,12 +57,16 @@ public class TaskView extends AppCompatActivity implements Serializable {
         this.taskLatitude = intent.getExtras().getDouble("taskLatitude");
         this.taskLongitude = intent.getExtras().getDouble("taskLongitude");
         ((TextView) findViewById(R.id.TaskTitleTextView)).setText(intent.getExtras().getString("taskTitle"));
-        ((TextView) findViewById(R.id.TaskDetailsDescription)).setText(intent.getExtras().getString("taskDescription"));
+        ((TextView) findViewById(R.id.TaskDetailsDescription)).setText("Description: " + intent.getExtras().getString("taskDescription"));
         ((TextView) findViewById(R.id.TaskDetailsLocation)).setText("\uD83D\uDCCD " + intent.getExtras().getString("taskLocation"));
         this.customizeMap();
         if (intent.getExtras().getBoolean("taskComplete")) {
             ViewGroup layout = (ViewGroup) this.markComplete.getParent();
             layout.removeView(this.markComplete);
+        }
+        if (intent.getExtras().getString("taskType").equalsIgnoreCase("group")) {
+            ViewGroup layout = (ViewGroup) findViewById(R.id.TaskDeleteFloatingButton).getParent();
+            layout.removeView(findViewById(R.id.TaskDeleteFloatingButton));
         }
     }
 
@@ -150,15 +154,12 @@ public class TaskView extends AppCompatActivity implements Serializable {
                 .setMessage("Are you sure you want to delete this task?")
                 .setIcon(R.drawable.warning)
                 .setPositiveButton("CONFIRM", (dialogInterface, whichButton) -> {
-                    TaskService.TaskServiceDeleteListener taskServiceDeleteListener = new TaskService.TaskServiceDeleteListener() {
-                        @Override
-                        public void onTaskDeleted() {
-                            Intent returnIntent = new Intent();
-                            returnIntent.putExtra("DeletedTask", true);
-                            returnIntent.putExtra("DeletedTaskPosition", thisIntent.getExtras().getInt("position"));
-                            setResult(Activity.RESULT_OK, returnIntent);
-                            finish();
-                        }
+                    TaskService.TaskServiceDeleteListener taskServiceDeleteListener = () -> {
+                        Intent returnIntent = new Intent();
+                        returnIntent.putExtra("DeletedTask", true);
+                        returnIntent.putExtra("DeletedTaskPosition", thisIntent.getExtras().getInt("position"));
+                        setResult(Activity.RESULT_OK, returnIntent);
+                        finish();
                     };
                     TaskService taskService = new TaskService();
                     taskService.setTaskServiceDeleteListener(taskServiceDeleteListener);
@@ -176,12 +177,11 @@ public class TaskView extends AppCompatActivity implements Serializable {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        System.out.println("OnActivityResult");
         if (resultCode == RESULT_OK && requestCode == 1423) {
             this.thisIntent = data;
 
             ((TextView) findViewById(R.id.TaskTitleTextView)).setText(data.getExtras().getString("taskTitle"));
-            ((TextView) findViewById(R.id.TaskDetailsDescription)).setText(data.getExtras().getString("taskDescription"));
+            ((TextView) findViewById(R.id.TaskDetailsDescription)).setText("Description: " + data.getExtras().getString("taskDescription"));
             ((TextView) findViewById(R.id.TaskDetailsLocation)).setText("\uD83D\uDCCD " + data.getExtras().getString("taskLocation"));
 
             this.taskLongitude = data.getExtras().getDouble("taskLongitude");
