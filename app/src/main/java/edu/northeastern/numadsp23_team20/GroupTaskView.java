@@ -59,7 +59,7 @@ public class GroupTaskView extends AppCompatActivity implements Serializable {
         this.markComplete = findViewById(R.id.TaskDetailsCompleteButton);
 
         Intent intent = getIntent();
-        this.groupId = intent.getExtras().getString("groupUUID");
+        this.groupId = intent.getExtras().getString("groupId");
         this.groupName = intent.getExtras().getString("groupName");
         this.groupParticipants = intent.getExtras().getStringArrayList("groupParticipants");
         this.taskName = intent.getExtras().getString("taskTitle");
@@ -159,19 +159,19 @@ public class GroupTaskView extends AppCompatActivity implements Serializable {
                 .setMessage("Are you sure you want to delete this task?")
                 .setIcon(R.drawable.warning)
                 .setPositiveButton("CONFIRM", (dialogInterface, whichButton) -> {
-                    TaskService.TaskServiceDeleteListener taskServiceDeleteListener = new TaskService.TaskServiceDeleteListener() {
+                    GroupService.GroupServiceDeleteListener groupServiceDeleteListener = new GroupService.GroupServiceDeleteListener() {
                         @Override
-                        public void onTaskDeleted() {
+                        public void onGroupTaskDeleted() {
                             Intent returnIntent = new Intent();
-                            returnIntent.putExtra("DeletedTask", true);
-                            returnIntent.putExtra("DeletedTaskPosition", thisIntent.getExtras().getInt("position"));
+                            returnIntent.putExtra("DeletedGroupTask", true);
+                            returnIntent.putExtra("DeletedGroupTaskPosition", thisIntent.getExtras().getInt("position"));
                             setResult(Activity.RESULT_OK, returnIntent);
                             finish();
                         }
                     };
-                    TaskService taskService = new TaskService();
-                    taskService.setTaskServiceDeleteListener(taskServiceDeleteListener);
-                    taskService.deleteGroupTask(this.uuid, groupId, groupParticipants);
+                    GroupService groupService = new GroupService();
+                    groupService.setGroupServiceDeleteListener(groupServiceDeleteListener);
+                    groupService.deleteGroupTask(this.uuid, groupId);
                 })
                 .setNegativeButton(android.R.string.no, null)
                 .show();
