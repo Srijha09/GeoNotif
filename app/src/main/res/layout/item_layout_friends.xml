@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="2dp"
     android:background="#1B2769"
     app:cardCornerRadius="5dp">
 
@@ -31,7 +30,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="10dp"
             android:adjustViewBounds="true"
-            android:src="@drawable/comedy" />
+            android:src="@drawable/ic_person" />
 
         <TextView
             android:id="@+id/name_of_person"
@@ -52,14 +51,14 @@
         <Button
             android:id="@+id/follow_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
             android:fontFamily="sans-serif-light"
             android:layout_marginEnd="8dp"
             android:text="Following"
             android:textColor="#FFFFFF"
-            android:textSize="14sp"
+            android:textSize="10sp"
             android:textStyle="bold"/>
 
     </RelativeLayout>

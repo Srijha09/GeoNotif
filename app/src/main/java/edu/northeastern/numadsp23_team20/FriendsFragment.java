@@ -61,7 +61,6 @@ public class FriendsFragment extends Fragment {
     private static ArrayList<String> friendsIds;
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -245,11 +244,11 @@ public class FriendsFragment extends Fragment {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     // Loop through all child nodes of "users"
-                    Log.d("Me:" ,firebaseUser.getUid());
+                    Log.d("Me:", firebaseUser.getUid());
 
                     for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                         String uid = childSnapshot.child("uid").getValue(String.class);
-                        Log.d("uid:" ,uid);
+                        Log.d("uid:", uid);
                         if (!uid.equals(firebaseUser.getUid())) {
                             String emailID = childSnapshot.child("emailId").getValue(String.class);
                             String fullname = childSnapshot.child("fullname").getValue(String.class);
@@ -275,8 +274,6 @@ public class FriendsFragment extends Fragment {
 
                 }
             });
-
-
 
 
             return view;
@@ -382,7 +379,6 @@ public class FriendsFragment extends Fragment {
                     }
                 }
             });
-
 
 
             return view;
