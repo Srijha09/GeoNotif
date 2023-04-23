@@ -34,6 +34,7 @@ public class GroupService {
     public void setGroupServiceListener(GroupServiceListener groupServiceListener) {
         this.groupServiceListener = groupServiceListener;
     }
+
     public void setGroupServiceTaskCreateListener(GroupServiceTaskCreateListener groupServiceTaskCreateListener) {
         this.groupServiceTaskCreateListener = groupServiceTaskCreateListener;
     }
@@ -42,16 +43,17 @@ public class GroupService {
         this.groupServiceReadParticipantsListener = groupServiceReadParticipantsListener;
     }
 
-    public String getFirebaseUserUID(){
+    public String getFirebaseUserUID() {
         return firebaseUser.getUid();
     }
+
     public void createGroup(Group group) {
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/"
                 + group.getUuid());
         this.ref.setValue(group);
         String currentUserUUID = firebaseUser.getUid();
         group.getGroupParticipants().add(currentUserUUID);
-        for (String participantUUID: group.getGroupParticipants()) {
+        for (String participantUUID : group.getGroupParticipants()) {
             DatabaseReference userGroupsRef = FirebaseDatabase.getInstance().getReference(
                     "GeoNotif/Users/" + participantUUID + "/Groups");
             userGroupsRef.get().addOnCompleteListener(userGroups -> {
@@ -69,12 +71,12 @@ public class GroupService {
         }
     }
 
-    public void editGroup(Group group, Group updatedGroup) {
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + group.getUuid());
-        this.ref.setValue(updatedGroup);
+    public void editGroupName(String groupUUID, String updatedGroupName) {
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupUUID);
+        this.ref.child("groupName").setValue(updatedGroupName);
     }
 
-    public void leaveGroup(String groupID){
+    public void leaveGroup(String groupID) {
         String userId = this.firebaseUser.getUid();
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID);
         this.ref.child("groupParticipants").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -176,7 +178,7 @@ public class GroupService {
                 Log.e("firebase", "Error getting data", userGroups.getException());
             } else {
                 List<String> groupUUIDs = (List<String>) userGroups.getResult().getValue();
-                for (String groupUUID: groupUUIDs) {
+                for (String groupUUID : groupUUIDs) {
                     DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference(
                             "GeoNotif/Groups/" + groupUUID);
                     groupRef.get().addOnCompleteListener(group -> {
@@ -206,7 +208,7 @@ public class GroupService {
                 Log.e("firebase", "Error getting data", group.getException());
             } else {
                 List<String> participantUUIDs = (List<String>) group.getResult().getValue();
-                for (String participantUUID: participantUUIDs) {
+                for (String participantUUID : participantUUIDs) {
                     DatabaseReference participantRef = FirebaseDatabase.getInstance().getReference(
                             "GeoNotif/Users/" + participantUUID);
                     participantRef.get().addOnCompleteListener(participant -> {
