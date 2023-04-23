@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class AddMembersList extends AppCompatActivity{
+public class AddMembersList extends AppCompatActivity {
 
     private SearchView searchView;
     private RecyclerView recyclerView;
@@ -49,7 +49,7 @@ public class AddMembersList extends AppCompatActivity{
     private FirebaseDatabase mDatabase;
     private FirebaseAuth mAuth;
     private DatabaseReference ref;
-    private final String TAG="AddMembersList";
+    private final String TAG = "AddMembersList";
     private static AddMemberAdapter.OnButtonClickListener listener;
     private Button cancelBttn;
     private Button doneBttn;
@@ -66,7 +66,6 @@ public class AddMembersList extends AppCompatActivity{
         firebaseUser = mAuth.getCurrentUser();
         String userId = firebaseUser.getUid();
 
-        System.out.println(firebaseUser);
         Intent intent = getIntent();
         groupID = intent.getStringExtra("groupUUID");
         String groupName = intent.getStringExtra("groupName");
@@ -87,52 +86,43 @@ public class AddMembersList extends AppCompatActivity{
                     finish();
                 }
             });
-        }else{
-            cancelBttn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(), GroupSettingsView.class);
-                    intent.putExtra("groupUUID", groupID);
-                    intent.putExtra("groupName", groupName);
-                    intent.putExtra("groupParticipantsNo", groupParticipantsNo);
-                    intent.putExtra("groupParticipants", groupParticipants);
-                    //intent.putExtra("groupName", groupName);
-                    startActivity(intent);
-                }
+        } else {
+            cancelBttn.setOnClickListener(v -> {
+                Intent intent12 = new Intent(getApplicationContext(), GroupSettingsView.class);
+                intent12.putExtra("groupUUID", groupID);
+                intent12.putExtra("groupName", groupName);
+                intent12.putExtra("groupParticipantsNo", groupParticipantsNo);
+                intent12.putExtra("groupParticipants", groupParticipants);
+                //intent.putExtra("groupName", groupName);
+                startActivity(intent12);
             });
         }
 
         doneBttn = findViewById(R.id.donebttn);
-        if(groupParticipantsNo < 2 || groupParticipantsNo==2)  {
-            doneBttn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(), GroupSettingsView.class);
-                    intent.putExtra("groupUUID", groupID);
-                    intent.putExtra("groupName", groupName);
-                    intent.putExtra("groupParticipantsNo", groupParticipantsNo);
-                    intent.putExtra("groupParticipants", groupParticipants);
-                    //intent.putExtra("groupName", groupName);
-                    startActivity(intent);
-                }
+        if (groupParticipantsNo < 2 || groupParticipantsNo == 2) {
+            doneBttn.setOnClickListener(v -> {
+                Intent intent1 = new Intent(getApplicationContext(), GroupSettingsView.class);
+                intent1.putExtra("groupUUID", groupID);
+                intent1.putExtra("groupName", groupName);
+                intent1.putExtra("groupParticipantsNo", groupParticipantsNo);
+                intent1.putExtra("groupParticipants", groupParticipants);
+                //intent.putExtra("groupName", groupName);
+                startActivity(intent1);
             });
-        }else{
-            doneBttn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("groupUUID", groupID);
-                    bundle.putString("groupName", groupName);
-                    bundle.putStringArrayList("groupParticipants", groupParticipants);
-                    bundle.putInt("groupParticipantsNo", groupParticipantsNo);
-                    GroupTasksFragment grouptasksFragment = new GroupTasksFragment();
-                    grouptasksFragment.setArguments(bundle);
-                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.FrameLayout3, grouptasksFragment);
-                    transaction.addToBackStack(null);
-                    if (!getSupportFragmentManager().isStateSaved()) { // Add check for isStateSaved()
-                        transaction.commit();
-                    }
+        } else {
+            doneBttn.setOnClickListener(v -> {
+                Bundle bundle = new Bundle();
+                bundle.putString("groupUUID", groupID);
+                bundle.putString("groupName", groupName);
+                bundle.putStringArrayList("groupParticipants", groupParticipants);
+                bundle.putInt("groupParticipantsNo", groupParticipantsNo);
+                GroupTasksFragment grouptasksFragment = new GroupTasksFragment();
+                grouptasksFragment.setArguments(bundle);
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.FrameLayout3, grouptasksFragment);
+                transaction.addToBackStack(null);
+                if (!getSupportFragmentManager().isStateSaved()) { // Add check for isStateSaved()
+                    transaction.commit();
                 }
             });
         }
@@ -164,8 +154,8 @@ public class AddMembersList extends AppCompatActivity{
                 //add the user uid to the groupParticipants of group
                 DatabaseReference groupParticipantsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" +
                         groupID + "/groupParticipants");
-                DatabaseReference  groupParticipantsNoRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" +
-                                groupID).getRef().child("groupParticipantsNo");
+                DatabaseReference groupParticipantsNoRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" +
+                        groupID).getRef().child("groupParticipantsNo");
                 // add the user UID to the group participants list
                 // set the value of the next available integer key to the new participant ID
                 // add the new participant ID to the groupParticipants list
@@ -202,7 +192,7 @@ public class AddMembersList extends AppCompatActivity{
                                             Toast.makeText(getApplicationContext(), "Failed to add user", Toast.LENGTH_SHORT).show();
                                         }
                                     });
-                            for (String participantUUID: groupParticipants) {
+                            for (String participantUUID : groupParticipants) {
                                 if (!userId.equals(participantUUID)) {
                                     DatabaseReference userGroupsRef = FirebaseDatabase.getInstance().getReference(
                                             "GeoNotif/Users/" + participantUUID + "/Groups");
@@ -227,15 +217,15 @@ public class AddMembersList extends AppCompatActivity{
                             Toast.makeText(getApplicationContext(), "User already exists in the group", Toast.LENGTH_SHORT).show();
                         }
                     }
+
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         // handle the error
                         Toast.makeText(getApplicationContext(), "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-            }
-            else{
-                if(groupParticipants.contains(user_id)) {
+            } else {
+                if (groupParticipants.contains(user_id)) {
                     datapoint.setButtonDetails("Added");
                 }
             }
@@ -243,13 +233,6 @@ public class AddMembersList extends AppCompatActivity{
         };
         memberAdapter = new AddMemberAdapter(memberList, listener);
         recyclerView.setAdapter(memberAdapter);
-        System.out.println("Participants:"+groupParticipants);
-        //adding the group uid to each participant
-
-        System.out.println(userId);
-
-
-
 
         //fetch friends user IDs.
         friendsUI = new ArrayList<String>();
@@ -304,17 +287,17 @@ public class AddMembersList extends AppCompatActivity{
     }
 
 
-    public void filterList(String text){
+    public void filterList(String text) {
         ArrayList<User> filteredList = new ArrayList<>();
-        for(User user: memberList){
-            if(user.getUsername().toLowerCase(Locale.ROOT).contains(text.toLowerCase(Locale.ROOT))){
+        for (User user : memberList) {
+            if (user.getUsername().toLowerCase(Locale.ROOT).contains(text.toLowerCase(Locale.ROOT))) {
                 filteredList.add(user);
             }
         }
 
-        if (filteredList.isEmpty()){
+        if (filteredList.isEmpty()) {
 //            Toast.makeText(this, "No data found", Toast.LENGTH_SHORT).show();
-        }else{
+        } else {
             memberAdapter.setFilteredList(filteredList);
         }
     }

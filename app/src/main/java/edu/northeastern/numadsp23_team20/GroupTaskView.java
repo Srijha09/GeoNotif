@@ -1,7 +1,9 @@
 package edu.northeastern.numadsp23_team20;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -138,19 +140,16 @@ public class GroupTaskView extends AppCompatActivity implements Serializable {
         task.setTaskType(thisIntent.getExtras().getString("taskType"));
         task.setTaskTypeString(thisIntent.getExtras().getString("taskTypeString"));
 
-        TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
-            @Override
-            public void onTaskCreated(String taskUUID) {
-                Intent returnIntent = new Intent();
-                returnIntent.putExtra("EditedTask", true);
-                returnIntent.putExtra("EditedTaskPosition", thisIntent.getExtras().getInt("position"));
-                setResult(Activity.RESULT_OK, returnIntent);
-                finish();
-            }
+        TaskService.TaskServiceCreateListener taskServiceCreateListener = taskUUID -> {
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("EditedTask", true);
+            returnIntent.putExtra("EditedTaskPosition", thisIntent.getExtras().getInt("position"));
+            setResult(Activity.RESULT_OK, returnIntent);
+            finish();
         };
         TaskService taskService = new TaskService();
         taskService.setTaskServiceCreateListener(taskServiceCreateListener);
-        taskService.createGroupTask(task, groupId, groupParticipants);
+        taskService.createTask(task);
     }
 
     public void onTaskDeleteFloatingButtonClick(View view) {

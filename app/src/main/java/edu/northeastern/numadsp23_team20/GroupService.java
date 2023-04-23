@@ -66,7 +66,6 @@ public class GroupService {
 
     public void editGroup(Group group, Group updatedGroup) {
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + group.getUuid());
-        System.out.println(group.getUuid());
         this.ref.setValue(updatedGroup);
     }
 
