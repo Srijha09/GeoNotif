@@ -24,6 +24,10 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -146,35 +150,27 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
     public void onAddTaskButtonClick(View view) {
         Intent intent = new Intent(getContext(), AddTask.class);
         this.addTaskActivityLaunch.launch(intent);
-
-        // Reference to create group and add task to group
-
-//        GroupService groupService = new GroupService();
-//        ArrayList<String> groupParticipants = new ArrayList<>();
-//        groupParticipants.add("0807XrhHnbYCitusNryNuiFhaRB2");
-//        groupParticipants.add("MCusNMtwr7hNW7e5xg6Un4tEpfu2");
-//        Group group = new Group("Group 1", groupParticipants);
-//        UUID groupUuid = UUID.randomUUID();
-//        group.setUuid(groupUuid.toString());
-//        groupService.createGroup(group);
-//        LocationItem locationItem = new LocationItem("Fenway park", 42.3467, -71.0972);
-//        Task task = new Task("Fenway test task", "Fenway test task description",
-//                locationItem);
-//        UUID taskUuid = UUID.randomUUID();
-//        task.setUuid(taskUuid.toString());
-//        groupService.addTaskToGroup(groupUuid.toString(), task);
-
-        // Reference to get friends of user
-//        FriendService friendService = new FriendService();
-//        friendService.readUserFriends();
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint({"ClickableViewAccessibility", "MissingPermission"})
     private void configureMap() {
         this.map.setTileSource(TileSourceFactory.MAPNIK);
         this.mapController.setZoom(15);
         this.map.setMultiTouchControls(true);
         this.map.setClickable(true);
+
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.getActivity());
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this.getActivity(), location -> {
+                    // Got last known location. In some rare situations this can be null.
+                    if (location != null) {
+                        GeoPoint markerPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                        this.mapController.setCenter(markerPoint);
+                        Marker mapMarker = this.getCustomizedMapMarker();
+                        mapMarker.setPosition(markerPoint);
+                    }
+                });
     }
 
     private Marker getCustomizedMapMarker() {
