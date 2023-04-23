@@ -10,6 +10,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import edu.northeastern.numadsp23_team20.BuildConfig;
 
 
@@ -83,15 +84,17 @@ public class AddGroupTask extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_group_task);
         Intent intent = getIntent();
-        groupID = intent.getStringExtra("groupUUID");
-        groupName = intent.getStringExtra("groupName");
-        groupParticipants = intent.getStringArrayListExtra("groupParticipants");
+        this.groupID = intent.getStringExtra("groupUUID");
+        this.groupName = intent.getStringExtra("groupName");
+        this.groupParticipants = intent.getStringArrayListExtra("groupParticipants");
         //this.addTaskTypeRecyclerViewContainer = findViewById(R.id.AddTaskTypeRecyclerViewContainer);
-        groupsList = new ArrayList<>();
-        onTaskTypeAssigneeItemClickListener = assignee -> {
+        this.groupsList = new ArrayList<>();
+        this.onTaskTypeAssigneeItemClickListener = assignee -> {
             taskTypeListAdapter.notifyDataSetChanged();
             nonPersonalTaskTypeAssignee = assignee;
         };
+
+        System.out.println("Add Group Task" + this.groupParticipants.toString());
 
         this.taskType = TaskType.GROUP;
         this.nonPersonalTaskTypeAssignee = groupName;
@@ -159,21 +162,19 @@ public class AddGroupTask extends AppCompatActivity {
             task.setTaskTypeString("Group task: " + nonPersonalTaskTypeAssignee);
         }
 
-        TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
-            @Override
-            public void onTaskCreated(String taskUUID) {
-                Intent returnIntent = new Intent();
-                returnIntent.putExtra("NewTask", true);
-                returnIntent.putExtra("TaskUUID", taskUUID);
-                setResult(Activity.RESULT_OK, returnIntent);
-                finish();
-            }
+        TaskService.TaskServiceCreateListener taskServiceCreateListener = taskUUID -> {
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("NewTask", true);
+            returnIntent.putExtra("TaskUUID", taskUUID);
+            setResult(Activity.RESULT_OK, returnIntent);
+            finish();
         };
+
         TaskService taskService = new TaskService();
         taskService.setTaskServiceCreateListener(taskServiceCreateListener);
         UUID uuid = UUID.randomUUID();
         task.setUuid(uuid.toString());
-        taskService.createGroupTask(task, groupID, groupParticipants);
+        taskService.createGroupTask(task, this.groupID, this.groupParticipants);
     }
 
     private boolean validateTaskType() {

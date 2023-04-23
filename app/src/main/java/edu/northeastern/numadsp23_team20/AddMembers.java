@@ -21,14 +21,11 @@ public class AddMembers extends AppCompatActivity {
         TextView groupNameTextView = findViewById(R.id.groupName);
         groupNameTextView.setText(groupName);
         settings = findViewById(R.id.settings_button);
-        settings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // create a new intent to open the new activity
-                Intent intent = new Intent(getApplicationContext(), GroupSettingsView.class);
-                intent.putExtra("groupName", groupName);
-                startActivity(intent);
-            }
+        settings.setOnClickListener(v -> {
+            // create a new intent to open the new activity
+            Intent intent1 = new Intent(getApplicationContext(), GroupSettingsView.class);
+            intent1.putExtra("groupName", groupName);
+            startActivity(intent1);
         });
     }
 }

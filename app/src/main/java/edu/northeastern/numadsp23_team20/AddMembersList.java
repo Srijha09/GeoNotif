@@ -312,7 +312,7 @@ public class AddMembersList extends AppCompatActivity{
         }
 
         if (filteredList.isEmpty()){
-            Toast.makeText(this, "No data found", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "No data found", Toast.LENGTH_SHORT).show();
         }else{
             memberAdapter.setFilteredList(filteredList);
         }

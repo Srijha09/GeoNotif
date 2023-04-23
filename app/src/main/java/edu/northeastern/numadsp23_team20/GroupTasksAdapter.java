@@ -35,10 +35,7 @@ public class GroupTasksAdapter extends RecyclerView.Adapter<GroupTasksAdapter.Ta
         this.onTaskItemClickListener = onTaskItemClickListener;
         this.taskService = new TaskService();
 
-        TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
-            @Override
-            public void onTaskCreated(String taskUUID) {
-            }
+        TaskService.TaskServiceCreateListener taskServiceCreateListener = taskUUID -> {
         };
         this.taskService.setTaskServiceCreateListener(taskServiceCreateListener);
     }

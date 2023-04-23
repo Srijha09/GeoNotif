@@ -85,8 +85,7 @@
             <org.osmdroid.views.MapView
                 android:id="@+id/TasksMapView"
                 android:layout_width="match_parent"
-                android:layout_height="268dp"
-                android:layout_marginTop="20dp">
+                android:layout_height="268dp">
             </org.osmdroid.views.MapView>
         </androidx.cardview.widget.CardView>
 
