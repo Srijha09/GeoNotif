@@ -174,7 +174,9 @@ public class AddGroupTask extends AppCompatActivity {
         taskService.setTaskServiceCreateListener(taskServiceCreateListener);
         UUID uuid = UUID.randomUUID();
         task.setUuid(uuid.toString());
-        taskService.createGroupTask(task, this.groupID, this.groupParticipants);
+        //taskService.createGroupTask(task, this.groupID, this.groupParticipants);
+        GroupService groupService = new GroupService();
+        groupService.addTaskToGroup(this.groupID, task);
     }
 
     private boolean validateTaskType() {

@@ -77,13 +77,14 @@ public class AddMembersList extends AppCompatActivity{
             cancelBttn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(), AddNewMembersPage.class);
-                    intent.putExtra("groupUUID", groupID);
-                    intent.putExtra("groupName", groupName);
-                    intent.putExtra("groupParticipantsNo", groupParticipantsNo);
-                    intent.putExtra("groupParticipants", groupParticipants);
-                    //intent.putExtra("groupName", groupName);
-                    startActivity(intent);
+//                    Intent intent = new Intent(getApplicationContext(), AddNewMembersPage.class);
+//                    intent.putExtra("groupUUID", groupID);
+//                    intent.putExtra("groupName", groupName);
+//                    intent.putExtra("groupParticipantsNo", groupParticipantsNo);
+//                    intent.putExtra("groupParticipants", groupParticipants);
+//                    //intent.putExtra("groupName", groupName);
+//                    startActivity(intent);
+                    finish();
                 }
             });
         }else{
