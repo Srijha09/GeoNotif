@@ -177,7 +177,6 @@ public class TaskView extends AppCompatActivity implements Serializable {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        System.out.println("OnActivityResult");
         if (resultCode == RESULT_OK && requestCode == 1423) {
             this.thisIntent = data;
 

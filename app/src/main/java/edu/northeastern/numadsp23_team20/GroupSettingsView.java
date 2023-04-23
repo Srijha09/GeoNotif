@@ -46,7 +46,6 @@ public class GroupSettingsView extends AppCompatActivity {
         this.group.setUuid(groupID);
         this.edit = findViewById(R.id.GroupSettingsEditName);
         this.edit.setOnClickListener(v -> editGroupAlertDialog(group));
-        //Button addMember = findViewById(R.id.addmember_bttn);
         Button addMember = findViewById(R.id.GroupSettingsAddParticipants);
         addMember.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,14 +58,8 @@ public class GroupSettingsView extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        // this.leaveBttn = findViewById(R.id.leave_bttn);
         this.leaveBttn = findViewById(R.id.GroupSettingsLeaveButton);
-        this.leaveBttn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                leaveGroupAlertDialog();
-            }
-        });
+        this.leaveBttn.setOnClickListener(v -> leaveGroupAlertDialog());
 
         RecyclerView groupParticipantsRecyclerView = findViewById(R.id.GroupSettingsParticipantsRecyclerViewContainer);
         this.recyclerViewParticipantList = new ArrayList<>();
