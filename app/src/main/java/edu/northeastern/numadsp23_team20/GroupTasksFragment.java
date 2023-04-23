@@ -34,6 +34,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.checkerframework.checker.units.qual.A;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -60,6 +61,8 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
     private ImageButton settings;
     private String groupName;
     private ArrayList<String> groupParticipants;
+    private  ArrayList<String> recyclerViewParticipantList;
+    private ParticipantListAdapter participantListAdapter;
 
     static FirebaseUser firebaseUser;
     FirebaseAuth mAuth;
@@ -76,22 +79,24 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View inflatedView = inflater.inflate(R.layout.fragment_group_tasks, container, false);
+        View inflatedView = inflater.inflate(R.layout.fragment_group_tasks_new, container, false);
         assert getArguments() != null;
         this.groupId = getArguments().getString("groupUUID");
         this.groupName = getArguments().getString("groupName");
         this.groupParticipants = getArguments().getStringArrayList("groupParticipants");
         Integer groupParticipantsNo = getArguments().getInt("groupParticipantsNo");
         // Set the group name as the text of the TextView
-        TextView groupNameTextView = inflatedView.findViewById(R.id.groupName);
+        TextView groupNameTextView = inflatedView.findViewById(R.id.GroupNameTitle);
         groupNameTextView.setText(groupName);
+
+
 
         this.loadingTasks = true;
         this.ctx = getContext();
         Configuration.getInstance().load(this.ctx, PreferenceManager.getDefaultSharedPreferences(this.ctx));
-        this.map = inflatedView.findViewById(R.id.TasksMapView);
-        this.mapController = this.map.getController();
-        this.configureMap();
+//        this.map = inflatedView.findViewById(R.id.TasksMapView);
+//        this.mapController = this.map.getController();
+//        this.configureMap();
         RecyclerView tasksRecyclerView = inflatedView.findViewById(R.id.TasksRecyclerView);
         this.tasksLoadingSpinner = inflatedView.findViewById(R.id.TasksLoadingSpinner);
         this.noTasksTextView = inflatedView.findViewById(R.id.NoTasksTextView);
@@ -133,6 +138,22 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
 
         });
 
+        RecyclerView groupParticipantsRecyclerView = inflatedView.findViewById(R.id.GroupParticipantsRecyclerViewContainer);
+        this.recyclerViewParticipantList = new ArrayList<>();
+        this.participantListAdapter = new ParticipantListAdapter(this.recyclerViewParticipantList);
+        groupParticipantsRecyclerView.setAdapter(participantListAdapter);
+        groupParticipantsRecyclerView.setHasFixedSize(true);
+        groupParticipantsRecyclerView.setLayoutManager(new LinearLayoutManager(this.ctx));
+        GroupService groupService = new GroupService();
+        GroupService.GroupServiceReadParticipantsListener groupServiceReadParticipantsListener = new GroupService.GroupServiceReadParticipantsListener() {
+            @Override
+            public void onParticipantRead(String participant) {
+                recyclerViewParticipantList.add(participant);
+                participantListAdapter.notifyDataSetChanged();
+            }
+        };
+        groupService.setGroupServiceReadParticipantsListener(groupServiceReadParticipantsListener);
+        groupService.readParticipantsForGroup(this.groupId);
 
         this.taskService.readTasks();
         this.addTaskActivityLaunch = registerForActivityResult(
@@ -173,7 +194,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                     }
                 });
 
-        settings = inflatedView.findViewById(R.id.settings_button);
+        settings = inflatedView.findViewById(R.id.GroupSettingsActionButton);
         settings.setOnClickListener(v -> {
             // create a new intent to open the new activity
             Intent intent = new Intent(getContext(), GroupSettingsView.class);
@@ -220,7 +241,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
 
             }
         });
-        inflatedView.findViewById(R.id.AddTaskButton).setOnClickListener(this::onAddTaskButtonClick);
+        inflatedView.findViewById(R.id.GroupTasksAddActionButton).setOnClickListener(this::onAddTaskButtonClick);
         return inflatedView;
     }
 

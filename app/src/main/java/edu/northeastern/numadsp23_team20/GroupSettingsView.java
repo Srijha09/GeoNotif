@@ -1,13 +1,8 @@
 package edu.northeastern.numadsp23_team20;
 
-import static android.text.TextUtils.isEmpty;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,11 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class GroupSettingsView extends AppCompatActivity {
     private Button edit;
@@ -93,7 +85,7 @@ public class GroupSettingsView extends AppCompatActivity {
 
             Group updatedGroup = group;
             updatedGroup.setGroupName(newGroupName);
-            this.groupService.editGroup(group, updatedGroup);
+            this.groupService.editGroupName(updatedGroup.getUuid(), updatedGroup.getGroupName());
             alert.dismiss();
         });
     }

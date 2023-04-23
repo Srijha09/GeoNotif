@@ -54,7 +54,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="8dp"
             android:fontFamily="sans-serif-light"
-            android:text="Unfriend"
+            android:text=""
             android:inputType="textCapSentences"
             android:textColor="#FFFFFF"
             android:textSize="10sp"

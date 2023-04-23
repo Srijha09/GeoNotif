@@ -69,7 +69,7 @@ public class AddTask extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
-        this.addTaskTypeRecyclerViewContainer = findViewById(R.id.AddTaskTypeRecyclerViewContainer);
+        this.addTaskTypeRecyclerViewContainer = findViewById(R.id.GroupParticipantsRecyclerViewContainer);
         groupsList = new ArrayList<>();
         onTaskTypeAssigneeItemClickListener = assignee -> {
             taskTypeListAdapter.notifyDataSetChanged();
