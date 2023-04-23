@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -18,9 +17,10 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GroupService {
     private FirebaseUser firebaseUser;
@@ -131,6 +131,35 @@ public class GroupService {
         this.ref.removeValue();
     }
 
+    private void removeTaskFromUser(Map<String, String> tasks) {
+        if (tasks.size() > 0) {
+            String userId = this.firebaseUser.getUid();
+            System.out.println("User tasks when leaving - " + tasks);
+            for (String taskUUID : tasks.values()) {
+                this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations/"
+                        + taskUUID);
+                this.ref.removeValue();
+                this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Tasks");
+                this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        List<String> taskUUIDs = new ArrayList<>();
+                        taskUUIDs = (List<String>) snapshot.getValue();
+                        if (taskUUIDs == null || taskUUIDs.isEmpty()) {
+                            taskUUIDs = new ArrayList<>();
+                        }
+                        removeUserTaskList(taskUUIDs, taskUUID, userId);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        }
+    }
+
     public void leaveGroup(String groupID) {
         System.out.println(groupID);
         String userId = this.firebaseUser.getUid();
@@ -170,7 +199,24 @@ public class GroupService {
 
             }
         });
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID + "/Tasks");
 
+        this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Map<String, String> tasks = new HashMap<>();
+                tasks = (Map<String, String>) snapshot.getValue();
+                if (tasks == null || tasks.isEmpty()) {
+                    tasks = new HashMap<>();
+                }
+                removeTaskFromUser(tasks);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         updateGroupParticipantsNo(groupID);
     }
 
