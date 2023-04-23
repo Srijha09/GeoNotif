@@ -26,7 +26,7 @@ public class FriendsData implements Parcelable {
         this.fullName = fullName;
         this.userID = userID;
         this.userName = userName;
-        this.buttonDetails = "Follow";
+        this.buttonDetails = "Add Friend";
         this.pathReference = pathReference;
     }
 

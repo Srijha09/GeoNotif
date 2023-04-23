@@ -26,7 +26,6 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
     public FriendsRecyclerView(List<FriendsData> data, OnButtonClickListener listener) {
         mData = data;
         mListener = listener;
-
     }
 
     // Create new views (invoked by the layout manager)
