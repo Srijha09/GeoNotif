@@ -1,6 +1,5 @@
 package edu.northeastern.numadsp23_team20;
 
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +26,6 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
     public FriendsRecyclerView(List<FriendsData> data, OnButtonClickListener listener) {
         mData = data;
         mListener = listener;
-
     }
 
     // Create new views (invoked by the layout manager)

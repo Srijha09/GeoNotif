@@ -10,6 +10,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import edu.northeastern.numadsp23_team20.BuildConfig;
 
 
@@ -52,7 +53,6 @@ import org.osmdroid.views.overlay.Marker;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class AddGroupTask extends AppCompatActivity {
@@ -67,12 +67,16 @@ public class AddGroupTask extends AppCompatActivity {
     private Marker mapMarker;
     private ActivityResultLauncher<Intent> addressSearchActivity;
     private TextView addTaskLocationValue;
+    private TaskTypeListAdapter taskTypeListAdapter;
+    private OnTaskTypeAssigneeItemClickListener onTaskTypeAssigneeItemClickListener;
     private TaskType taskType;
-    //private String nonPersonalTaskTypeAssignee;
+    private String nonPersonalTaskTypeAssignee;
+    private GroupService.GroupServiceListener groupServiceListener;
     private String groupID;
     private String groupName;
     private List<String> groupsList;
     private ArrayList<String> groupParticipants;
+    private RecyclerView addTaskTypeRecyclerViewContainer;
 
 
     @Override
@@ -80,15 +84,20 @@ public class AddGroupTask extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_group_task);
         Intent intent = getIntent();
-        groupID = intent.getStringExtra("groupUUID");
-        groupName = intent.getStringExtra("groupName");
-        groupParticipants = intent.getStringArrayListExtra("groupParticipants");
+        this.groupID = intent.getStringExtra("groupUUID");
+        this.groupName = intent.getStringExtra("groupName");
+        this.groupParticipants = intent.getStringArrayListExtra("groupParticipants");
         //this.addTaskTypeRecyclerViewContainer = findViewById(R.id.AddTaskTypeRecyclerViewContainer);
-        groupsList = new ArrayList<>();
+        this.groupsList = new ArrayList<>();
+        this.onTaskTypeAssigneeItemClickListener = assignee -> {
+            taskTypeListAdapter.notifyDataSetChanged();
+            nonPersonalTaskTypeAssignee = assignee;
+        };
 
-        //set default type as GROUP
+        System.out.println("Add Group Task" + this.groupParticipants.toString());
+
         this.taskType = TaskType.GROUP;
-        //this.nonPersonalTaskTypeAssignee = groupName;
+        this.nonPersonalTaskTypeAssignee = groupName;
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
         this.map = findViewById(R.id.AddTaskMapView);
         this.mapMarker = new Marker(this.map);
@@ -133,6 +142,7 @@ public class AddGroupTask extends AppCompatActivity {
     public void onAddTaskSubmitButtonClick(View view) {
         String taskTitle = ((TextView) findViewById(R.id.AddTaskTitleValue)).getText().toString();
         String taskDescription = ((TextView) findViewById(R.id.AddTaskDescriptionValue)).getText().toString();
+
         if (!validateTaskTitle(taskTitle)) {
             return;
         } else if (!validateTaskDescription(taskDescription)) {
@@ -149,28 +159,28 @@ public class AddGroupTask extends AppCompatActivity {
 
         if (taskType == TaskType.GROUP) {
             task.setTaskType(TaskType.GROUP.toString());
-            task.setTaskTypeString("Group task: " + groupName);
+            task.setTaskTypeString("Group task: " + nonPersonalTaskTypeAssignee);
         }
 
-        TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
-            @Override
-            public void onTaskCreated(String taskUUID) {
-                Intent returnIntent = new Intent();
-                returnIntent.putExtra("NewTask", true);
-                returnIntent.putExtra("TaskUUID", taskUUID);
-                setResult(Activity.RESULT_OK, returnIntent);
-                finish();
-            }
+        TaskService.TaskServiceCreateListener taskServiceCreateListener = taskUUID -> {
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("NewTask", true);
+            returnIntent.putExtra("TaskUUID", taskUUID);
+            setResult(Activity.RESULT_OK, returnIntent);
+            finish();
         };
+
         TaskService taskService = new TaskService();
         taskService.setTaskServiceCreateListener(taskServiceCreateListener);
         UUID uuid = UUID.randomUUID();
         task.setUuid(uuid.toString());
-        taskService.createGroupTask(task, groupID, groupParticipants);
+        //taskService.createGroupTask(task, this.groupID, this.groupParticipants);
+        GroupService groupService = new GroupService();
+        groupService.addTaskToGroup(this.groupID, task);
     }
 
     private boolean validateTaskType() {
-        if (this.taskType == TaskType.GROUP) {
+        if (this.taskType == TaskType.GROUP && this.nonPersonalTaskTypeAssignee.equals("")) {
             return true;
         }
         return false;
@@ -275,6 +285,7 @@ public class AddGroupTask extends AppCompatActivity {
         outState.putDouble("taskLongitude", this.taskLongitude);
         outState.putInt("addTaskLocationValueVisibility", this.addTaskLocationValue.getVisibility());
         outState.putString("addTaskLocationValue", this.addTaskLocationValue.getText().toString());
+        outState.putInt("addTaskTypeRecyclerViewContainerVisibility", addTaskTypeRecyclerViewContainer.getVisibility());
         outState.putSerializable("taskType", this.taskType);
     }
 
@@ -288,6 +299,7 @@ public class AddGroupTask extends AppCompatActivity {
             this.taskLongitude = savedInstanceState.getDouble("taskLongitude");
             this.addTaskLocationValue.setVisibility(savedInstanceState.getInt("addTaskLocationValueVisibility"));
             this.addTaskLocationValue.setText(savedInstanceState.getString("addTaskLocationValue"));
+            this.addTaskTypeRecyclerViewContainer.setVisibility(savedInstanceState.getInt("addTaskTypeRecyclerViewContainerVisibility"));
             this.taskType = (TaskType) savedInstanceState.getSerializable("taskType");
             if (this.taskLocationName != null) {
                 setMapMarker(this.taskLatitude, this.taskLongitude);

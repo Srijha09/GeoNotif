@@ -132,6 +132,7 @@ public class TaskService {
             });
         }
     }
+
     public void addUserTaskList(List<String> tasks, String uuid) {
         tasks.add(uuid);
         List<String> newTasks = new ArrayList<>(new HashSet<>(tasks));

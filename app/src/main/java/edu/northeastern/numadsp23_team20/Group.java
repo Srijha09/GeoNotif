@@ -1,7 +1,7 @@
 package edu.northeastern.numadsp23_team20;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 public class Group {
 
@@ -13,14 +13,11 @@ public class Group {
     public Group() {
     }
 
-    public Group(String groupName, Integer groupParticipantsNo) {
-        this.groupName = groupName;
-        this.groupParticipantsNo = groupParticipantsNo;
-    }
-
     public Group(String groupName, ArrayList<String> groupParticipants) {
         this.groupName = groupName;
+        this.groupParticipantsNo = groupParticipants.size();
         this.groupParticipants = groupParticipants;
+        this.uuid = String.valueOf(UUID.randomUUID());
     }
 
     public String getUuid() {
@@ -46,10 +43,18 @@ public class Group {
     public void setGroupParticipants(ArrayList<String> groupParticipants) {
         this.groupParticipants = groupParticipants;
     }
-    public Integer getGroupParticipantsNo(){
-        if(groupParticipants!=null) {
+
+    public Integer getGroupParticipantsNo() {
+        if (groupParticipants != null) {
             return groupParticipants.size();
         }
         return 1;
+    }
+
+    @Override
+    public String toString() {
+        return "Group [groupName =" + getGroupName() + ", groupParticipantsNo=" + getGroupParticipantsNo()
+                + ", groupParticipants()=" + getGroupParticipants()
+                + ", groupId=" + getUuid() + "]";
     }
 }

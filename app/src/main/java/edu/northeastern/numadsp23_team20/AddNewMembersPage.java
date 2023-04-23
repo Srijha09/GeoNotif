@@ -18,45 +18,42 @@ public class AddNewMembersPage extends AppCompatActivity {
     private String groupName;
     private Integer groupParticipantsNo;
     private ArrayList<String> groupParticipants;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_members);
         Intent intent = getIntent();
-        groupID = intent.getStringExtra("groupUUID");
+        this.groupID = intent.getStringExtra("groupUUID");
         System.out.println(groupID);
-        groupName = intent.getStringExtra("groupName");
+        this.groupName = intent.getStringExtra("groupName");
         System.out.println(groupName);
-        groupParticipants = intent.getStringArrayListExtra("groupParticipants");
+        this.groupParticipants = intent.getStringArrayListExtra("groupParticipants");
         System.out.println(groupParticipants);
-        groupParticipantsNo = intent.getIntExtra("groupParticipantsNo", 1);
+        this.groupParticipantsNo = intent.getIntExtra("groupParticipantsNo", 1);
         System.out.println(groupParticipantsNo);
         // Set the group name as the text of the TextView
         TextView groupNameTextView = findViewById(R.id.groupName);
-        groupNameTextView.setText(groupName);
-        addNewMembers = findViewById(R.id.addmember_bttn);
-        addNewMembers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), AddMembersList.class);
-                intent.putExtra("groupUUID", groupID);
-                intent.putExtra("groupName", groupName);
-                intent.putExtra("groupParticipantsNo", groupParticipantsNo);
-                intent.putExtra("groupParticipants", groupParticipants);
-                //intent.putExtra("groupName", groupName);
-                startActivity(intent);
-            }
+        groupNameTextView.setText(this.groupName);
+        this.addNewMembers = findViewById(R.id.addmember_bttn);
+        this.addNewMembers.setOnClickListener(v -> {
+            Intent intent1 = new Intent(getApplicationContext(), AddMembersList.class);
+            intent1.putExtra("groupUUID", groupID);
+            intent1.putExtra("groupName", groupName);
+            intent1.putExtra("groupParticipantsNo", groupParticipantsNo);
+            intent1.putExtra("groupParticipants", groupParticipants);
+            startActivity(intent1);
         });
 
         settings = findViewById(R.id.settings_button);
-        settings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // create a new intent to open the new activity
-                Intent intent = new Intent(getApplicationContext(), GroupSettingsView.class);
-                intent.putExtra("groupName", groupName);
-                startActivity(intent);
-            }
+        settings.setOnClickListener(v -> {
+            // create a new intent to open the new activity
+            Intent intent12 = new Intent(getApplicationContext(), GroupSettingsView.class);
+            intent12.putExtra("groupUUID", groupID);
+            intent12.putExtra("groupName", groupName);
+            intent12.putExtra("groupParticipantsNo", groupParticipantsNo);
+            intent12.putExtra("groupParticipants", groupParticipants);
+            startActivity(intent12);
         });
     }
 }

@@ -61,7 +61,6 @@ public class FriendsFragment extends Fragment {
     private static ArrayList<String> friendsIds;
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -168,8 +167,8 @@ public class FriendsFragment extends Fragment {
 
                 FriendsData datapoint = all_users.get(position);
 
-                if (datapoint.getButtonDetails().equals("Following")) {
-                    datapoint.setButtonDetails("Follow");
+                if (datapoint.getButtonDetails().equalsIgnoreCase("Unfriend")) {
+                    datapoint.setButtonDetails("Add Friend");
                     friends.remove(datapoint);
                     friendsIds.remove(datapoint.getUserID());
 
@@ -177,29 +176,45 @@ public class FriendsFragment extends Fragment {
                     String userId = firebaseUser.getUid();
                     DatabaseReference userFriendsRef = FirebaseDatabase.getInstance().getReference(
                             "GeoNotif/Users/" + userId + "/Friends");
-                    userFriendsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DataSnapshot> userFriends) {
-                            if (!userFriends.isSuccessful()) {
-                                Log.e("firebase", "Error getting data", userFriends.getException());
-                            } else {
-                                for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
-                                    //get the user IFD
-                                    String userID = childSnapshot.getValue(String.class);
-                                    //Log.d("UserID", userID);
-                                    if (userID.equals(datapoint.getUserID())) {
-                                        //Log.d("I came here", userID);
-                                        childSnapshot.getRef().removeValue(); // delete the child node
-                                        break;
-                                    }
+                    userFriendsRef.get().addOnCompleteListener(userFriends -> {
+                        if (!userFriends.isSuccessful()) {
+                            Log.e("firebase", "Error getting data", userFriends.getException());
+                        } else {
+                            for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
+                                //get the user IFD
+                                String userID = childSnapshot.getValue(String.class);
+                                //Log.d("UserID", userID);
+                                if (userID.equals(datapoint.getUserID())) {
+                                    //Log.d("I came here", userID);
+                                    childSnapshot.getRef().removeValue(); // delete the child node
+                                    break;
                                 }
-
                             }
+
                         }
                     });
 
+                    userFriendsRef = FirebaseDatabase.getInstance().getReference(
+                            "GeoNotif/Users/" + datapoint.getUserID() + "/Friends");
+                    userFriendsRef.get().addOnCompleteListener(userFriends -> {
+                        if (!userFriends.isSuccessful()) {
+                            Log.e("firebase", "Error getting data", userFriends.getException());
+                        } else {
+                            for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
+                                //get the user IFD
+                                String userID = childSnapshot.getValue(String.class);
+                                //Log.d("UserID", userID);
+                                if (userID.equals(firebaseUser.getUid())) {
+                                    //Log.d("I came here", userID);
+                                    childSnapshot.getRef().removeValue(); // delete the child node
+                                    break;
+                                }
+                            }
+
+                        }
+                    });
                 } else {
-                    datapoint.setButtonDetails("Following");
+                    datapoint.setButtonDetails("Unfriend");
                     if (!friendsIds.contains(datapoint.getUserID())) {
                         friends.add(datapoint);
                         friendsIds.add(datapoint.getUserID());
@@ -208,6 +223,10 @@ public class FriendsFragment extends Fragment {
                         String newFriendKey = usersRef.push().getKey();
                         //String newFriendKey = "uid";
                         usersRef.child(newFriendKey).setValue(datapoint.getUserID());
+
+                        usersRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + datapoint.getUserID() + "/" + "Friends");
+                        newFriendKey = usersRef.push().getKey();
+                        usersRef.child(newFriendKey).setValue(firebaseUser.getUid());
                     }
 
 
@@ -245,11 +264,11 @@ public class FriendsFragment extends Fragment {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     // Loop through all child nodes of "users"
-                    Log.d("Me:" ,firebaseUser.getUid());
+                    Log.d("Me:", firebaseUser.getUid());
 
                     for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                         String uid = childSnapshot.child("uid").getValue(String.class);
-                        Log.d("uid:" ,uid);
+                        Log.d("uid:", uid);
                         if (!uid.equals(firebaseUser.getUid())) {
                             String emailID = childSnapshot.child("emailId").getValue(String.class);
                             String fullname = childSnapshot.child("fullname").getValue(String.class);
@@ -277,8 +296,6 @@ public class FriendsFragment extends Fragment {
             });
 
 
-
-
             return view;
         }
     }
@@ -296,7 +313,7 @@ public class FriendsFragment extends Fragment {
 
                 for (int i = 0; i < all_users.size(); i++) {
                     if (data.getUserName().equals(all_users.get(i).getUserName())) {
-                        all_users.get(i).setButtonDetails("follow");
+                        all_users.get(i).setButtonDetails("Add Friend");
                         adapter_all_users.notifyDataSetChanged(); // Notify the adapter that the data has changed
                     }
                 }
@@ -318,6 +335,29 @@ public class FriendsFragment extends Fragment {
                                 String userID = childSnapshot.getValue(String.class);
                                 //Log.d("UserID", userID);
                                 if (userID.equals(data.getUserID())) {
+                                    //Log.d("I came here", userID);
+                                    childSnapshot.getRef().removeValue(); // delete the child node
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+                });
+
+                userFriendsRef = FirebaseDatabase.getInstance().getReference(
+                        "GeoNotif/Users/" + data.getUserID() + "/Friends");
+                userFriendsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> userFriends) {
+                        if (!userFriends.isSuccessful()) {
+                            Log.e("firebase", "Error getting data", userFriends.getException());
+                        } else {
+                            for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
+                                //get the user IFD
+                                String userID = childSnapshot.getValue(String.class);
+                                //Log.d("UserID", userID);
+                                if (userID.equals(firebaseUser.getUid())) {
                                     //Log.d("I came here", userID);
                                     childSnapshot.getRef().removeValue(); // delete the child node
                                     break;
@@ -367,7 +407,7 @@ public class FriendsFragment extends Fragment {
                             //add that person to friends
                             for (int i = 0; i < all_users.size(); i++) {
                                 if (userID.equals(all_users.get(i).getUserID())) {
-                                    all_users.get(i).setButtonDetails("following");
+                                    all_users.get(i).setButtonDetails("Unfriend");
                                     if (!friendsIds.contains(all_users.get(i).getUserID())) {
                                         friends.add(all_users.get(i));
                                         friendsIds.add(all_users.get(i).getUserID());
@@ -382,7 +422,6 @@ public class FriendsFragment extends Fragment {
                     }
                 }
             });
-
 
 
             return view;
