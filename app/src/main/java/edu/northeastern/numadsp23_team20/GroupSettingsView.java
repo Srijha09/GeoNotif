@@ -1,13 +1,10 @@
 package edu.northeastern.numadsp23_team20;
 
-import static android.text.TextUtils.isEmpty;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,11 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class GroupSettingsView extends AppCompatActivity {
     private Button edit;
@@ -30,10 +24,13 @@ public class GroupSettingsView extends AppCompatActivity {
     private String groupName;
     private Integer groupParticipantsNo;
     private ArrayList<String> groupParticipants;
+    private ArrayList<String> recyclerViewParticipantList;
+    private ParticipantListAdapter participantListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setContentView(R.layout.activity_group_settings_old);
         setContentView(R.layout.activity_group_settings_view);
         Intent intent = getIntent();
         this.groupID = intent.getStringExtra("groupUUID");
@@ -41,15 +38,16 @@ public class GroupSettingsView extends AppCompatActivity {
         this.groupParticipants = intent.getStringArrayListExtra("groupParticipants");
         this.groupParticipantsNo = intent.getIntExtra("groupParticipantsNo", 1);
         // Set the group name as the text of the TextView
-        TextView groupNameTextView = findViewById(R.id.groupName);
+        TextView groupNameTextView = findViewById(R.id.GroupSettingsGroupName);
         groupNameTextView.setText(groupName);
         this.groupService = new GroupService();
         // Find the group with the matching name in groupsList
         this.group = new Group(groupName, groupParticipants);
         this.group.setUuid(groupID);
-        this.edit = findViewById(R.id.donebttn);
+        this.edit = findViewById(R.id.GroupSettingsEditName);
         this.edit.setOnClickListener(v -> editGroupAlertDialog(group));
-        Button addMember = findViewById(R.id.addmember_bttn);
+        //Button addMember = findViewById(R.id.addmember_bttn);
+        Button addMember = findViewById(R.id.GroupSettingsAddParticipants);
         addMember.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,13 +59,31 @@ public class GroupSettingsView extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        this.leaveBttn = findViewById(R.id.leave_bttn);
+        // this.leaveBttn = findViewById(R.id.leave_bttn);
+        this.leaveBttn = findViewById(R.id.GroupSettingsLeaveButton);
         this.leaveBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 leaveGroupAlertDialog();
             }
         });
+
+        RecyclerView groupParticipantsRecyclerView = findViewById(R.id.GroupSettingsParticipantsRecyclerViewContainer);
+        this.recyclerViewParticipantList = new ArrayList<>();
+        this.participantListAdapter = new ParticipantListAdapter(this.recyclerViewParticipantList);
+        groupParticipantsRecyclerView.setAdapter(participantListAdapter);
+        groupParticipantsRecyclerView.setHasFixedSize(true);
+        groupParticipantsRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        GroupService groupService = new GroupService();
+        GroupService.GroupServiceReadParticipantsListener groupServiceReadParticipantsListener = new GroupService.GroupServiceReadParticipantsListener() {
+            @Override
+            public void onParticipantRead(String participant) {
+                recyclerViewParticipantList.add(participant);
+                participantListAdapter.notifyDataSetChanged();
+            }
+        };
+        groupService.setGroupServiceReadParticipantsListener(groupServiceReadParticipantsListener);
+        groupService.readParticipantsForGroup(this.groupID);
     }
 
     public void editGroupAlertDialog(Group group) {

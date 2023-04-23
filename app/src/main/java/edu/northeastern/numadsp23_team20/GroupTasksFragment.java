@@ -61,7 +61,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
     private ImageButton settings;
     private String groupName;
     private ArrayList<String> groupParticipants;
-    private  ArrayList<String> recyclerViewParticipantList;
+    private ArrayList<String> recyclerViewParticipantList;
     private ParticipantListAdapter participantListAdapter;
 
     static FirebaseUser firebaseUser;
