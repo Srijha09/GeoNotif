@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -97,7 +98,7 @@ public class GroupSettingsView extends AppCompatActivity {
 
         alert.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view1 -> {
             String newGroupName = group_name.getText().toString();
-            TextView groupNameTextView = findViewById(R.id.groupName);
+            TextView groupNameTextView = findViewById(R.id.GroupSettingsGroupName);
             groupNameTextView.setText(newGroupName);
 
             Group updatedGroup = group;
