@@ -84,7 +84,7 @@ public class TaskService {
     public void createGroupTask(Task task, String groupID, ArrayList<String> groupParticipants) {
         //String userId = this.firebaseUser.getUid();
         //adding the location for each group user
-        for(String userId : groupParticipants) {
+        for (String userId : groupParticipants) {
             this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations");
             this.geoFire = new GeoFire(this.ref);
             this.geoFire.setLocation(task.getUuid(), new GeoLocation(
@@ -111,7 +111,7 @@ public class TaskService {
 
             }
         });
-        for(String userid : groupParticipants) {
+        for (String userid : groupParticipants) {
             this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userid + "/Tasks");
             this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -211,20 +211,10 @@ public class TaskService {
                 updatedTask.getLocation().getLat(), updatedTask.getLocation().getLon()));
     }
 
-    public void editGroupTask(Task task, Task updatedTask, String groupId, ArrayList<String> groupParticipants) {
-        //String userId = this.firebaseUser.getUid();
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/Tasks/" + updatedTask.getUuid());
-        this.ref.setValue(updatedTask);
+    public void editGroupTask(Task updatedTask) {
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + updatedTask.getUuid());
         this.ref.setValue(updatedTask);
-        for(String userId:groupParticipants) {
-            this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations");
-            this.geoFire = new GeoFire(this.ref);
-            this.geoFire.setLocation(updatedTask.getUuid(), new GeoLocation(
-                    updatedTask.getLocation().getLat(), updatedTask.getLocation().getLon()));
-        }
     }
-
 
 
     public void removeUserTaskList(List<String> tasks, String uuid) {

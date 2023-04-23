@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +51,8 @@ public class EditGroupTask extends AppCompatActivity {
     private ArrayList<String> groupParticipants;
     private TextView editTaskTitleValue;
     private TextView editTaskDescriptionValue;
+    private String taskTitle;
+    private String taskDescription;
     private String taskLocation;
     private double taskLatitude;
     private double taskLongitude;
@@ -86,12 +89,11 @@ public class EditGroupTask extends AppCompatActivity {
         this.mapController = this.map.getController();
         this.mapMarker = new Marker(this.map);
         Intent intent = this.getIntent();
-        String taskTitle = intent.getExtras().getString("taskTitle");
-        String taskDescription = intent.getExtras().getString("taskDescription");
+        this.taskTitle = intent.getExtras().getString("taskTitle");
+        this.taskDescription = intent.getExtras().getString("taskDescription");
         this.groupId = intent.getExtras().getString("groupId");
         this.groupName = intent.getExtras().getString("groupName");
         this.groupParticipants = intent.getExtras().getStringArrayList("groupParticipants");
-
         this.taskLocation = intent.getExtras().getString("taskLocation");
         this.taskLatitude = intent.getExtras().getDouble("taskLatitude");
         this.taskLongitude = intent.getExtras().getDouble("taskLongitude");
@@ -100,7 +102,9 @@ public class EditGroupTask extends AppCompatActivity {
         this.taskType = intent.getExtras().getString("taskType");
         this.taskTypeString = intent.getExtras().getString("taskTypeString");
         LocationItem locationItem = new LocationItem(this.taskLocation, this.taskLatitude, this.taskLongitude);
-        this.task = new Task(taskTitle, taskDescription, locationItem);
+        this.task = new Task(taskTitle, taskDescription, locationItem, this.uuid, this.isComplete);
+        this.task.setTaskType(this.taskType);
+        this.task.setTaskTypeString(this.taskTypeString);
         this.configureMap();
         this.customizeMapMarker();
         this.setMapMarker(this.taskLatitude, this.taskLongitude);
@@ -109,6 +113,10 @@ public class EditGroupTask extends AppCompatActivity {
         this.editTaskDescriptionValue = findViewById(R.id.EditTaskDescriptionValue);
         this.editTaskDescriptionValue.setText(taskDescription);
         ((TextView) findViewById(R.id.EditTaskLocationValue)).setText("\uD83D\uDCCD " + taskLocation);
+        if (this.taskType.equalsIgnoreCase("group")) {
+            ViewGroup layout = (ViewGroup) findViewById(R.id.EditTaskUpdateButton).getParent();
+            layout.removeView(findViewById(R.id.EditTaskUpdateButton));
+        }
 
         initialItemData(savedInstanceState);
     }
@@ -122,7 +130,7 @@ public class EditGroupTask extends AppCompatActivity {
     }
 
     public void onEditTaskCancelButtonClick(View view) {
-        this.finish();
+        finish();
     }
 
     private boolean validateLocation() {
@@ -174,8 +182,19 @@ public class EditGroupTask extends AppCompatActivity {
                     updatedTask.setTaskType(this.taskType);
                     updatedTask.setTaskTypeString(this.taskTypeString);
                     TaskService taskService = new TaskService();
-                    taskService.editGroupTask(this.task, updatedTask, this.groupId, this.groupParticipants);
-                    this.finish();
+                    taskService.editGroupTask(updatedTask);
+                    Intent data = new Intent();
+                    data.putExtra("taskTitle", this.editTaskTitleValue.getText().toString());
+                    data.putExtra("taskDescription", this.editTaskDescriptionValue.getText().toString());
+                    data.putExtra("taskLocation", this.taskLocation);
+                    data.putExtra("taskLatitude", this.taskLatitude);
+                    data.putExtra("taskLongitude", this.taskLongitude);
+                    data.putExtra("taskComplete", this.isComplete);
+                    data.putExtra("taskUUID", this.uuid);
+                    data.putExtra("taskType", this.taskType);
+                    data.putExtra("taskTypeString", this.taskTypeString);
+                    setResult(RESULT_OK, data);
+                    finish();
                 })
                 .setNegativeButton(android.R.string.no, null)
                 .show();
