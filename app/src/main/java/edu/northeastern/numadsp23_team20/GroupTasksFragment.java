@@ -194,7 +194,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                     }
                 });
 
-        settings = inflatedView.findViewById(R.id.settings_button);
+        settings = inflatedView.findViewById(R.id.GroupSettingsActionButton);
         settings.setOnClickListener(v -> {
             // create a new intent to open the new activity
             Intent intent = new Intent(getContext(), GroupSettingsView.class);
@@ -241,7 +241,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
 
             }
         });
-        // inflatedView.findViewById(R.id.AddTaskButton).setOnClickListener(this::onAddTaskButtonClick);
+        inflatedView.findViewById(R.id.GroupTasksAddActionButton).setOnClickListener(this::onAddTaskButtonClick);
         return inflatedView;
     }
 
