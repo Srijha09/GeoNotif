@@ -76,38 +76,19 @@ public class AddMembersList extends AppCompatActivity {
             cancelBttn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    Intent intent = new Intent(getApplicationContext(), AddNewMembersPage.class);
-//                    intent.putExtra("groupUUID", groupID);
-//                    intent.putExtra("groupName", groupName);
-//                    intent.putExtra("groupParticipantsNo", groupParticipantsNo);
-//                    intent.putExtra("groupParticipants", groupParticipants);
-//                    //intent.putExtra("groupName", groupName);
-//                    startActivity(intent);
                     finish();
                 }
             });
         } else {
             cancelBttn.setOnClickListener(v -> {
-                Intent intent12 = new Intent(getApplicationContext(), GroupSettingsView.class);
-                intent12.putExtra("groupUUID", groupID);
-                intent12.putExtra("groupName", groupName);
-                intent12.putExtra("groupParticipantsNo", groupParticipantsNo);
-                intent12.putExtra("groupParticipants", groupParticipants);
-                //intent.putExtra("groupName", groupName);
-                startActivity(intent12);
+                finish();
             });
         }
 
         doneBttn = findViewById(R.id.donebttn);
         if (groupParticipantsNo < 2 || groupParticipantsNo == 2) {
             doneBttn.setOnClickListener(v -> {
-                Intent intent1 = new Intent(getApplicationContext(), GroupSettingsView.class);
-                intent1.putExtra("groupUUID", groupID);
-                intent1.putExtra("groupName", groupName);
-                intent1.putExtra("groupParticipantsNo", groupParticipantsNo);
-                intent1.putExtra("groupParticipants", groupParticipants);
-                //intent.putExtra("groupName", groupName);
-                startActivity(intent1);
+                finish();
             });
         } else {
             doneBttn.setOnClickListener(v -> {
