@@ -57,7 +57,7 @@ public class TaskView extends AppCompatActivity implements Serializable {
         this.taskLatitude = intent.getExtras().getDouble("taskLatitude");
         this.taskLongitude = intent.getExtras().getDouble("taskLongitude");
         ((TextView) findViewById(R.id.TaskTitleTextView)).setText(intent.getExtras().getString("taskTitle"));
-        ((TextView) findViewById(R.id.TaskDetailsDescription)).setText(intent.getExtras().getString("taskDescription"));
+        ((TextView) findViewById(R.id.TaskDetailsDescription)).setText("Description: " + intent.getExtras().getString("taskDescription"));
         ((TextView) findViewById(R.id.TaskDetailsLocation)).setText("\uD83D\uDCCD " + intent.getExtras().getString("taskLocation"));
         this.customizeMap();
         if (intent.getExtras().getBoolean("taskComplete")) {
@@ -181,7 +181,7 @@ public class TaskView extends AppCompatActivity implements Serializable {
             this.thisIntent = data;
 
             ((TextView) findViewById(R.id.TaskTitleTextView)).setText(data.getExtras().getString("taskTitle"));
-            ((TextView) findViewById(R.id.TaskDetailsDescription)).setText(data.getExtras().getString("taskDescription"));
+            ((TextView) findViewById(R.id.TaskDetailsDescription)).setText("Description: " + data.getExtras().getString("taskDescription"));
             ((TextView) findViewById(R.id.TaskDetailsLocation)).setText("\uD83D\uDCCD " + data.getExtras().getString("taskLocation"));
 
             this.taskLongitude = data.getExtras().getDouble("taskLongitude");
