@@ -91,7 +91,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
                     noTasksTextView.setVisibility(View.INVISIBLE);
                     tasksScrollView.setVisibility(View.VISIBLE);
                 }
-                //setMapMarker(task);
+                setMapMarker(task);
                 taskList.add(task);
                 taskListAdapter.notifyDataSetChanged();
             }

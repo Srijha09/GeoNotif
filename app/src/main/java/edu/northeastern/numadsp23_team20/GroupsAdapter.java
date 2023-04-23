@@ -42,7 +42,6 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Group group = groupsList.get(position);
-        System.out.println("In Group List - " + group.toString());
         holder.groupname.setText(group.getGroupName());
         if (group.getGroupParticipantsNo() != null) {
             if (group.getGroupParticipantsNo() == 1)

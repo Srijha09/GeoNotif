@@ -101,7 +101,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
 
         //pass filtered list based on groupID) and pass the filtered list here
         //create another recycler
-        this.taskListAdapter = new GroupTasksAdapter(this.grouptaskList, (OnTaskItemClickListener) this);
+        this.taskListAdapter = new GroupTasksAdapter(this.grouptaskList, this);
         tasksRecyclerView.setAdapter(taskListAdapter);
         tasksRecyclerView.setHasFixedSize(true);
         tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this.ctx));
@@ -123,8 +123,6 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                     noTasksTextView.setVisibility(View.INVISIBLE);
                     tasksScrollView.setVisibility(View.VISIBLE);
                 }
-                //setMapMarker(task);
-                grouptaskList.add(task);
                 taskListAdapter.notifyDataSetChanged();
             }
 
@@ -176,52 +174,50 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                 });
 
         settings = inflatedView.findViewById(R.id.settings_button);
-        settings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // create a new intent to open the new activity
-                Intent intent = new Intent(getContext(), GroupSettingsView.class);
-                intent.putExtra("groupUUID", groupId);
-                intent.putExtra("groupName", groupName);
-                intent.putExtra("groupParticipantsNo", groupParticipantsNo);
-                intent.putExtra("groupParticipants", groupParticipants);
-                startActivity(intent);
-            }
+        settings.setOnClickListener(v -> {
+            // create a new intent to open the new activity
+            Intent intent = new Intent(getContext(), GroupSettingsView.class);
+            intent.putExtra("groupUUID", groupId);
+            intent.putExtra("groupName", groupName);
+            intent.putExtra("groupParticipantsNo", groupParticipantsNo);
+            intent.putExtra("groupParticipants", groupParticipants);
+            startActivity(intent);
         });
         //query all the tasks
         //fetch the tasks where the group name is the current group name
         String newGroupName1 = "Group task: " + "";
         String newGroupName = "Group task: " + groupName;
-        DatabaseReference userFriendsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/");
-        userFriendsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> userFriends) {
-                if (!userFriends.isSuccessful()) {
-                    Log.e("firebase", "Error getting data", userFriends.getException());
-                } else {
-                    for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
-                        String groupName = childSnapshot.child("taskTypeString").getValue(String.class);
+        DatabaseReference userFriendsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks");
+        userFriendsRef.get().addOnCompleteListener(userFriends -> {
+            if (!userFriends.isSuccessful()) {
+                Log.e("firebase", "Error getting data", userFriends.getException());
+            } else {
+                for (DataSnapshot childSnapshot : userFriends.getResult().getChildren()) {
+                    String groupName = childSnapshot.child("taskTypeString").getValue(String.class);
+                    if (groupName != null && (groupName.equals(newGroupName) || groupName.equals(newGroupName1))) {
+                        String description = childSnapshot.child("description").getValue(String.class);
+                        Boolean isComplete = childSnapshot.child("isComplete").getValue(Boolean.class);
+                        String taskName = childSnapshot.child("taskName").getValue(String.class);
+                        String uuid = childSnapshot.child("uuid").getValue(String.class);
 
-                        if (groupName != null && (groupName.equals(newGroupName) || groupName.equals(newGroupName1))) {
-                            String description = childSnapshot.child("description").getValue(String.class);
-                            Boolean isComplete = childSnapshot.child("isComplete").getValue(Boolean.class);
-                            String taskName = childSnapshot.child("taskName").getValue(String.class);
-                            String uuid = childSnapshot.child("uuid").getValue(String.class);
+                        String locationKey = childSnapshot.child("location").child("key").getValue(String.class);
+                        double locationLat = childSnapshot.child("location").child("lat").getValue(Double.class);
+                        double locationLon = childSnapshot.child("location").child("lon").getValue(Double.class);
 
-                            String locationKey = childSnapshot.child("location").child("key").getValue(String.class);
-                            double locationLat = childSnapshot.child("location").child("lat").getValue(Double.class);
-                            double locationLon = childSnapshot.child("location").child("lon").getValue(Double.class);
+                        LocationItem location = new LocationItem(locationKey, locationLat, locationLon);
 
-                            LocationItem location = new LocationItem(locationKey, locationLat, locationLon);
+                        String taskType = childSnapshot.child("taskType").getValue(String.class);
+                        String taskTypeString = childSnapshot.child("taskTypeString").getValue(String.class);
 
-                            Task addTask = new Task(taskName, description, location, uuid, isComplete);
-                            grouptaskList.add(addTask);
-                            taskListAdapter.notifyDataSetChanged(); // Notify the adapter that the data has changed
+                        Task addTask = new Task(taskName, description, location, uuid, isComplete);
+                        addTask.setTaskType(taskType);
+                        addTask.setTaskTypeString(taskTypeString);
+                        grouptaskList.add(addTask);
+                        taskListAdapter.notifyDataSetChanged(); // Notify the adapter that the data has changed
 
-                        }
                     }
-
                 }
+
             }
         });
         inflatedView.findViewById(R.id.AddTaskButton).setOnClickListener(this::onAddTaskButtonClick);
@@ -257,9 +253,9 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
     public void onTaskItemClick(int position) {
         Task task = this.grouptaskList.get(position);
         Intent intent = new Intent(getContext(), GroupTaskView.class);
-        intent.putExtra("groupId", groupId);
-        intent.putExtra("groupName", groupName);
-        intent.putExtra("groupParticipants", groupParticipants);
+        intent.putExtra("groupId", this.groupId);
+        intent.putExtra("groupName", this.groupName);
+        intent.putExtra("groupParticipants", this.groupParticipants);
 
         intent.putExtra("position", position);
         intent.putExtra("taskTitle", task.getTaskName());

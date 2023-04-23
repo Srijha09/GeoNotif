@@ -202,7 +202,7 @@
                     app:strokeWidth="0.5dp" />
 
                 <Button
-                    android:id="@+id/AddTaskSubmitButton"
+                    android:id="@+id/AddGroupTaskSubmitButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"

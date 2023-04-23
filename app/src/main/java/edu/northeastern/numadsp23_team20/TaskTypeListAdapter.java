@@ -13,11 +13,11 @@ import java.util.List;
 
 public class TaskTypeListAdapter extends RecyclerView.Adapter<TaskTypeListAdapter.ViewHolder> {
 
-    List<String> arrayList;
+    List<Group> arrayList;
     OnTaskTypeAssigneeItemClickListener onTaskTypeAssigneeItemClickListener;
     int selectedPosition = -1;
 
-    public TaskTypeListAdapter(List<String> arrayList, OnTaskTypeAssigneeItemClickListener onTaskTypeAssigneeItemClickListener)
+    public TaskTypeListAdapter(List<Group> arrayList, OnTaskTypeAssigneeItemClickListener onTaskTypeAssigneeItemClickListener)
     {
         this.arrayList = arrayList;
         this.onTaskTypeAssigneeItemClickListener = onTaskTypeAssigneeItemClickListener;
@@ -34,7 +34,7 @@ public class TaskTypeListAdapter extends RecyclerView.Adapter<TaskTypeListAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.assigneeRadioButton.setText(arrayList.get(position));
+        holder.assigneeRadioButton.setText(arrayList.get(position).getGroupName());
         holder.assigneeRadioButton.setChecked(position == selectedPosition);
         holder.assigneeRadioButton.setOnCheckedChangeListener(
             new CompoundButton.OnCheckedChangeListener() {
@@ -43,7 +43,7 @@ public class TaskTypeListAdapter extends RecyclerView.Adapter<TaskTypeListAdapte
                 {
                     if (b) {
                         selectedPosition = holder.getAdapterPosition();
-                        onTaskTypeAssigneeItemClickListener.onClick(holder.assigneeRadioButton.getText().toString());
+                        onTaskTypeAssigneeItemClickListener.onClick(arrayList.get(position));
                     }
                 }
             });
