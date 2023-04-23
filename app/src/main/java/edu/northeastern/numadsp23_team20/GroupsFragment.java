@@ -154,15 +154,15 @@ public class GroupsFragment extends Fragment {
     /**
      * alert dialogbox to add a new list view
      */
-    private void addDialogBoxToCreateAGroup(){
-        View view=getLayoutInflater().inflate(R.layout.activity_createa_group_dialog, null);
+    private void addDialogBoxToCreateAGroup() {
+        View view = getLayoutInflater().inflate(R.layout.activity_createa_group_dialog, null);
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
         alertDialog.setView(view);
         EditText group_name = view.findViewById(R.id.editgroupname);
         alertDialog.setPositiveButton("DONE", (dialogInterface, i) -> {
 
         });
-        alertDialog.setNegativeButton("CANCEL",(dialogInterface, i) -> {
+        alertDialog.setNegativeButton("CANCEL", (dialogInterface, i) -> {
             dialogInterface.dismiss();
         });
         AlertDialog alert = alertDialog.create();
@@ -171,18 +171,15 @@ public class GroupsFragment extends Fragment {
         String currentUserUUID = groupService.getFirebaseUserUID();
         groupParticipants.add(currentUserUUID);
         alert.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view1 -> {
-            if(!isEmpty(group_name.getText().toString())){
+            if (!isEmpty(group_name.getText().toString())) {
                 groupname = group_name.getText().toString();
-                Group groups = new Group(groupname, groupParticipants);
-                UUID groupUuid = UUID.randomUUID();
-                groups.setUuid(groupUuid.toString());
-                groupService.createGroup(groups);
-                Group group = new Group(groupname, groupParticipants.size());
+                Group group = new Group(groupname, groupParticipants);
+                groupService.createGroup(group);
                 groupsList.add(group);
                 groupsAdapter.notifyDataSetChanged();
                 alert.dismiss();
 
-            }else{
+            } else {
                 Toast.makeText(requireContext(), "Fields cannot be empty",
                         Toast.LENGTH_SHORT).show();
             }
@@ -190,7 +187,6 @@ public class GroupsFragment extends Fragment {
         });
         alert.show();
     }
-
 
 
     public void deleteGroupFromDatabase(Group group) {

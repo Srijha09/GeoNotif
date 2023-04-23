@@ -23,7 +23,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
     //String currentGroup;
 
     //Creating the constructor
-    public GroupsAdapter(ArrayList<Group> groupsList,Context context) {
+    public GroupsAdapter(ArrayList<Group> groupsList, Context context) {
         this.groupsList = groupsList;
         this.context = context;
     }
@@ -42,22 +42,23 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Group group = groupsList.get(position);
+        System.out.println("In Group List - " + group.toString());
         holder.groupname.setText(group.getGroupName());
-        if(group.getGroupParticipantsNo()!=null) {
-            if(group.getGroupParticipantsNo()==1)
+        if (group.getGroupParticipantsNo() != null) {
+            if (group.getGroupParticipantsNo() == 1)
                 holder.participants_no.setText(group.getGroupParticipantsNo() + " participant");
             else
                 holder.participants_no.setText(group.getGroupParticipantsNo() + " participants");
         }
         holder.itemView.setOnClickListener(view -> {
-            if(group.getGroupParticipantsNo()<2){
+            if (group.getGroupParticipantsNo() < 2) {
                 Intent intent = new Intent(context, AddNewMembersPage.class);
                 intent.putExtra("groupName", group.getGroupName());
                 intent.putExtra("groupUUID", group.getUuid());
                 intent.putExtra("groupParticipantsNo", group.getGroupParticipantsNo());
                 intent.putExtra("groupParticipants", group.getGroupParticipants());
                 context.startActivity(intent);
-            }else {
+            } else {
                 Bundle bundle = new Bundle();
                 bundle.putString("groupUUID", group.getUuid());
                 bundle.putString("groupName", group.getGroupName());
@@ -83,6 +84,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
 
         public TextView groupname;
         public TextView participants_no;
+
         public ViewHolder(@NonNull View itemView, final ItemClickListener listener) {
             super(itemView);
 
@@ -92,7 +94,6 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                 if (listener != null) {
                     int position = getLayoutPosition();
                     if (position != RecyclerView.NO_POSITION) {
-
                         listener.onItemClick(v, position);
                     }
                 }

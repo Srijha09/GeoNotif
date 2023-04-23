@@ -36,24 +36,19 @@ public class GroupSettingsView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_settings_view);
         Intent intent = getIntent();
-        groupID = intent.getStringExtra("groupUUID");
-        String groupName = intent.getStringExtra("groupName");
-        groupParticipants = intent.getStringArrayListExtra("groupParticipants");
-        groupParticipantsNo = intent.getIntExtra("groupParticipantsNo", 1);
-        System.out.println(groupParticipantsNo);
+        this.groupID = intent.getStringExtra("groupUUID");
+        this.groupName = intent.getStringExtra("groupName");
+        this.groupParticipants = intent.getStringArrayListExtra("groupParticipants");
+        this.groupParticipantsNo = intent.getIntExtra("groupParticipantsNo", 1);
         // Set the group name as the text of the TextView
         TextView groupNameTextView = findViewById(R.id.groupName);
         groupNameTextView.setText(groupName);
-        groupService = new GroupService();
+        this.groupService = new GroupService();
         // Find the group with the matching name in groupsList
         this.group = new Group(groupName, groupParticipants);
-        edit = findViewById(R.id.donebttn);
-        edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editGroupAlertDialog(group);
-            }
-        });
+        this.group.setUuid(groupID);
+        this.edit = findViewById(R.id.donebttn);
+        this.edit.setOnClickListener(v -> editGroupAlertDialog(group));
         Button addMember = findViewById(R.id.addmember_bttn);
         addMember.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,12 +58,11 @@ public class GroupSettingsView extends AppCompatActivity {
                 intent.putExtra("groupName", groupName);
                 intent.putExtra("groupParticipantsNo", groupParticipantsNo);
                 intent.putExtra("groupParticipants", groupParticipants);
-                //intent.putExtra("loggedInUsername", GroupsAdapter.this.currentUser);
                 startActivity(intent);
             }
         });
-        leaveBttn = findViewById(R.id.leave_bttn);
-        leaveBttn.setOnClickListener(new View.OnClickListener() {
+        this.leaveBttn = findViewById(R.id.leave_bttn);
+        this.leaveBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 leaveGroupAlertDialog();
@@ -78,9 +72,11 @@ public class GroupSettingsView extends AppCompatActivity {
 
     public void editGroupAlertDialog(Group group) {
         View view = getLayoutInflater().inflate(R.layout.editgroupname_dialog, null);
+        EditText group_name = view.findViewById(R.id.editgroupname);
+        group_name.setText(this.groupName);
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(GroupSettingsView.this);
         alertDialog.setView(view);
-        EditText group_name = view.findViewById(R.id.editgroupname);
+
         alertDialog.setPositiveButton("DONE", (dialogInterface, i) -> {
 
         });
@@ -94,18 +90,15 @@ public class GroupSettingsView extends AppCompatActivity {
             String newGroupName = group_name.getText().toString();
             TextView groupNameTextView = findViewById(R.id.groupName);
             groupNameTextView.setText(newGroupName);
-//            if (groupNameChangedListener != null) {
-//                groupNameChangedListener.onGroupNameChanged(newGroupName);
-//            }
-            Group updatedGroup = new Group(newGroupName, groupParticipants);
-            group.setUuid(groupID);
-            updatedGroup.setUuid(groupID);
-            groupService.editGroup(group, updatedGroup);
+
+            Group updatedGroup = group;
+            updatedGroup.setGroupName(newGroupName);
+            this.groupService.editGroup(group, updatedGroup);
             alert.dismiss();
         });
     }
 
-    public void leaveGroupAlertDialog(){
+    public void leaveGroupAlertDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Warning")
                 .setMessage("Are you sure you want to leave this group?")

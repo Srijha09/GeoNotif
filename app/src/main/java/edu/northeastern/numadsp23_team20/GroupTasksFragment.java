@@ -86,8 +86,6 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         TextView groupNameTextView = inflatedView.findViewById(R.id.groupName);
         groupNameTextView.setText(groupName);
 
-        System.out.println(this.groupParticipants.toString());
-
         this.loadingTasks = true;
         this.ctx = getContext();
         Configuration.getInstance().load(this.ctx, PreferenceManager.getDefaultSharedPreferences(this.ctx));
