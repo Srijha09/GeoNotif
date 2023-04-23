@@ -24,6 +24,7 @@ public class GroupService {
     private GroupServiceListener groupServiceListener;
     private ValueEventListener valueEventListener;
     private GroupServiceTaskCreateListener groupServiceTaskCreateListener;
+    private GroupServiceReadParticipantsListener groupServiceReadParticipantsListener;
 
     public GroupService() {
         this.mAuth = FirebaseAuth.getInstance();
@@ -35,6 +36,10 @@ public class GroupService {
     }
     public void setGroupServiceTaskCreateListener(GroupServiceTaskCreateListener groupServiceTaskCreateListener) {
         this.groupServiceTaskCreateListener = groupServiceTaskCreateListener;
+    }
+
+    public void setGroupServiceReadParticipantsListener(GroupServiceReadParticipantsListener groupServiceReadParticipantsListener) {
+        this.groupServiceReadParticipantsListener = groupServiceReadParticipantsListener;
     }
 
     public String getFirebaseUserUID(){
@@ -178,10 +183,39 @@ public class GroupService {
                         if (!group.isSuccessful()) {
                             Log.e("firebase", "Error getting data", group.getException());
                         } else {
-                            for (DataSnapshot groupDetails : group.getResult().getChildren()) {
-                                if (groupDetails.getKey().equals("groupName")) {
-                                    Group g = group.getResult().getValue(Group.class);
-                                    groupServiceListener.onUserGroupLoaded(g);
+                            Group g = group.getResult().getValue(Group.class);
+                            groupServiceListener.onUserGroupLoaded(g);
+//                            for (DataSnapshot groupDetails : group.getResult().getChildren()) {
+//                                if (groupDetails.getKey().equals("groupName")) {
+//                                    Group g = group.getResult().getValue(Group.class);
+//                                    groupServiceListener.onUserGroupLoaded(g);
+//                                }
+//                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public void readParticipantsForGroup(String groupUUID) {
+        DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference(
+                "GeoNotif/Groups/" + groupUUID + "/groupParticipants");
+        groupRef.get().addOnCompleteListener(group -> {
+            if (!group.isSuccessful()) {
+                Log.e("firebase", "Error getting data", group.getException());
+            } else {
+                List<String> participantUUIDs = (List<String>) group.getResult().getValue();
+                for (String participantUUID: participantUUIDs) {
+                    DatabaseReference participantRef = FirebaseDatabase.getInstance().getReference(
+                            "GeoNotif/Users/" + participantUUID);
+                    participantRef.get().addOnCompleteListener(participant -> {
+                        if (!participant.isSuccessful()) {
+                            Log.e("firebase", "Error getting data", participant.getException());
+                        } else {
+                            for (DataSnapshot userDetails : participant.getResult().getChildren()) {
+                                if (userDetails.getKey().equals("fullname")) {
+                                    groupServiceReadParticipantsListener.onParticipantRead(userDetails.getValue().toString());
                                 }
                             }
                         }
@@ -199,5 +233,9 @@ public class GroupService {
 
     public interface GroupServiceTaskCreateListener {
         void onTaskCreated(String taskUUID);
+    }
+
+    public interface GroupServiceReadParticipantsListener {
+        void onParticipantRead(String participant);
     }
 }
