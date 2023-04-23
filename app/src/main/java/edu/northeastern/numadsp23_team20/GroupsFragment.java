@@ -13,6 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -47,6 +50,10 @@ public class GroupsFragment extends Fragment {
     private FirebaseAuth mAuth;
     private DatabaseReference ref;
     private final String TAG="GroupFragment";
+    private TextView noGroupsTextView;
+    private ProgressBar groupsLoadingSpinner;
+    private ScrollView groupsScrollView;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +64,9 @@ public class GroupsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_groups, container, false);
+        this.noGroupsTextView = view.findViewById(R.id.NoGroupsTextView);
+        this.groupsLoadingSpinner = view.findViewById(R.id.GroupsLoadingSpinner);
+        this.groupsScrollView = view.findViewById(R.id.GroupsScrollView);
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -71,13 +81,20 @@ public class GroupsFragment extends Fragment {
                 groupsList.clear(); // clear the list before adding new data
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Group group = snapshot.getValue(Group.class);
-                    if (group != null && group.getGroupParticipants().contains(currentUserUid)) {
+                    if (group != null && group.getGroupParticipants() != null
+                            && group.getGroupParticipants().contains(currentUserUid)) {
                         groupsList.add(group);
                     }
                 }
                 groupsAdapter.notifyDataSetChanged();// notify the adapter of the data change
                 System.out.println(groupsList);
-
+                if (groupsList.isEmpty()) {
+                    groupsLoadingSpinner.setVisibility(View.INVISIBLE);
+                    noGroupsTextView.setVisibility(View.VISIBLE);
+                } else {
+                    groupsLoadingSpinner.setVisibility(View.INVISIBLE);
+                    groupsScrollView.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
@@ -96,40 +113,40 @@ public class GroupsFragment extends Fragment {
             }
         });
         //deleting a group when swiped left
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getLayoutPosition();
-                // Create and show the alert dialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                builder.setMessage("Are you sure you want to delete this group?");
-                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        deleteGroupFromDatabase(groupsList.get(position));
-                        groupsList.remove(position);
-                        groupsAdapter.notifyItemRemoved(position);
-
-                        dialogInterface.dismiss();
-                    }
-                });
-                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        groupsAdapter.notifyItemChanged(position);
-                        dialogInterface.dismiss();
-                    }
-                });
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-            }
-        });
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+//        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+//            @Override
+//            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+//                return false;
+//            }
+//
+//            @Override
+//            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+//                int position = viewHolder.getLayoutPosition();
+//                // Create and show the alert dialog
+//                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+//                builder.setMessage("Are you sure you want to delete this group?");
+//                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        deleteGroupFromDatabase(groupsList.get(position));
+//                        groupsList.remove(position);
+//                        groupsAdapter.notifyItemRemoved(position);
+//
+//                        dialogInterface.dismiss();
+//                    }
+//                });
+//                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        groupsAdapter.notifyItemChanged(position);
+//                        dialogInterface.dismiss();
+//                    }
+//                });
+//                AlertDialog alertDialog = builder.create();
+//                alertDialog.show();
+//            }
+//        });
+//        itemTouchHelper.attachToRecyclerView(recyclerView);
         return view;
     }
 

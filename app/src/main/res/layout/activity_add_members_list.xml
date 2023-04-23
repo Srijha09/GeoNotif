@@ -14,19 +14,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
+        android:layout_marginTop="10dp"
         android:text="Done"
         android:textColor="@color/primary_highlight" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:layout_marginStart="140dp"
-        android:layout_marginTop="10dp"
+        android:layout_gravity="center|top|center_vertical"
+        android:layout_marginTop="20dp"
         android:text="Add group members"
-        android:textStyle="bold"
         android:textColor="@color/primary"
-        android:textSize="16dp" />
+        android:textSize="16dp"
+        android:textStyle="bold" />
 
     <Button
         android:id="@+id/cancelbttn"
@@ -34,6 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
+        android:layout_marginTop="10dp"
         android:text="CANCEL"
         android:textColor="@color/primary_highlight"
         android:textSize="15dp" />
@@ -43,19 +44,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
-        android:layout_marginTop="20pt"
+        android:layout_marginTop="70dp"
         android:background="#D3D3D3"
         app:cardCornerRadius="10dp"
         app:iconifiedByDefault="false"
-        app:queryHint="Search name">
-    </androidx.appcompat.widget.SearchView>
+        app:queryHint="Search name"></androidx.appcompat.widget.SearchView>
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/members_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="43pt"/>
+        android:layout_marginTop="120dp" />
 
 
 </FrameLayout>

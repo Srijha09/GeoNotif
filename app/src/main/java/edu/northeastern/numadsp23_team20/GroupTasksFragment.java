@@ -138,7 +138,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         });
 
 
-        //this.taskService.readTasks();
+        this.taskService.readTasks();
         this.addTaskActivityLaunch = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
