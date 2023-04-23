@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
@@ -16,12 +15,12 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -45,6 +44,9 @@ public class GroupTaskView extends AppCompatActivity implements Serializable {
     String uuid;
     Intent thisIntent;
 
+    double taskLatitude;
+    double taskLongitude;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +55,7 @@ public class GroupTaskView extends AppCompatActivity implements Serializable {
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         this.map = findViewById(R.id.MapView);
-        this.customizeMap();
+
         this.markComplete = findViewById(R.id.TaskDetailsCompleteButton);
 
         Intent intent = getIntent();
@@ -62,10 +64,12 @@ public class GroupTaskView extends AppCompatActivity implements Serializable {
         this.groupParticipants = intent.getExtras().getStringArrayList("groupParticipants");
         this.taskName = intent.getExtras().getString("taskTitle");
         this.uuid = intent.getExtras().getString("taskUUID");
+        this.taskLatitude = intent.getExtras().getDouble("taskLatitude");
+        this.taskLongitude = intent.getExtras().getDouble("taskLongitude");
         ((TextView) findViewById(R.id.TaskTitleTextView)).setText(intent.getExtras().getString("taskTitle"));
         ((TextView) findViewById(R.id.TaskDetailsDescription)).setText(intent.getExtras().getString("taskDescription"));
         ((TextView) findViewById(R.id.TaskDetailsLocation)).setText("\uD83D\uDCCD " + intent.getExtras().getString("taskLocation"));
-
+        this.customizeMap();
         if (intent.getExtras().getBoolean("taskComplete")) {
             ViewGroup layout = (ViewGroup) this.markComplete.getParent();
             layout.removeView(this.markComplete);
@@ -78,10 +82,7 @@ public class GroupTaskView extends AppCompatActivity implements Serializable {
         this.map.setTileSource(TileSourceFactory.MAPNIK);
         IMapController mapController = this.map.getController();
         mapController.setZoom(18.8);
-        // Set center
-        Intent intent = getIntent();
-        GeoPoint centerPoint = new GeoPoint(intent.getExtras().getDouble("taskLatitude"),
-                intent.getExtras().getDouble("taskLongitude"));
+        GeoPoint centerPoint = new GeoPoint(this.taskLatitude, this.taskLongitude);
         mapController.setCenter(centerPoint);
         // Set marker
         Marker marker = new Marker(this.map);
@@ -127,7 +128,7 @@ public class GroupTaskView extends AppCompatActivity implements Serializable {
         intent.putExtra("taskUUID", thisIntent.getExtras().getString("taskUUID"));
         intent.putExtra("taskType", thisIntent.getExtras().getString("taskType"));
         intent.putExtra("taskTypeString", thisIntent.getExtras().getString("taskTypeString"));
-        this.startActivity(intent);
+        startActivityForResult(intent, 1234);
     }
 
     public void onTaskMarkCompleteButtonClick(View view) {
@@ -175,4 +176,27 @@ public class GroupTaskView extends AppCompatActivity implements Serializable {
                 .setNegativeButton(android.R.string.no, null)
                 .show();
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        System.out.println("OnActivityResult");
+        if (resultCode == RESULT_OK && requestCode == 1234) {
+            this.thisIntent = data;
+
+            ((TextView) findViewById(R.id.TaskTitleTextView)).setText(data.getExtras().getString("taskTitle"));
+            ((TextView) findViewById(R.id.TaskDetailsDescription)).setText(data.getExtras().getString("taskDescription"));
+            ((TextView) findViewById(R.id.TaskDetailsLocation)).setText("\uD83D\uDCCD " + data.getExtras().getString("taskLocation"));
+
+            this.taskLongitude = data.getExtras().getDouble("taskLongitude");
+            this.taskLatitude = data.getExtras().getDouble("taskLatitude");
+            customizeMap();
+        }
+    }
+
 }

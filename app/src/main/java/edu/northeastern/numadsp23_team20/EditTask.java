@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -101,7 +102,10 @@ public class EditTask extends AppCompatActivity {
         this.editTaskDescriptionValue = findViewById(R.id.EditTaskDescriptionValue);
         this.editTaskDescriptionValue.setText(taskDescription);
         ((TextView) findViewById(R.id.EditTaskLocationValue)).setText("\uD83D\uDCCD " + taskLocation);
-
+        if (this.taskType.equalsIgnoreCase("group")) {
+            ViewGroup layout = (ViewGroup) findViewById(R.id.EditTaskUpdateButton).getParent();
+            layout.removeView(findViewById(R.id.EditTaskUpdateButton));
+        }
         initialItemData(savedInstanceState);
     }
 
@@ -167,6 +171,17 @@ public class EditTask extends AppCompatActivity {
                     updatedTask.setTaskTypeString(this.taskTypeString);
                     TaskService taskService = new TaskService();
                     taskService.editTask(this.task, updatedTask);
+                    Intent data = new Intent();
+                    data.putExtra("taskTitle", this.editTaskTitleValue.getText().toString());
+                    data.putExtra("taskDescription", this.editTaskDescriptionValue.getText().toString());
+                    data.putExtra("taskLocation", this.taskLocation);
+                    data.putExtra("taskLatitude", this.taskLatitude);
+                    data.putExtra("taskLongitude", this.taskLongitude);
+                    data.putExtra("taskComplete", this.isComplete);
+                    data.putExtra("taskUUID", this.uuid);
+                    data.putExtra("taskType", this.taskType);
+                    data.putExtra("taskTypeString", this.taskTypeString);
+                    setResult(RESULT_OK, data);
                     this.finish();
                 })
                 .setNegativeButton(android.R.string.no, null)
