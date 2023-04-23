@@ -308,9 +308,6 @@ public class AddTask extends AppCompatActivity {
 
     private void initialItemData(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-//            for (String key : savedInstanceState.keySet()) {
-//                System.out.println("GeoNotif Add Task : " + key + " = \"" + savedInstanceState.get(key) + "\"");
-//            }
             this.taskLocationName = savedInstanceState.getString("taskLocationName");
             this.taskLatitude = savedInstanceState.getDouble("taskLatitude");
             this.taskLongitude = savedInstanceState.getDouble("taskLongitude");

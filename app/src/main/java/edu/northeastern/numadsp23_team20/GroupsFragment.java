@@ -87,7 +87,6 @@ public class GroupsFragment extends Fragment {
                     }
                 }
                 groupsAdapter.notifyDataSetChanged();// notify the adapter of the data change
-                System.out.println(groupsList);
                 if (groupsList.isEmpty()) {
                     groupsLoadingSpinner.setVisibility(View.INVISIBLE);
                     noGroupsTextView.setVisibility(View.VISIBLE);

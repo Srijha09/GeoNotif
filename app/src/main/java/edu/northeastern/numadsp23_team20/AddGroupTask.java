@@ -94,8 +94,6 @@ public class AddGroupTask extends AppCompatActivity {
             nonPersonalTaskTypeAssignee = assignee;
         };
 
-        System.out.println("Add Group Task" + this.groupParticipants.toString());
-
         this.taskType = TaskType.GROUP;
         this.nonPersonalTaskTypeAssignee = groupName;
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));

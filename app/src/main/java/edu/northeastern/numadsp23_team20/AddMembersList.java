@@ -66,7 +66,6 @@ public class AddMembersList extends AppCompatActivity {
         firebaseUser = mAuth.getCurrentUser();
         String userId = firebaseUser.getUid();
 
-        System.out.println(firebaseUser);
         Intent intent = getIntent();
         groupID = intent.getStringExtra("groupUUID");
         String groupName = intent.getStringExtra("groupName");
@@ -234,11 +233,6 @@ public class AddMembersList extends AppCompatActivity {
         };
         memberAdapter = new AddMemberAdapter(memberList, listener);
         recyclerView.setAdapter(memberAdapter);
-        System.out.println("Participants:" + groupParticipants);
-        //adding the group uid to each participant
-
-        System.out.println(userId);
-
 
         //fetch friends user IDs.
         friendsUI = new ArrayList<String>();
