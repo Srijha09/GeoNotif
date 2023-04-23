@@ -61,12 +61,12 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
     private ImageButton settings;
     private String groupName;
     private ArrayList<String> groupParticipants;
-    private  ArrayList<String> recyclerViewParticipantList;
+    private ArrayList<String> recyclerViewParticipantList;
     private ParticipantListAdapter participantListAdapter;
 
     static FirebaseUser firebaseUser;
     FirebaseAuth mAuth;
-    String groupId;
+    private String groupId;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,8 +89,6 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         TextView groupNameTextView = inflatedView.findViewById(R.id.GroupNameTitle);
         groupNameTextView.setText(groupName);
 
-
-
         this.loadingTasks = true;
         this.ctx = getContext();
         Configuration.getInstance().load(this.ctx, PreferenceManager.getDefaultSharedPreferences(this.ctx));
@@ -99,7 +97,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
 //        this.configureMap();
         RecyclerView tasksRecyclerView = inflatedView.findViewById(R.id.TasksRecyclerView);
         this.tasksLoadingSpinner = inflatedView.findViewById(R.id.TasksLoadingSpinner);
-        this.noTasksTextView = inflatedView.findViewById(R.id.NoTasksTextView);
+        this.noTasksTextView = inflatedView.findViewById(R.id.NoTasksGroupFragmentTextView);
         this.tasksScrollView = inflatedView.findViewById(R.id.TasksScrollView);
         this.grouptaskList = new ArrayList<>();
         this.taskService = new TaskService();
@@ -176,8 +174,8 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         Bundle intentExtras = data.getExtras();
-                        if (intentExtras.getBoolean("DeletedTask")) {
-                            grouptaskList.remove(intentExtras.getInt("DeletedTaskPosition"));
+                        if (intentExtras.getBoolean("DeletedGroupTask")) {
+                            grouptaskList.remove(intentExtras.getInt("DeletedGroupTaskPosition"));
                             taskListAdapter.notifyDataSetChanged();
                             loadingTasks = false;
                             tasksLoadingSpinner.setVisibility(View.INVISIBLE);
@@ -277,6 +275,10 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         intent.putExtra("groupId", this.groupId);
         intent.putExtra("groupName", this.groupName);
         intent.putExtra("groupParticipants", this.groupParticipants);
+
+        System.out.println("On Item Click" + this.groupId);
+        System.out.println(this.groupName);
+        System.out.println(this.groupParticipants);
 
         intent.putExtra("position", position);
         intent.putExtra("taskTitle", task.getTaskName());
