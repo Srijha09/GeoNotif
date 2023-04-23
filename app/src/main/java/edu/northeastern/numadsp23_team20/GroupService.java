@@ -23,6 +23,7 @@ public class GroupService {
     private DatabaseReference ref;
     private GroupServiceListener groupServiceListener;
     private ValueEventListener valueEventListener;
+    private GroupServiceTaskCreateListener groupServiceTaskCreateListener;
 
     public GroupService() {
         this.mAuth = FirebaseAuth.getInstance();
@@ -31,6 +32,9 @@ public class GroupService {
 
     public void setGroupServiceListener(GroupServiceListener groupServiceListener) {
         this.groupServiceListener = groupServiceListener;
+    }
+    public void setGroupServiceTaskCreateListener(GroupServiceTaskCreateListener groupServiceTaskCreateListener) {
+        this.groupServiceTaskCreateListener = groupServiceTaskCreateListener;
     }
 
     public String getFirebaseUserUID(){
@@ -154,6 +158,7 @@ public class GroupService {
                         });
                     }
                 }
+                groupServiceTaskCreateListener.onTaskCreated(task.getUuid());
             }
         });
     }
@@ -176,7 +181,8 @@ public class GroupService {
                         } else {
                             for (DataSnapshot groupDetails : group.getResult().getChildren()) {
                                 if (groupDetails.getKey().equals("groupName")) {
-                                    groupServiceListener.onUserGroupLoaded(groupDetails.getValue().toString());
+                                    Group g = group.getResult().getValue(Group.class);
+                                    groupServiceListener.onUserGroupLoaded(g);
                                 }
                             }
                         }
@@ -187,8 +193,12 @@ public class GroupService {
     }
 
     public interface GroupServiceListener {
-        void onUserGroupLoaded(String group);
+        void onUserGroupLoaded(Group group);
 
         void onGroupCreated(Group group);
+    }
+
+    public interface GroupServiceTaskCreateListener {
+        void onTaskCreated(String taskUUID);
     }
 }

@@ -58,9 +58,9 @@ public class AddTask extends AppCompatActivity {
     private TaskTypeListAdapter taskTypeListAdapter;
     private OnTaskTypeAssigneeItemClickListener onTaskTypeAssigneeItemClickListener;
     private TaskType taskType;
-    private String nonPersonalTaskTypeAssignee;
+    private Group nonPersonalTaskTypeAssignee;
     private GroupService.GroupServiceListener groupServiceListener;
-    private List<String> groupsList;
+    private List<Group> groupsList;
     private RecyclerView addTaskTypeRecyclerViewContainer;
 
 
@@ -82,7 +82,7 @@ public class AddTask extends AppCompatActivity {
         groupService.setGroupServiceListener(new GroupService.GroupServiceListener() {
 
             @Override
-            public void onUserGroupLoaded(String group) {
+            public void onUserGroupLoaded(Group group) {
                 groupsList.add(group);
                 taskTypeListAdapter.notifyDataSetChanged();
             }
@@ -94,7 +94,7 @@ public class AddTask extends AppCompatActivity {
         });
         groupService.readGroupsForUser();
         this.taskType = TaskType.PERSONAL;
-        this.nonPersonalTaskTypeAssignee = "";
+        this.nonPersonalTaskTypeAssignee = null;
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
         this.map = findViewById(R.id.AddTaskMapView);
         this.mapMarker = new Marker(this.map);
@@ -132,13 +132,13 @@ public class AddTask extends AppCompatActivity {
     public void onAddTaskTypePersonalRadioButtonClick(View view) {
         addTaskTypeRecyclerViewContainer.setVisibility(View.GONE);
         this.taskType = TaskType.PERSONAL;
-        this.nonPersonalTaskTypeAssignee = "";
+        this.nonPersonalTaskTypeAssignee = null;
     }
 
     public void onAddTaskTypeGroupRadioButtonClick(View view) {
         addTaskTypeRecyclerViewContainer.setVisibility(View.VISIBLE);
         this.taskType = TaskType.GROUP;
-        this.nonPersonalTaskTypeAssignee = "";
+        this.nonPersonalTaskTypeAssignee = null;
     }
 
     public void onAddTaskCancelButtonClick(View view) {
@@ -166,18 +166,8 @@ public class AddTask extends AppCompatActivity {
 
         LocationItem location = new LocationItem(this.taskLocationName, this.taskLatitude, this.taskLongitude);
         Task task = new Task(taskTitle, taskDescription, location);
-
-        if (taskType == TaskType.PERSONAL) {
-            task.setTaskType(TaskType.PERSONAL.toString());
-            task.setTaskTypeString("Personal task");
-        } else if (taskType == TaskType.GROUP) {
-            task.setTaskType(TaskType.GROUP.toString());
-            task.setTaskTypeString("Group task: " + nonPersonalTaskTypeAssignee);
-        } else {
-            task.setTaskType(TaskType.FRIEND.toString());
-            task.setTaskTypeString("Friend task: " + nonPersonalTaskTypeAssignee);
-        }
-
+        UUID uuid = UUID.randomUUID();
+        task.setUuid(uuid.toString());
         TaskService.TaskServiceCreateListener taskServiceCreateListener = new TaskService.TaskServiceCreateListener() {
             @Override
             public void onTaskCreated(String taskUUID) {
@@ -188,11 +178,35 @@ public class AddTask extends AppCompatActivity {
                 finish();
             }
         };
+        GroupService.GroupServiceTaskCreateListener groupServiceTaskCreateListener = new GroupService.GroupServiceTaskCreateListener() {
+            @Override
+            public void onTaskCreated(String taskUUID) {
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("NewTask", true);
+                returnIntent.putExtra("TaskUUID", taskUUID);
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
+            }
+        };
         TaskService taskService = new TaskService();
+        GroupService groupService = new GroupService();
         taskService.setTaskServiceCreateListener(taskServiceCreateListener);
-        UUID uuid = UUID.randomUUID();
-        task.setUuid(uuid.toString());
-        taskService.createTask(task);
+        groupService.setGroupServiceTaskCreateListener(groupServiceTaskCreateListener);
+
+        if (taskType == TaskType.PERSONAL) {
+            task.setTaskType(TaskType.PERSONAL.toString());
+            task.setTaskTypeString("Personal task");
+            taskService.createTask(task);
+        } else if (taskType == TaskType.GROUP) {
+            task.setTaskType(TaskType.GROUP.toString());
+            task.setTaskTypeString("Group task: " + nonPersonalTaskTypeAssignee.getGroupName());
+            groupService.addTaskToGroup(nonPersonalTaskTypeAssignee.getUuid(), task);
+        } else {
+            task.setTaskType(TaskType.FRIEND.toString());
+            task.setTaskTypeString("Friend task: " + nonPersonalTaskTypeAssignee.getGroupName());
+        }
+
+
     }
 
     private boolean validateTaskType() {

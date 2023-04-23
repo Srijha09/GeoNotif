@@ -89,10 +89,10 @@ public class AddGroupTask extends AppCompatActivity {
         this.groupParticipants = intent.getStringArrayListExtra("groupParticipants");
         //this.addTaskTypeRecyclerViewContainer = findViewById(R.id.AddTaskTypeRecyclerViewContainer);
         this.groupsList = new ArrayList<>();
-        this.onTaskTypeAssigneeItemClickListener = assignee -> {
-            taskTypeListAdapter.notifyDataSetChanged();
-            nonPersonalTaskTypeAssignee = assignee;
-        };
+//        this.onTaskTypeAssigneeItemClickListener = assignee -> {
+//            taskTypeListAdapter.notifyDataSetChanged();
+//            nonPersonalTaskTypeAssignee = assignee;
+//        };
 
         System.out.println("Add Group Task" + this.groupParticipants.toString());
 
@@ -139,7 +139,7 @@ public class AddGroupTask extends AppCompatActivity {
         finish();
     }
 
-    public void onAddTaskSubmitButtonClick(View view) {
+    public void onAddGroupTaskSubmitButtonClick(View view) {
         String taskTitle = ((TextView) findViewById(R.id.AddTaskTitleValue)).getText().toString();
         String taskDescription = ((TextView) findViewById(R.id.AddTaskDescriptionValue)).getText().toString();
 

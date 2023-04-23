@@ -156,13 +156,13 @@
                     app:strokeWidth="0.5dp" />
 
                 <Button
-                    android:id="@+id/AddTaskSubmitButton"
+                    android:id="@+id/AddGroupTaskSubmitButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"
                     android:backgroundTint="@color/primary"
-                    android:onClick="onAddTaskSubmitButtonClick"
+                    android:onClick="onAddGroupTaskSubmitButtonClick"
                     android:text="Submit"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
