@@ -133,6 +133,10 @@ public class GroupService {
 
     public void addTaskToGroup(String groupUuid, Task task) {
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/"
+                + groupUuid + "/Tasks");
+        String newTaskKey = this.ref.push().getKey();
+        this.ref.child(newTaskKey).setValue(task.getUuid());
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/"
                 + groupUuid);
         this.ref.get().addOnCompleteListener(group -> {
             if (!group.isSuccessful()) {
