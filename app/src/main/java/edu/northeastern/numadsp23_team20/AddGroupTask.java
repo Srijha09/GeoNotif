@@ -87,6 +87,11 @@ public class AddGroupTask extends AppCompatActivity {
         this.groupID = intent.getStringExtra("groupUUID");
         this.groupName = intent.getStringExtra("groupName");
         this.groupParticipants = intent.getStringArrayListExtra("groupParticipants");
+
+        System.out.println(this.groupID);
+        System.out.println(this.groupName);
+        System.out.println(this.groupParticipants);
+
         //this.addTaskTypeRecyclerViewContainer = findViewById(R.id.AddTaskTypeRecyclerViewContainer);
         this.groupsList = new ArrayList<>();
 //        this.onTaskTypeAssigneeItemClickListener = assignee -> {
@@ -138,6 +143,7 @@ public class AddGroupTask extends AppCompatActivity {
     }
 
     public void onAddGroupTaskSubmitButtonClick(View view) {
+        System.out.println("Clicked");
         String taskTitle = ((TextView) findViewById(R.id.AddTaskTitleValue)).getText().toString();
         String taskDescription = ((TextView) findViewById(R.id.AddTaskDescriptionValue)).getText().toString();
 
@@ -145,35 +151,31 @@ public class AddGroupTask extends AppCompatActivity {
             return;
         } else if (!validateTaskDescription(taskDescription)) {
             return;
-        } else if (!validateTaskType()) {
-            return;
         } else if (!validateLocation()) {
             Toast.makeText(this, "Please choose a location!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         LocationItem location = new LocationItem(this.taskLocationName, this.taskLatitude, this.taskLongitude);
-        Task task = new Task(taskTitle, taskDescription, location);
+        UUID uuid = UUID.randomUUID();
+        Task task = new Task(taskTitle, taskDescription, location, uuid.toString(), false);
+        task.setTaskType(TaskType.GROUP.toString());
+        task.setTaskTypeString("Group task: " + nonPersonalTaskTypeAssignee);
 
-        if (taskType == TaskType.GROUP) {
-            task.setTaskType(TaskType.GROUP.toString());
-            task.setTaskTypeString("Group task: " + nonPersonalTaskTypeAssignee);
-        }
 
-        TaskService.TaskServiceCreateListener taskServiceCreateListener = taskUUID -> {
-            Intent returnIntent = new Intent();
-            returnIntent.putExtra("NewTask", true);
-            returnIntent.putExtra("TaskUUID", taskUUID);
-            setResult(Activity.RESULT_OK, returnIntent);
-            finish();
+        GroupService.GroupServiceTaskCreateListener groupServiceTaskCreateListener = new GroupService.GroupServiceTaskCreateListener() {
+            @Override
+            public void onTaskCreated(String taskUUID) {
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("NewTask", true);
+                returnIntent.putExtra("TaskUUID", taskUUID);
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
+            }
         };
 
-        TaskService taskService = new TaskService();
-        taskService.setTaskServiceCreateListener(taskServiceCreateListener);
-        UUID uuid = UUID.randomUUID();
-        task.setUuid(uuid.toString());
-        //taskService.createGroupTask(task, this.groupID, this.groupParticipants);
         GroupService groupService = new GroupService();
+        groupService.setGroupServiceTaskCreateListener(groupServiceTaskCreateListener);
         groupService.addTaskToGroup(this.groupID, task);
     }
 
