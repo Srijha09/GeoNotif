@@ -265,8 +265,19 @@ public class AddTask extends AppCompatActivity {
                     "GeoNotif/Users/" + firebaseUser.getUid());
             mDatabase.get().addOnSuccessListener(dataSnapshot -> {
                 User user = dataSnapshot.getValue(User.class);
-                task.setTaskTypeString("Friend task: " + user.getFullname());
-                friendService.createFriendTask(task, friendTaskTypeAssignee.getUid());
+                // check user points and only then allow to add
+                if (user.getAssignableTasks() > 0) {
+                    task.setTaskTypeString("Friend task: " + user.getFullname());
+                    friendService.createFriendTask(task, friendTaskTypeAssignee.getUid());
+                    // decrement AssignableTasks
+                    DatabaseReference userAssignableTasksRef = FirebaseDatabase.getInstance().getReference(
+                            "GeoNotif/Users/" + user.getUid() + "/assignableTasks");
+                    userAssignableTasksRef.setValue(user.getAssignableTasks() - 1);
+                }
+                 else {
+                     Toast.makeText(getApplicationContext(),
+                             "You don't have any assignable tasks left!", Toast.LENGTH_LONG).show();
+                }
             });
         }
     }

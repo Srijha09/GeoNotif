@@ -297,24 +297,26 @@ public class GroupService {
             if (!userGroups.isSuccessful()) {
                 Log.e("firebase", "Error getting data", userGroups.getException());
             } else {
-                List<String> groupUUIDs = (List<String>) userGroups.getResult().getValue();
-                for (String groupUUID : groupUUIDs) {
-                    DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference(
-                            "GeoNotif/Groups/" + groupUUID);
-                    groupRef.get().addOnCompleteListener(group -> {
-                        if (!group.isSuccessful()) {
-                            Log.e("firebase", "Error getting data", group.getException());
-                        } else {
-                            Group g = group.getResult().getValue(Group.class);
-                            groupServiceListener.onUserGroupLoaded(g);
+                if (userGroups.getResult().getValue() != null) {
+                    List<String> groupUUIDs = (List<String>) userGroups.getResult().getValue();
+                    for (String groupUUID : groupUUIDs) {
+                        DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference(
+                                "GeoNotif/Groups/" + groupUUID);
+                        groupRef.get().addOnCompleteListener(group -> {
+                            if (!group.isSuccessful()) {
+                                Log.e("firebase", "Error getting data", group.getException());
+                            } else {
+                                Group g = group.getResult().getValue(Group.class);
+                                groupServiceListener.onUserGroupLoaded(g);
 //                            for (DataSnapshot groupDetails : group.getResult().getChildren()) {
 //                                if (groupDetails.getKey().equals("groupName")) {
 //                                    Group g = group.getResult().getValue(Group.class);
 //                                    groupServiceListener.onUserGroupLoaded(g);
 //                                }
 //                            }
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
             }
         });

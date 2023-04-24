@@ -53,18 +53,20 @@ public class FriendService {
                 if (!userFriends.isSuccessful()) {
                     Log.e("firebase", "Error getting data", userFriends.getException());
                 } else {
-                   HashMap<String, String> friendUUIDs = (HashMap<String, String>) userFriends.getResult().getValue();
-                    for (String friendUUID : friendUUIDs.values()) {
-                        DatabaseReference friendRef = FirebaseDatabase.getInstance().getReference(
-                                "GeoNotif/Users/" + friendUUID);
-                        friendRef.get().addOnCompleteListener(friend -> {
-                            if (!friend.isSuccessful()) {
-                                Log.e("firebase", "Error getting data", friend.getException());
-                            } else {
-                                User f = friend.getResult().getValue(User.class);
-                                friendServiceReadListener.onFriendLoad(f);
-                            }
-                        });
+                    if (userFriends.getResult().getValue() != null) {
+                        HashMap<String, String> friendUUIDs = (HashMap<String, String>) userFriends.getResult().getValue();
+                        for (String friendUUID : friendUUIDs.values()) {
+                            DatabaseReference friendRef = FirebaseDatabase.getInstance().getReference(
+                                    "GeoNotif/Users/" + friendUUID);
+                            friendRef.get().addOnCompleteListener(friend -> {
+                                if (!friend.isSuccessful()) {
+                                    Log.e("firebase", "Error getting data", friend.getException());
+                                } else {
+                                    User f = friend.getResult().getValue(User.class);
+                                    friendServiceReadListener.onFriendLoad(f);
+                                }
+                            });
+                        }
                     }
                 }
             }
@@ -105,7 +107,6 @@ public class FriendService {
             }
         });
     }
-
     public interface FriendServiceReadListener {
         void onFriendLoad(User friend);
     }

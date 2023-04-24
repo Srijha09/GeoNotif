@@ -7,6 +7,16 @@ public class User {
     public String fullname, username, emailId, uid;
     private String buttonDetails="Add";
 
+    public int getAssignableTasks() {
+        return assignableTasks;
+    }
+
+    public void setAssignableTasks(int assignableTasks) {
+        this.assignableTasks = assignableTasks;
+    }
+
+    private int assignableTasks;
+
     public String getButtonDetails() {
         return buttonDetails;
     }
@@ -56,6 +66,8 @@ public class User {
         this.uid = uid;
     }
 
+
+
     public User() {
     }
 
@@ -68,6 +80,7 @@ public class User {
         this.username = username;
         this.emailId = emailId;
         this.uid = uid;
+        this.assignableTasks = 1;
     }
 
     @Override
