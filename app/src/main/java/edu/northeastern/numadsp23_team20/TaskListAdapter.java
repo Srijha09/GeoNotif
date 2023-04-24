@@ -10,6 +10,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.List;
 
 public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskListViewHolder>
@@ -71,6 +76,18 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
             this.taskList.get(position).setIsComplete(isChecked);
             notifyItemChanged(position);
             this.taskService.createTask(task);
+            if (task.getTaskType().equals(TaskType.FRIEND.toString())) {
+                FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                FirebaseUser firebaseUser = mAuth.getCurrentUser();;
+                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference(
+                        "GeoNotif/Users/" + firebaseUser.getUid());
+                mDatabase.get().addOnSuccessListener(dataSnapshot -> {
+                    User user = dataSnapshot.getValue(User.class);
+                    DatabaseReference userAssignableTasksRef = FirebaseDatabase.getInstance().getReference(
+                            "GeoNotif/Users/" + user.getUid() + "/assignableTasks");
+                    userAssignableTasksRef.setValue(user.getAssignableTasks() + 1);
+                });
+            }
         });
     }
 

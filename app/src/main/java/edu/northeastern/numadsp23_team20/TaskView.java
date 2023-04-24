@@ -144,7 +144,6 @@ public class TaskView extends AppCompatActivity implements Serializable {
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("EditedTask", true);
                 returnIntent.putExtra("EditedTaskPosition", thisIntent.getExtras().getInt("position"));
-                System.out.println(task.getTaskType()+ " " + TaskType.FRIEND.toString() + " " + (task.getTaskType().equals(TaskType.FRIEND.toString())));
                 if (task.getTaskType().equals(TaskType.FRIEND.toString())) {
                     FirebaseAuth mAuth = FirebaseAuth.getInstance();
                     FirebaseUser firebaseUser = mAuth.getCurrentUser();;
