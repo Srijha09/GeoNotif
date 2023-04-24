@@ -36,6 +36,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class TasksFragment extends Fragment implements OnTaskItemClickListener {
@@ -52,6 +53,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
     private TextView noTasksTextView;
     private ScrollView tasksScrollView;
     private TaskListAdapter taskListAdapter;
+    private HashMap<Task, Marker> mapMarkerCollection;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
         Configuration.getInstance().load(this.ctx, PreferenceManager.getDefaultSharedPreferences(this.ctx));
         this.map = inflatedView.findViewById(R.id.TasksMapView);
         this.mapController = this.map.getController();
+        this.mapMarkerCollection = new HashMap<>();
         this.configureMap();
         RecyclerView tasksRecyclerView = inflatedView.findViewById(R.id.TasksRecyclerView);
         this.tasksLoadingSpinner = inflatedView.findViewById(R.id.TasksLoadingSpinner);
@@ -127,15 +130,24 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
                         Intent data = result.getData();
                         Bundle intentExtras = data.getExtras();
                         if (intentExtras.getBoolean("DeletedTask")) {
-                            taskList.remove(intentExtras.getInt("DeletedTaskPosition"));
+                            int deletedTaskPosition = intentExtras.getInt("DeletedTaskPosition");
+                            Task delTask = taskList.get(deletedTaskPosition);
+                            taskList.remove(deletedTaskPosition);
+                            map.getOverlays().remove(mapMarkerCollection.get(delTask));
+                            mapMarkerCollection.remove(delTask);
                             taskListAdapter.notifyDataSetChanged();
                             loadingTasks = false;
                             tasksLoadingSpinner.setVisibility(View.INVISIBLE);
-                            noTasksTextView.setVisibility(View.VISIBLE);
-                            tasksScrollView.setVisibility(View.INVISIBLE);
+                            if (taskList.isEmpty()) {
+                                noTasksTextView.setVisibility(View.VISIBLE);
+                                tasksScrollView.setVisibility(View.INVISIBLE);
+                            } else {
+                                noTasksTextView.setVisibility(View.INVISIBLE);
+                                tasksScrollView.setVisibility(View.VISIBLE);
+                            }
                         } else if (intentExtras.getBoolean("MarkCompleteTask")) {
-                            taskList.get(intentExtras.getInt("MarkCompleteTaskPosition")).setIsComplete(true);
-                            taskListAdapter.notifyItemChanged(intentExtras.getInt("MarkCompleteTaskPosition"));
+                            taskList.get(intentExtras.getInt("MarkCompleteTask")).setIsComplete(true);
+                            taskListAdapter.notifyItemChanged(intentExtras.getInt("EditedTaskPosition"));
                             loadingTasks = false;
                             tasksLoadingSpinner.setVisibility(View.INVISIBLE);
                             noTasksTextView.setVisibility(View.INVISIBLE);
@@ -190,6 +202,8 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
         GeoPoint markerPoint = new GeoPoint(task.getLocation().getLat(), task.getLocation().getLon());
         this.mapController.setCenter(markerPoint);
         Marker mapMarker = this.getCustomizedMapMarker();
+        this.mapMarkerCollection.put(task, mapMarker);
+        System.out.println(this.mapMarkerCollection);
         mapMarker.setPosition(markerPoint);
         mapMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         mapMarker.setOnMarkerClickListener((marker, mapView) -> {
