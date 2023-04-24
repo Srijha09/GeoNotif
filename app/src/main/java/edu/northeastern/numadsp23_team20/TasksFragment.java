@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -121,6 +122,9 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
                             tasksLoadingSpinner.setVisibility(View.INVISIBLE);
                             noTasksTextView.setVisibility(View.INVISIBLE);
                             tasksScrollView.setVisibility(View.VISIBLE);
+                        } else if (intentExtras.getBoolean("NewFriendTask")) {
+                            String message = "Added task to friend!";
+                            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
                         }
                     }
                 });

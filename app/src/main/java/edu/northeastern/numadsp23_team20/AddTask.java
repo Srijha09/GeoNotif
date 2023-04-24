@@ -30,6 +30,10 @@ import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -81,23 +85,24 @@ public class AddTask extends AppCompatActivity {
 //            nonPersonalTaskTypeAssignee = assignee;
 //        };
         groupsList = new ArrayList<>();
-        groupListAdapter = new TaskTypeListAdapter(
-                TaskType.GROUP,
-                this.groupsList, onTaskTypeGroupItemClickListener,
-                null, null);
         onTaskTypeGroupItemClickListener = assignee -> {
             groupListAdapter.notifyDataSetChanged();
             nonPersonalTaskTypeAssignee = assignee;
         };
+        groupListAdapter = new TaskTypeListAdapter(
+                TaskType.GROUP,
+                this.groupsList, onTaskTypeGroupItemClickListener,
+                null, null);
         friendsList = new ArrayList<>();
+        onTaskTypeFriendItemClickListener = assignee -> {
+            System.out.println(assignee);
+            friendListAdapter.notifyDataSetChanged();
+            friendTaskTypeAssignee = assignee;
+        };
         friendListAdapter = new TaskTypeListAdapter(
                 TaskType.FRIEND,
                 null, null,
                 this.friendsList, onTaskTypeFriendItemClickListener);
-        onTaskTypeFriendItemClickListener = assignee -> {
-            friendListAdapter.notifyDataSetChanged();
-            friendTaskTypeAssignee = assignee;
-        };
         this.addTaskTypeRecyclerViewContainer.setLayoutManager(new LinearLayoutManager(this));
         GroupService groupService = new GroupService();
         groupService.setGroupServiceListener(new GroupService.GroupServiceListener() {
@@ -228,10 +233,21 @@ public class AddTask extends AppCompatActivity {
                 finish();
             }
         };
+        FriendService.FriendServiceCreateListener friendServiceCreateListener = new FriendService.FriendServiceCreateListener() {
+            @Override
+            public void onTaskCreated(String friendFullname) {
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("NewFriendTask", true);
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
+            }
+        };
         TaskService taskService = new TaskService();
         GroupService groupService = new GroupService();
+        FriendService friendService = new FriendService();
         taskService.setTaskServiceCreateListener(taskServiceCreateListener);
         groupService.setGroupServiceTaskCreateListener(groupServiceTaskCreateListener);
+        friendService.setFriendServiceCreateListener(friendServiceCreateListener);
 
         if (taskType == TaskType.PERSONAL) {
             task.setTaskType(TaskType.PERSONAL.toString());
@@ -241,11 +257,18 @@ public class AddTask extends AppCompatActivity {
             task.setTaskType(TaskType.GROUP.toString());
             task.setTaskTypeString("Group task: " + nonPersonalTaskTypeAssignee.getGroupName());
             groupService.addTaskToGroup(nonPersonalTaskTypeAssignee.getUuid(), task);
-        } else {
+        } else if (taskType == TaskType.FRIEND) {
             task.setTaskType(TaskType.FRIEND.toString());
-            task.setTaskTypeString("Friend task: " + nonPersonalTaskTypeAssignee.getGroupName());
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            FirebaseUser firebaseUser = mAuth.getCurrentUser();;
+            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference(
+                    "GeoNotif/Users/" + firebaseUser.getUid());
+            mDatabase.get().addOnSuccessListener(dataSnapshot -> {
+                User user = dataSnapshot.getValue(User.class);
+                task.setTaskTypeString("Friend task: " + user.getFullname());
+                friendService.createFriendTask(task, friendTaskTypeAssignee.getUid());
+            });
         }
-
     }
 
     private boolean validateTaskType() {
