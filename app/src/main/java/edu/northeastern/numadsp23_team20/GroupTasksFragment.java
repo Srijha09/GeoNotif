@@ -200,10 +200,13 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                         if (result.getResultCode() == Activity.RESULT_OK) {
                             Intent data = result.getData();
                             Bundle intentExtras = data.getExtras();
-                            System.out.println(intentExtras.getString("GroupName"));
-                            groupNameTextView.setText(intentExtras.getString("GroupName"));
-                            recyclerViewParticipantList.clear();
-                            groupService.readParticipantsForGroup(groupId);
+                            if (intentExtras.getBoolean("LeaveGroup")) {
+                                getFragmentManager().popBackStack();
+                            } else {
+                                groupNameTextView.setText(intentExtras.getString("GroupName"));
+                                recyclerViewParticipantList.clear();
+                                groupService.readParticipantsForGroup(groupId);
+                            }
                         }
                     });
         settings = inflatedView.findViewById(R.id.GroupSettingsActionButton);

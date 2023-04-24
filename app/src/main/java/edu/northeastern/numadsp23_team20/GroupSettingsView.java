@@ -35,6 +35,7 @@ public class GroupSettingsView extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         Intent returnIntent = new Intent();
+        returnIntent.putExtra("LeaveGroup", false);
         returnIntent.putExtra("GroupName", groupName);
         returnIntent.putExtra("GroupParticipants", groupParticipants);
         setResult(Activity.RESULT_OK, returnIntent);
@@ -147,8 +148,10 @@ public class GroupSettingsView extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         groupService.leaveGroup(groupID);
+                        Intent returnIntent = new Intent();
+                        returnIntent.putExtra("LeaveGroup", true);
+                        setResult(Activity.RESULT_OK, returnIntent);
                         finish();
-
                     }
                 })
                 .setNegativeButton(android.R.string.no, null)
