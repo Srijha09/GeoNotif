@@ -168,6 +168,8 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                             tasksLoadingSpinner.setVisibility(View.INVISIBLE);
                             noTasksTextView.setVisibility(View.INVISIBLE);
                             tasksScrollView.setVisibility(View.VISIBLE);
+                            grouptaskList.clear();
+                            this.loadGroupTasks();
                         }
                     }
                 });
@@ -223,6 +225,14 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         //fetch the tasks where the group name is the current group name
         String newGroupName1 = "Group task: " + "";
         String newGroupName = "Group task: " + groupName;
+        this.loadGroupTasks();
+        inflatedView.findViewById(R.id.GroupTasksAddActionButton).setOnClickListener(this::onAddTaskButtonClick);
+        return inflatedView;
+    }
+
+    private void loadGroupTasks() {
+        String newGroupName1 = "Group task: " + "";
+        String newGroupName = "Group task: " + groupName;
         DatabaseReference userFriendsRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks");
         userFriendsRef.get().addOnCompleteListener(userFriends -> {
             if (!userFriends.isSuccessful()) {
@@ -256,8 +266,6 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
 
             }
         });
-        inflatedView.findViewById(R.id.GroupTasksAddActionButton).setOnClickListener(this::onAddTaskButtonClick);
-        return inflatedView;
     }
 
     public void onAddTaskButtonClick(View view) {
