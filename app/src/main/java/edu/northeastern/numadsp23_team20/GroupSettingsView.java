@@ -1,9 +1,12 @@
 package edu.northeastern.numadsp23_team20;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,6 +30,16 @@ public class GroupSettingsView extends AppCompatActivity {
     private ArrayList<String> groupParticipants;
     private ArrayList<String> recyclerViewParticipantList;
     private ParticipantListAdapter participantListAdapter;
+    private ActivityResultLauncher<Intent> addMembersActivityLauncher;
+
+    @Override
+    public void onBackPressed() {
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("GroupName", groupName);
+        returnIntent.putExtra("GroupParticipants", groupParticipants);
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,25 +55,6 @@ public class GroupSettingsView extends AppCompatActivity {
         TextView groupNameTextView = findViewById(R.id.GroupSettingsGroupName);
         groupNameTextView.setText(groupName);
         this.groupService = new GroupService();
-        // Find the group with the matching name in groupsList
-        this.group = new Group(groupName, groupParticipants);
-        this.group.setUuid(groupID);
-        this.edit = findViewById(R.id.GroupSettingsEditName);
-        this.edit.setOnClickListener(v -> editGroupAlertDialog(group));
-        Button addMember = findViewById(R.id.GroupSettingsAddParticipants);
-        addMember.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), AddMembersList.class);
-                intent.putExtra("groupUUID", groupID);
-                intent.putExtra("groupName", groupName);
-                intent.putExtra("groupParticipantsNo", groupParticipantsNo);
-                intent.putExtra("groupParticipants", groupParticipants);
-                startActivity(intent);
-            }
-        });
-        this.leaveBttn = findViewById(R.id.GroupSettingsLeaveButton);
-        this.leaveBttn.setOnClickListener(v -> leaveGroupAlertDialog());
 
         RecyclerView groupParticipantsRecyclerView = findViewById(R.id.GroupSettingsParticipantsRecyclerViewContainer);
         this.recyclerViewParticipantList = new ArrayList<>();
@@ -78,6 +72,41 @@ public class GroupSettingsView extends AppCompatActivity {
         };
         groupService.setGroupServiceReadParticipantsListener(groupServiceReadParticipantsListener);
         groupService.readParticipantsForGroup(this.groupID);
+
+        // Find the group with the matching name in groupsList
+        this.group = new Group(groupName, groupParticipants);
+        this.group.setUuid(groupID);
+        this.edit = findViewById(R.id.GroupSettingsEditName);
+        this.edit.setOnClickListener(v -> editGroupAlertDialog(group));
+        //Button addMember = findViewById(R.id.addmember_bttn);
+        Button addMember = findViewById(R.id.GroupSettingsAddParticipants);
+        this.addMembersActivityLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            recyclerViewParticipantList.clear();
+                            groupService.readParticipantsForGroup(groupID);
+                        }
+                    });
+        addMember.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), AddMembersList.class);
+                intent.putExtra("groupUUID", groupID);
+                intent.putExtra("groupName", groupName);
+                intent.putExtra("groupParticipantsNo", groupParticipantsNo);
+                intent.putExtra("groupParticipants", groupParticipants);
+                startActivity(intent);
+            }
+        });
+        // this.leaveBttn = findViewById(R.id.leave_bttn);
+        this.leaveBttn = findViewById(R.id.GroupSettingsLeaveButton);
+        this.leaveBttn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                leaveGroupAlertDialog();
+            }
+        });
     }
 
     public void editGroupAlertDialog(Group group) {
@@ -98,6 +127,7 @@ public class GroupSettingsView extends AppCompatActivity {
 
         alert.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view1 -> {
             String newGroupName = group_name.getText().toString();
+            groupName = newGroupName;
             TextView groupNameTextView = findViewById(R.id.GroupSettingsGroupName);
             groupNameTextView.setText(newGroupName);
 

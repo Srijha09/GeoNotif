@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -58,6 +59,13 @@ public class AddMembersList extends AppCompatActivity {
     private static List<String> friendsUI;
 
     @Override
+    public void onBackPressed() {
+        Intent returnIntent = new Intent();
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_members_list);
@@ -76,38 +84,19 @@ public class AddMembersList extends AppCompatActivity {
             cancelBttn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    Intent intent = new Intent(getApplicationContext(), AddNewMembersPage.class);
-//                    intent.putExtra("groupUUID", groupID);
-//                    intent.putExtra("groupName", groupName);
-//                    intent.putExtra("groupParticipantsNo", groupParticipantsNo);
-//                    intent.putExtra("groupParticipants", groupParticipants);
-//                    //intent.putExtra("groupName", groupName);
-//                    startActivity(intent);
                     finish();
                 }
             });
         } else {
             cancelBttn.setOnClickListener(v -> {
-                Intent intent12 = new Intent(getApplicationContext(), GroupSettingsView.class);
-                intent12.putExtra("groupUUID", groupID);
-                intent12.putExtra("groupName", groupName);
-                intent12.putExtra("groupParticipantsNo", groupParticipantsNo);
-                intent12.putExtra("groupParticipants", groupParticipants);
-                //intent.putExtra("groupName", groupName);
-                startActivity(intent12);
+                finish();
             });
         }
 
         doneBttn = findViewById(R.id.donebttn);
         if (groupParticipantsNo < 2 || groupParticipantsNo == 2) {
             doneBttn.setOnClickListener(v -> {
-                Intent intent1 = new Intent(getApplicationContext(), GroupSettingsView.class);
-                intent1.putExtra("groupUUID", groupID);
-                intent1.putExtra("groupName", groupName);
-                intent1.putExtra("groupParticipantsNo", groupParticipantsNo);
-                intent1.putExtra("groupParticipants", groupParticipants);
-                //intent.putExtra("groupName", groupName);
-                startActivity(intent1);
+                finish();
             });
         } else {
             doneBttn.setOnClickListener(v -> {
