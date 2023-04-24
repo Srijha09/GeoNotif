@@ -82,7 +82,6 @@ public class GroupService {
     }
 
     public void editGroupName(String groupUUID, String updatedGroupName) {
-        System.out.println("" + groupUUID + " " + updatedGroupName);
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupUUID);
         this.ref.child("groupName").setValue(updatedGroupName);
     }
@@ -188,7 +187,6 @@ public class GroupService {
     }
 
     public void leaveGroup(String groupID) {
-        System.out.println(groupID);
         String userId = this.firebaseUser.getUid();
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID + "/groupParticipants");
 
