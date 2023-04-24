@@ -149,8 +149,8 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
                                 noTasksTextView.setVisibility(View.INVISIBLE);
                                 tasksScrollView.setVisibility(View.VISIBLE);
                             }
-                        } else if (intentExtras.getBoolean("EditedTask")) {
-                            taskList.get(intentExtras.getInt("EditedTaskPosition")).setIsComplete(true);
+                        } else if (intentExtras.getBoolean("MarkCompleteTask")) {
+                            taskList.get(intentExtras.getInt("MarkCompleteTask")).setIsComplete(true);
                             taskListAdapter.notifyItemChanged(intentExtras.getInt("EditedTaskPosition"));
                             loadingTasks = false;
                             tasksLoadingSpinner.setVisibility(View.INVISIBLE);

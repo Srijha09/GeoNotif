@@ -5,7 +5,7 @@ import java.util.List;
 
 public class User {
     public String fullname, username, emailId, uid;
-    private String buttonDetails="Add";
+    private String buttonDetails = "Add";
 
     public int getAssignableTasks() {
         return assignableTasks;
@@ -20,6 +20,7 @@ public class User {
     public String getButtonDetails() {
         return buttonDetails;
     }
+
     public void setButtonDetails(String buttonDetails) {
         this.buttonDetails = buttonDetails;
     }
@@ -71,7 +72,7 @@ public class User {
     public User() {
     }
 
-    public User(String username){
+    public User(String username) {
         this.username = username;
     }
 

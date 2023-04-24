@@ -190,9 +190,9 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                                 noTasksTextView.setVisibility(View.INVISIBLE);
                                 tasksScrollView.setVisibility(View.VISIBLE);
                             }
-                        } else if (intentExtras.getBoolean("EditedTask")) {
-                            grouptaskList.get(intentExtras.getInt("EditedTaskPosition")).setIsComplete(true);
-                            taskListAdapter.notifyItemChanged(intentExtras.getInt("EditedTaskPosition"));
+                        } else if (intentExtras.getBoolean("MarkCompleteGroupTask")) {
+                            grouptaskList.get(intentExtras.getInt("MarkCompleteGroupTaskPosition")).setIsComplete(true);
+                            taskListAdapter.notifyItemChanged(intentExtras.getInt("MarkCompleteGroupTaskPosition"));
                             loadingTasks = false;
                             tasksLoadingSpinner.setVisibility(View.INVISIBLE);
                             noTasksTextView.setVisibility(View.INVISIBLE);
@@ -203,19 +203,19 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
 
         this.groupSettingsActivityLauncher =
                 registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == Activity.RESULT_OK) {
-                            Intent data = result.getData();
-                            Bundle intentExtras = data.getExtras();
-                            if (intentExtras.getBoolean("LeaveGroup")) {
-                                getFragmentManager().popBackStack();
-                            } else {
-                                groupNameTextView.setText(intentExtras.getString("GroupName"));
-                                recyclerViewParticipantList.clear();
-                                groupService.readParticipantsForGroup(groupId);
+                        result -> {
+                            if (result.getResultCode() == Activity.RESULT_OK) {
+                                Intent data = result.getData();
+                                Bundle intentExtras = data.getExtras();
+                                if (intentExtras.getBoolean("LeaveGroup")) {
+                                    getFragmentManager().popBackStack();
+                                } else {
+                                    groupNameTextView.setText(intentExtras.getString("GroupName"));
+                                    recyclerViewParticipantList.clear();
+                                    groupService.readParticipantsForGroup(groupId);
+                                }
                             }
-                        }
-                    });
+                        });
         settings = inflatedView.findViewById(R.id.GroupSettingsActionButton);
         settings.setOnClickListener(v -> {
             // create a new intent to open the new activity
