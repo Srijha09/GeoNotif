@@ -143,8 +143,8 @@ public class GroupTaskView extends AppCompatActivity implements Serializable {
 
         TaskService.TaskServiceCreateListener taskServiceCreateListener = taskUUID -> {
             Intent returnIntent = new Intent();
-            returnIntent.putExtra("EditedTask", true);
-            returnIntent.putExtra("EditedTaskPosition", thisIntent.getExtras().getInt("position"));
+            returnIntent.putExtra("MarkCompleteGroupTask", true);
+            returnIntent.putExtra("MarkCompleteGroupTaskPosition", thisIntent.getExtras().getInt("position"));
             setResult(Activity.RESULT_OK, returnIntent);
             finish();
         };

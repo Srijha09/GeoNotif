@@ -137,8 +137,8 @@ public class TaskView extends AppCompatActivity implements Serializable {
             @Override
             public void onTaskCreated(String taskUUID) {
                 Intent returnIntent = new Intent();
-                returnIntent.putExtra("EditedTask", true);
-                returnIntent.putExtra("EditedTaskPosition", thisIntent.getExtras().getInt("position"));
+                returnIntent.putExtra("MarkCompleteTask", true);
+                returnIntent.putExtra("MarkCompleteTaskPosition", thisIntent.getExtras().getInt("position"));
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
             }
