@@ -1,5 +1,6 @@
 package edu.northeastern.numadsp23_team20;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +49,7 @@ public class TaskTypeListAdapter extends RecyclerView.Adapter<TaskTypeListAdapte
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         if (this.taskType == TaskType.GROUP) {
             holder.assigneeRadioButton.setText(this.groupList.get(position).getGroupName());
             holder.assigneeRadioButton.setChecked(position == selectedPosition);
