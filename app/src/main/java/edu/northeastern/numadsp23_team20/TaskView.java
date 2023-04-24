@@ -19,6 +19,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -139,6 +144,19 @@ public class TaskView extends AppCompatActivity implements Serializable {
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("MarkCompleteTask", true);
                 returnIntent.putExtra("MarkCompleteTaskPosition", thisIntent.getExtras().getInt("position"));
+                if (task.getTaskType().equals(TaskType.FRIEND.toString())) {
+                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                    FirebaseUser firebaseUser = mAuth.getCurrentUser();;
+                    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference(
+                            "GeoNotif/Users/" + firebaseUser.getUid());
+                    mDatabase.get().addOnSuccessListener(dataSnapshot -> {
+                        User user = dataSnapshot.getValue(User.class);
+                        DatabaseReference userAssignableTasksRef = FirebaseDatabase.getInstance().getReference(
+                                "GeoNotif/Users/" + user.getUid() + "/assignableTasks");
+                        userAssignableTasksRef.setValue(user.getAssignableTasks() + 1);
+                    });
+
+                }
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
             }

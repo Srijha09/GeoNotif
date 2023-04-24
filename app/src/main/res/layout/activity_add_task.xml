@@ -117,6 +117,14 @@
                     android:buttonTint="@color/primary"
                     android:onClick="onAddTaskTypeGroupRadioButtonClick"
                     android:text="Group" />
+
+                <RadioButton
+                    android:id="@+id/AddTaskTypeFriendRadio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="onAddTaskTypeFriendRadioButtonClick"
+                    android:text="Friend" />
             </RadioGroup>
 
             <androidx.recyclerview.widget.RecyclerView

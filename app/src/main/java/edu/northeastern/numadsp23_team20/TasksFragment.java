@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -121,6 +122,9 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
                             tasksLoadingSpinner.setVisibility(View.INVISIBLE);
                             noTasksTextView.setVisibility(View.INVISIBLE);
                             tasksScrollView.setVisibility(View.VISIBLE);
+                        } else if (intentExtras.getBoolean("NewFriendTask")) {
+                            String message = "Added task to friend!";
+                            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -170,6 +174,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
         this.mapController.setZoom(15);
         this.map.setMultiTouchControls(true);
         this.map.setClickable(true);
+        this.map.setExpectedCenter(new GeoPoint(42.3398, -71.0892));
 
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.getActivity());
 

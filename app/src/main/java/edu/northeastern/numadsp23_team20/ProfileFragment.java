@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -60,6 +61,7 @@ public class ProfileFragment extends Fragment {
     Button logoutButton;
     private EditText fullNameEditText, emailEditText;
     private SwitchMaterial notificationSwitch;
+    private TextView gamificationTextView;
 
     ImageView profileImage;
     FloatingActionButton fab;
@@ -123,12 +125,14 @@ public class ProfileFragment extends Fragment {
         profileImage = view.findViewById(R.id.imgProfile);
         fullNameEditText = view.findViewById(R.id.fullnameTextBox);
         emailEditText = view.findViewById(R.id.emailTextBox);
+        gamificationTextView = view.findViewById(R.id.GamificationTextView);
         DatabaseReference mDatabase;
         mDatabase = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + firebaseUser.getUid());
         mDatabase.get().addOnSuccessListener(dataSnapshot -> {
             User user = dataSnapshot.getValue(User.class);
             emailEditText.setText(firebaseUser.getEmail());
             fullNameEditText.setText(user.getFullname());
+            gamificationTextView.setText(gamificationTextView.getText().toString() + user.getAssignableTasks());
         });
 
         pathReference.getDownloadUrl().addOnSuccessListener(downloadUrl -> {

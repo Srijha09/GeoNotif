@@ -30,6 +30,10 @@ import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -55,13 +59,19 @@ public class AddTask extends AppCompatActivity {
     private Marker mapMarker;
     private ActivityResultLauncher<Intent> addressSearchActivity;
     private TextView addTaskLocationValue;
-    private TaskTypeListAdapter taskTypeListAdapter;
-    private OnTaskTypeAssigneeItemClickListener onTaskTypeAssigneeItemClickListener;
+    //private TaskTypeListAdapter taskTypeListAdapter;
+    private TaskTypeListAdapter groupListAdapter;
+    private TaskTypeListAdapter friendListAdapter;
+    // private OnTaskTypeAssigneeItemClickListener onTaskTypeAssigneeItemClickListener;
+    private OnTaskTypeGroupItemClickListener onTaskTypeGroupItemClickListener;
+    private OnTaskTypeFriendItemClickListener onTaskTypeFriendItemClickListener;
     private TaskType taskType;
     private Group nonPersonalTaskTypeAssignee;
+    private User friendTaskTypeAssignee;
     private GroupService.GroupServiceListener groupServiceListener;
     private List<Group> groupsList;
     private RecyclerView addTaskTypeRecyclerViewContainer;
+    private List<User> friendsList;
 
 
     @Override
@@ -70,21 +80,36 @@ public class AddTask extends AppCompatActivity {
         setContentView(R.layout.activity_add_task);
 
         this.addTaskTypeRecyclerViewContainer = findViewById(R.id.GroupParticipantsRecyclerViewContainer);
+//        onTaskTypeAssigneeItemClickListener = assignee -> {
+//            taskTypeListAdapter.notifyDataSetChanged();
+//            nonPersonalTaskTypeAssignee = assignee;
+//        };
         groupsList = new ArrayList<>();
-        onTaskTypeAssigneeItemClickListener = assignee -> {
-            taskTypeListAdapter.notifyDataSetChanged();
+        onTaskTypeGroupItemClickListener = assignee -> {
+            groupListAdapter.notifyDataSetChanged();
             nonPersonalTaskTypeAssignee = assignee;
         };
+        groupListAdapter = new TaskTypeListAdapter(
+                TaskType.GROUP,
+                this.groupsList, onTaskTypeGroupItemClickListener,
+                null, null);
+        friendsList = new ArrayList<>();
+        onTaskTypeFriendItemClickListener = assignee -> {
+            System.out.println(assignee);
+            friendListAdapter.notifyDataSetChanged();
+            friendTaskTypeAssignee = assignee;
+        };
+        friendListAdapter = new TaskTypeListAdapter(
+                TaskType.FRIEND,
+                null, null,
+                this.friendsList, onTaskTypeFriendItemClickListener);
         this.addTaskTypeRecyclerViewContainer.setLayoutManager(new LinearLayoutManager(this));
-        taskTypeListAdapter = new TaskTypeListAdapter(this.groupsList, onTaskTypeAssigneeItemClickListener);
-        addTaskTypeRecyclerViewContainer.setAdapter(taskTypeListAdapter);
         GroupService groupService = new GroupService();
         groupService.setGroupServiceListener(new GroupService.GroupServiceListener() {
-
             @Override
             public void onUserGroupLoaded(Group group) {
                 groupsList.add(group);
-                taskTypeListAdapter.notifyDataSetChanged();
+                groupListAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -93,6 +118,15 @@ public class AddTask extends AppCompatActivity {
             }
         });
         groupService.readGroupsForUser();
+        FriendService friendService = new FriendService();
+        friendService.setFriendServiceReadListener(new FriendService.FriendServiceReadListener() {
+            @Override
+            public void onFriendLoad(User friend) {
+                friendsList.add(friend);
+                friendListAdapter.notifyDataSetChanged();
+            }
+        });
+        friendService.readUserFriends();
         this.taskType = TaskType.PERSONAL;
         this.nonPersonalTaskTypeAssignee = null;
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
@@ -100,6 +134,8 @@ public class AddTask extends AppCompatActivity {
         this.mapMarker = new Marker(this.map);
         this.customizeMapMarker();
         this.mapController = this.map.getController();
+        this.configureMap();
+        this.map.setExpectedCenter(new GeoPoint(42.3398, -71.0892));
         this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         this.getCurrentUserLocation();
         this.addTaskLocationValue = findViewById(R.id.AddTaskLocationValue);
@@ -133,12 +169,23 @@ public class AddTask extends AppCompatActivity {
         addTaskTypeRecyclerViewContainer.setVisibility(View.GONE);
         this.taskType = TaskType.PERSONAL;
         this.nonPersonalTaskTypeAssignee = null;
+        this.friendTaskTypeAssignee = null;
     }
 
     public void onAddTaskTypeGroupRadioButtonClick(View view) {
         addTaskTypeRecyclerViewContainer.setVisibility(View.VISIBLE);
         this.taskType = TaskType.GROUP;
         this.nonPersonalTaskTypeAssignee = null;
+        this.friendTaskTypeAssignee = null;
+        addTaskTypeRecyclerViewContainer.setAdapter(groupListAdapter);
+    }
+
+    public void onAddTaskTypeFriendRadioButtonClick(View view) {
+        addTaskTypeRecyclerViewContainer.setVisibility(View.VISIBLE);
+        this.taskType = TaskType.FRIEND;
+        this.friendTaskTypeAssignee = null;
+        this.nonPersonalTaskTypeAssignee = null;
+        addTaskTypeRecyclerViewContainer.setAdapter(friendListAdapter);
     }
 
     public void onAddTaskCancelButtonClick(View view) {
@@ -157,7 +204,11 @@ public class AddTask extends AppCompatActivity {
         } else if (!validateTaskDescription(taskDescription)) {
             return;
         } else if (!validateTaskType()) {
-            Toast.makeText(this, "Group not selected!", Toast.LENGTH_SHORT).show();
+            if (taskType == TaskType.GROUP) {
+                Toast.makeText(this, "Group not selected!", Toast.LENGTH_SHORT).show();
+            } else if (taskType == TaskType.FRIEND) {
+                Toast.makeText(this, "Friend not selected!", Toast.LENGTH_SHORT).show();
+            }
             return;
         } else if (!validateLocation()) {
             Toast.makeText(this, "Please choose a location!", Toast.LENGTH_SHORT).show();
@@ -188,10 +239,21 @@ public class AddTask extends AppCompatActivity {
                 finish();
             }
         };
+        FriendService.FriendServiceCreateListener friendServiceCreateListener = new FriendService.FriendServiceCreateListener() {
+            @Override
+            public void onTaskCreated(String friendFullname) {
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("NewFriendTask", true);
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
+            }
+        };
         TaskService taskService = new TaskService();
         GroupService groupService = new GroupService();
+        FriendService friendService = new FriendService();
         taskService.setTaskServiceCreateListener(taskServiceCreateListener);
         groupService.setGroupServiceTaskCreateListener(groupServiceTaskCreateListener);
+        friendService.setFriendServiceCreateListener(friendServiceCreateListener);
 
         if (taskType == TaskType.PERSONAL) {
             task.setTaskType(TaskType.PERSONAL.toString());
@@ -201,17 +263,37 @@ public class AddTask extends AppCompatActivity {
             task.setTaskType(TaskType.GROUP.toString());
             task.setTaskTypeString("Group task: " + nonPersonalTaskTypeAssignee.getGroupName());
             groupService.addTaskToGroup(nonPersonalTaskTypeAssignee.getUuid(), task);
-        } else {
+        } else if (taskType == TaskType.FRIEND) {
             task.setTaskType(TaskType.FRIEND.toString());
-            task.setTaskTypeString("Friend task: " + nonPersonalTaskTypeAssignee.getGroupName());
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            FirebaseUser firebaseUser = mAuth.getCurrentUser();;
+            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference(
+                    "GeoNotif/Users/" + firebaseUser.getUid());
+            mDatabase.get().addOnSuccessListener(dataSnapshot -> {
+                User user = dataSnapshot.getValue(User.class);
+                // check user points and only then allow to add
+                if (user.getAssignableTasks() > 0) {
+                    task.setTaskTypeString("Friend task: " + user.getFullname());
+                    friendService.createFriendTask(task, friendTaskTypeAssignee.getUid());
+                    // decrement AssignableTasks
+                    DatabaseReference userAssignableTasksRef = FirebaseDatabase.getInstance().getReference(
+                            "GeoNotif/Users/" + user.getUid() + "/assignableTasks");
+                    userAssignableTasksRef.setValue(user.getAssignableTasks() - 1);
+                }
+                 else {
+                     Toast.makeText(getApplicationContext(),
+                             "You don't have any assignable tasks left!", Toast.LENGTH_LONG).show();
+                }
+            });
         }
-
-
     }
 
     private boolean validateTaskType() {
-        if (this.taskType == TaskType.GROUP && this.nonPersonalTaskTypeAssignee.equals("")) {
+        if (this.taskType == TaskType.GROUP && this.nonPersonalTaskTypeAssignee == null) {
             ((TextView) findViewById(R.id.AddTaskTypeLabel)).setError("Group not selected!");
+            return false;
+        } else if (this.taskType == TaskType.FRIEND && this.friendTaskTypeAssignee == null) {
+            ((TextView) findViewById(R.id.AddTaskTypeLabel)).setError("Friend not selected!");
             return false;
         }
         return true;
