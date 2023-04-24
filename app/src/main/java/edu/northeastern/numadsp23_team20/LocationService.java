@@ -1,5 +1,6 @@
 package edu.northeastern.numadsp23_team20;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -18,7 +19,6 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -27,7 +27,6 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryDataEventListener;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -58,12 +57,11 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        System.out.println("LocationService - " + "Location service started");
 
         this.mAuth = FirebaseAuth.getInstance();
         this.firebaseUser = mAuth.getCurrentUser();
         String userId = this.firebaseUser.getUid();
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId + "/locations");
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations");
         this.geoFire = new GeoFire(this.ref);
         ref.keepSynced(true);
         this.geoQuery = geoFire.queryAtLocation(new GeoLocation(0.0, 0.0), 0.3);
@@ -73,9 +71,7 @@ public class LocationService extends Service {
         geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
             @Override
             public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
-//                System.out.println("Key: " + dataSnapshot.getKey());
-                DatabaseReference taskRef = FirebaseDatabase.getInstance().getReference("GeoNotif/" + userId
-                        + "/tasks/" + dataSnapshot.getKey());
+                DatabaseReference taskRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + dataSnapshot.getKey());
                 taskRef.get().addOnCompleteListener(t -> {
                     if (!t.isSuccessful()) {
                         Log.e("firebase", "Error getting data", t.getException());
@@ -106,10 +102,19 @@ public class LocationService extends Service {
                                     LocationItem locationItem = new LocationItem(key, lat, lon);
                                     task.setLocation(locationItem);
                                 }
+                            } else if (item.getKey().equals("taskType")) {
+                                System.out.println(item.getValue());
+                                task.setTaskType(item.getValue().toString());
+                            } else if (item.getKey().equals("taskTypeString")) {
+                                task.setTaskTypeString((item.getValue().toString()));
+                            } else if (item.getKey().equals("uuid")) {
+                                task.setUuid(item.getValue().toString());
                             }
                         }
-                        if(!task.getIsComplete())
+                        if (!task.getIsComplete()) {
+                            System.out.println("Before Notification - " + task.toString());
                             sendNotification(task);
+                        }
                     }
                 });
 
@@ -131,7 +136,6 @@ public class LocationService extends Service {
 
             @Override
             public void onGeoQueryReady() {
-                //System.out.println("All initial data has been loaded and events have been fired!");
             }
 
             @Override
@@ -146,7 +150,6 @@ public class LocationService extends Service {
     @SuppressLint("InvalidWakeLockTag")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        System.out.println("LocationService-" + "Location service started");
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LocationServiceWakeLock");
         wakeLock.acquire();
@@ -157,7 +160,7 @@ public class LocationService extends Service {
         Notification notification = new NotificationCompat.Builder(this, "LocationServiceChannel")
                 .setContentTitle("Location Service")
                 .setContentText("Location updates are running...")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .build();
 
         startForeground(NOTIFICATION_ID, notification);
@@ -167,8 +170,9 @@ public class LocationService extends Service {
     }
 
     private void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
@@ -178,26 +182,19 @@ public class LocationService extends Service {
     private final LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
-//            System.out.println("LocationService" + "Latitude: " + latitude + " Longitude: " + longitude);
-
             geoQuery.setCenter(new GeoLocation(location.getLatitude(), location.getLongitude()));
         }
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-//            System.out.println("LocationService" + "Provider status changed: " + provider + " status: " + status);
         }
 
         @Override
         public void onProviderEnabled(String provider) {
-//            System.out.println("LocationService" + "Provider enabled: " + provider);
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-//            System.out.println("LocationService" + "Provider disabled: " + provider);
         }
     };
 
@@ -232,18 +229,20 @@ public class LocationService extends Service {
     }
 
     private void sendNotification(Task task) {
-
         Intent intent = new Intent(getApplicationContext(), TaskView.class);
         intent.putExtra("taskTitle", task.getTaskName());
         intent.putExtra("taskDescription", task.getDescription());
         intent.putExtra("taskLocation", task.getLocation().getKey());
         intent.putExtra("taskLatitude", task.getLocation().getLat());
         intent.putExtra("taskLongitude", task.getLocation().getLon());
+        intent.putExtra("taskComplete", task.getIsComplete());
+        intent.putExtra("taskUUID", task.getUuid());
+        intent.putExtra("taskType", task.getTaskType());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "TaskNotificationChannel")
-                .setSmallIcon(R.mipmap.ic_geonotif_logo_foreground)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle("You have a task nearby!")
                 .setContentText(task.getTaskName())
                 .setContentIntent(pendingIntent)

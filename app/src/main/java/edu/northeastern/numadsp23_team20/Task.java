@@ -8,6 +8,19 @@ public class Task {
     private String description;
     private LocationItem location;
     private boolean isComplete;
+    private String uuid;
+
+    private String taskType;
+
+    private String taskTypeString;
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     public Task() {
         //default constructor
@@ -17,6 +30,24 @@ public class Task {
         this.taskName = taskName;
         this.description = description;
         this.location = location;
+    }
+
+    public Task(String taskName, String description, LocationItem location, String uuid, boolean isComplete) {
+        this.taskName = taskName;
+        this.description = description;
+        this.location = location;
+        this.uuid = uuid;
+        this.isComplete = isComplete;
+    }
+
+    public Task(String taskName, String description, LocationItem location, String uuid, boolean isComplete, String taskType, String taskTypeString) {
+        this.taskName = taskName;
+        this.description = description;
+        this.location = location;
+        this.uuid = uuid;
+        this.isComplete = isComplete;
+        this.taskType = taskType;
+        this.taskTypeString = taskTypeString;
     }
 
     public String getTaskName() {
@@ -48,7 +79,8 @@ public class Task {
     public String toString() {
         if (this.getLocation() != null)
             return "Task [taskName=" + getTaskName() + ", description=" + getDescription()
-                    + ", location()=" + getLocation().toString() + "]";
+                    + ", location()=" + getLocation().toString()
+                    + ", uuid=" + getUuid() + ", isComplete=" + getIsComplete() + "]";
         else
             return "Task [taskName=" + getTaskName() + ", description=" + getDescription()
                     + "]";
@@ -60,5 +92,21 @@ public class Task {
 
     public void setIsComplete(boolean complete) {
         isComplete = complete;
+    }
+
+    public String getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(String taskType) {
+        this.taskType = taskType;
+    }
+
+    public String getTaskTypeString() {
+        return taskTypeString;
+    }
+
+    public void setTaskTypeString(String taskTypeString) {
+        this.taskTypeString = taskTypeString;
     }
 }

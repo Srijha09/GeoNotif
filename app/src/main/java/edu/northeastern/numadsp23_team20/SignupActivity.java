@@ -1,6 +1,7 @@
 package edu.northeastern.numadsp23_team20;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -57,17 +58,25 @@ public class SignupActivity extends AppCompatActivity {
             mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener
                     (task -> {
                         if (task.isSuccessful()) {
-                            User data = new User(fullName, username, email);
-                            FirebaseDatabase.getInstance().getReference("GeoNotif")
+                            String uid = task.getResult().getUser().getUid();
+                            User data = new User(fullName, username, email, uid);
+                            FirebaseDatabase.getInstance().getReference("GeoNotif/Users")
                                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(data).
                                     addOnCompleteListener(task1 -> {
+                                        SharedPreferences.Editor editor = this.getSharedPreferences(GeoNotif.PREFERENCES, MODE_PRIVATE).edit();
+                                        editor.putString(GeoNotif.NOTIF_SETTING, GeoNotif.ENABLE_NOTIF_SETTING);
+                                        editor.apply();
                                         Intent intent = new Intent(SignupActivity.this, HomePage.class);
                                         startActivity(intent);
                                         finish();
                                     });
                         } else {
                             System.out.println(task.getException().getLocalizedMessage());
-                            Toast.makeText(SignupActivity.this, "Check Email or Password", Toast.LENGTH_SHORT).show();
+                            if (task.getException().getLocalizedMessage().equals("The email address is already in use by another account.")) {
+                                emailEditText.setError("Email is already in use.");
+                            } else {
+                                Toast.makeText(SignupActivity.this, "Check Email or Password", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     });
         });

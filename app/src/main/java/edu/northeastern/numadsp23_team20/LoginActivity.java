@@ -2,6 +2,7 @@ package edu.northeastern.numadsp23_team20;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -43,6 +44,9 @@ public class LoginActivity extends AppCompatActivity {
             mAuth.signInWithEmailAndPassword(loginEmail, loginPassword).
                     addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
+                            SharedPreferences.Editor editor = this.getSharedPreferences(GeoNotif.PREFERENCES, MODE_PRIVATE).edit();
+                            editor.putString(GeoNotif.NOTIF_SETTING, GeoNotif.ENABLE_NOTIF_SETTING);
+                            editor.apply();
                             Intent intent = new Intent(LoginActivity.this, HomePage.class);
                             startActivity(intent);
                             finish();

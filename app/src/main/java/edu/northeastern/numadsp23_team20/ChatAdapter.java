@@ -2,13 +2,10 @@ package edu.northeastern.numadsp23_team20;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.URLUtil;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -75,7 +72,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                         int position = getLayoutPosition();
                         if (position != RecyclerView.NO_POSITION) {
 
-                            listener.onItemClick(position);
+                            listener.onItemClick(v, position);
                         }
                     }
                 }

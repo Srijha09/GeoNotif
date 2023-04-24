@@ -4,15 +4,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.BreakIterator;
-import java.util.List;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.ObjectKey;
 
-import edu.northeastern.numadsp23_team20.R;
+import java.util.List;
+import java.util.UUID;
 
 public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerView.ViewHolder> {
 
@@ -37,8 +38,6 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
     }
 
 
-
-
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
@@ -46,8 +45,24 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
         // replace String with your data type
         FriendsData data = mData.get(position);
         // set the data to the view holder's views
-        holder.userName.setText(data.getUserName());
+        holder.userName.setText(data.getFullname());
         holder.button.setText(data.getButtonDetails());
+
+
+        data.getImageUrl().getDownloadUrl().addOnSuccessListener(downloadUrl -> {
+            if (holder.itemView.getContext() == null) {
+            } else {
+                Glide.with(holder.itemView.getContext())
+                        .load(downloadUrl)
+                        .circleCrop()
+                        .signature(new ObjectKey(data.getUserID()))
+                        .into(holder.photoImageView);
+
+            }
+        });
+
+
+        //Picasso.get().load(data.getImageUrl()).into(holder.photoImageView);
 
 
     }
@@ -58,18 +73,22 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
         return mData.size();
     }
 
+
     public interface OnButtonClickListener {
         void onButtonClickChange(int position);
     }
 
     // Provide a reference to the views for each data item
     public class ViewHolder extends RecyclerView.ViewHolder {
+        public ImageView photoImageView;
         public TextView userName;
 
         public Button button;
 
         public ViewHolder(View view, OnButtonClickListener listener) {
             super(view);
+
+            photoImageView = itemView.findViewById(R.id.photo_of_user);
             userName = view.findViewById(R.id.name_of_person);
             button = view.findViewById(R.id.follow_button);
 
@@ -81,7 +100,6 @@ public class FriendsRecyclerView extends RecyclerView.Adapter<FriendsRecyclerVie
                 }
             });
         }
-
 
 
     }

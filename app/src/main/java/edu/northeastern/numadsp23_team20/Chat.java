@@ -1,5 +1,7 @@
 package edu.northeastern.numadsp23_team20;
 
+import android.view.View;
+
 public class Chat implements ItemClickListener{
     String username;
 
@@ -14,5 +16,5 @@ public class Chat implements ItemClickListener{
 
 
     @Override
-    public void onItemClick(int position) {}
+    public void onItemClick(View v, int position) {}
 }
