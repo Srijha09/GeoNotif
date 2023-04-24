@@ -24,6 +24,12 @@ public class AddMemberAdapter extends RecyclerView.Adapter<AddMemberAdapter.View
         this.listener = listener;
     }
 
+    // Method to update the list
+    public void setList(ArrayList<User> memberList) {
+        this.memberList = memberList;
+        notifyDataSetChanged();
+    }
+
     public void setOnItemClickListener(OnButtonClickListener listener) {
         this.listener = listener;
     }

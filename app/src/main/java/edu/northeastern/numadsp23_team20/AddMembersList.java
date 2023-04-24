@@ -162,6 +162,7 @@ public class AddMembersList extends AppCompatActivity {
                             // get the current number of participants in the group
                             int numParticipants = (int) dataSnapshot.getChildrenCount();
                             groupParticipants.add(user_id);
+
                             // set the value of the next available integer key to the new participant ID
                             groupParticipantsRef.child(String.valueOf(numParticipants)).setValue(user_id)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -170,8 +171,19 @@ public class AddMembersList extends AppCompatActivity {
                                             // update the UI and notify the adapter that the data has changed
                                             memberList.get(position).setButtonDetails("Added");
                                             groupParticipantsNoRef.setValue(numParticipants + 1);
+                                            memberList.remove(position);
                                             memberAdapter.notifyDataSetChanged();
                                             Toast.makeText(getApplicationContext(), "User Added", Toast.LENGTH_SHORT).show();
+
+                                            // filter out the added users from the memberList and set the adapter
+                                            ArrayList<User> filteredList = new ArrayList<>();
+                                            for (User user : memberList) {
+                                                if (!groupParticipants.contains(user.getUid())) {
+                                                    filteredList.add(user);
+                                                }
+                                            }
+                                            memberAdapter.setList(filteredList);
+                                            memberAdapter.notifyDataSetChanged();
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
@@ -213,10 +225,6 @@ public class AddMembersList extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-            } else {
-                if (groupParticipants.contains(user_id)) {
-                    datapoint.setButtonDetails("Added");
-                }
             }
             memberAdapter.notifyDataSetChanged(); // Notify the adapter that the data has changed
         };
@@ -275,20 +283,32 @@ public class AddMembersList extends AppCompatActivity {
         });
     }
 
-
-    public void filterList(String text) {
+    private void filterList(String newText) {
         ArrayList<User> filteredList = new ArrayList<>();
         for (User user : memberList) {
-            if (user.getUsername().toLowerCase(Locale.ROOT).contains(text.toLowerCase(Locale.ROOT))) {
+            if (user.getUsername().toLowerCase().contains(newText.toLowerCase())
+                    && !groupParticipants.contains(user.getUid())) {
                 filteredList.add(user);
             }
         }
-
-        if (filteredList.isEmpty()) {
-//            Toast.makeText(this, "No data found", Toast.LENGTH_SHORT).show();
-        } else {
-            memberAdapter.setFilteredList(filteredList);
-        }
+        memberList.clear();
+        memberList.addAll(filteredList);
+        memberAdapter.notifyDataSetChanged();
     }
+
+//    public void filterList(String text) {
+//        ArrayList<User> filteredList = new ArrayList<>();
+//        for (User user : memberList) {
+//            if (user.getUsername().toLowerCase(Locale.ROOT).contains(text.toLowerCase(Locale.ROOT))) {
+//                filteredList.add(user);
+//            }
+//        }
+//
+//        if (filteredList.isEmpty()) {
+////            Toast.makeText(this, "No data found", Toast.LENGTH_SHORT).show();
+//        } else {
+//            memberAdapter.setFilteredList(filteredList);
+//        }
+//    }
 
 }
