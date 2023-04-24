@@ -55,13 +55,19 @@ public class AddTask extends AppCompatActivity {
     private Marker mapMarker;
     private ActivityResultLauncher<Intent> addressSearchActivity;
     private TextView addTaskLocationValue;
-    private TaskTypeListAdapter taskTypeListAdapter;
-    private OnTaskTypeAssigneeItemClickListener onTaskTypeAssigneeItemClickListener;
+    //private TaskTypeListAdapter taskTypeListAdapter;
+    private TaskTypeListAdapter groupListAdapter;
+    private TaskTypeListAdapter friendListAdapter;
+    // private OnTaskTypeAssigneeItemClickListener onTaskTypeAssigneeItemClickListener;
+    private OnTaskTypeGroupItemClickListener onTaskTypeGroupItemClickListener;
+    private OnTaskTypeFriendItemClickListener onTaskTypeFriendItemClickListener;
     private TaskType taskType;
     private Group nonPersonalTaskTypeAssignee;
+    private User friendTaskTypeAssignee;
     private GroupService.GroupServiceListener groupServiceListener;
     private List<Group> groupsList;
     private RecyclerView addTaskTypeRecyclerViewContainer;
+    private List<User> friendsList;
 
 
     @Override
@@ -70,21 +76,35 @@ public class AddTask extends AppCompatActivity {
         setContentView(R.layout.activity_add_task);
 
         this.addTaskTypeRecyclerViewContainer = findViewById(R.id.GroupParticipantsRecyclerViewContainer);
+//        onTaskTypeAssigneeItemClickListener = assignee -> {
+//            taskTypeListAdapter.notifyDataSetChanged();
+//            nonPersonalTaskTypeAssignee = assignee;
+//        };
         groupsList = new ArrayList<>();
-        onTaskTypeAssigneeItemClickListener = assignee -> {
-            taskTypeListAdapter.notifyDataSetChanged();
+        groupListAdapter = new TaskTypeListAdapter(
+                TaskType.GROUP,
+                this.groupsList, onTaskTypeGroupItemClickListener,
+                null, null);
+        onTaskTypeGroupItemClickListener = assignee -> {
+            groupListAdapter.notifyDataSetChanged();
             nonPersonalTaskTypeAssignee = assignee;
         };
+        friendsList = new ArrayList<>();
+        friendListAdapter = new TaskTypeListAdapter(
+                TaskType.FRIEND,
+                null, null,
+                this.friendsList, onTaskTypeFriendItemClickListener);
+        onTaskTypeFriendItemClickListener = assignee -> {
+            friendListAdapter.notifyDataSetChanged();
+            friendTaskTypeAssignee = assignee;
+        };
         this.addTaskTypeRecyclerViewContainer.setLayoutManager(new LinearLayoutManager(this));
-        taskTypeListAdapter = new TaskTypeListAdapter(this.groupsList, onTaskTypeAssigneeItemClickListener);
-        addTaskTypeRecyclerViewContainer.setAdapter(taskTypeListAdapter);
         GroupService groupService = new GroupService();
         groupService.setGroupServiceListener(new GroupService.GroupServiceListener() {
-
             @Override
             public void onUserGroupLoaded(Group group) {
                 groupsList.add(group);
-                taskTypeListAdapter.notifyDataSetChanged();
+                groupListAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -93,6 +113,15 @@ public class AddTask extends AppCompatActivity {
             }
         });
         groupService.readGroupsForUser();
+        FriendService friendService = new FriendService();
+        friendService.setFriendServiceReadListener(new FriendService.FriendServiceReadListener() {
+            @Override
+            public void onFriendLoad(User friend) {
+                friendsList.add(friend);
+                friendListAdapter.notifyDataSetChanged();
+            }
+        });
+        friendService.readUserFriends();
         this.taskType = TaskType.PERSONAL;
         this.nonPersonalTaskTypeAssignee = null;
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
@@ -133,12 +162,23 @@ public class AddTask extends AppCompatActivity {
         addTaskTypeRecyclerViewContainer.setVisibility(View.GONE);
         this.taskType = TaskType.PERSONAL;
         this.nonPersonalTaskTypeAssignee = null;
+        this.friendTaskTypeAssignee = null;
     }
 
     public void onAddTaskTypeGroupRadioButtonClick(View view) {
         addTaskTypeRecyclerViewContainer.setVisibility(View.VISIBLE);
         this.taskType = TaskType.GROUP;
         this.nonPersonalTaskTypeAssignee = null;
+        this.friendTaskTypeAssignee = null;
+        addTaskTypeRecyclerViewContainer.setAdapter(groupListAdapter);
+    }
+
+    public void onAddTaskTypeFriendRadioButtonClick(View view) {
+        addTaskTypeRecyclerViewContainer.setVisibility(View.VISIBLE);
+        this.taskType = TaskType.FRIEND;
+        this.friendTaskTypeAssignee = null;
+        this.nonPersonalTaskTypeAssignee = null;
+        addTaskTypeRecyclerViewContainer.setAdapter(friendListAdapter);
     }
 
     public void onAddTaskCancelButtonClick(View view) {
@@ -205,7 +245,6 @@ public class AddTask extends AppCompatActivity {
             task.setTaskType(TaskType.FRIEND.toString());
             task.setTaskTypeString("Friend task: " + nonPersonalTaskTypeAssignee.getGroupName());
         }
-
 
     }
 
