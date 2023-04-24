@@ -126,7 +126,35 @@ public class GroupService {
         });
     }
 
+    private void removeTasks(Map<String, String> tasks) {
+        if (tasks.size() > 0) {
+            for (String taskUUID : tasks.values()) {
+                this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + taskUUID);
+                this.ref.removeValue();
+            }
+        }
+    }
+
     private void deleteGroup(String groupId) {
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupId + "/Tasks");
+
+        this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Map<String, String> tasks = new HashMap<>();
+                tasks = (Map<String, String>) snapshot.getValue();
+                if (tasks == null || tasks.isEmpty()) {
+                    tasks = new HashMap<>();
+                }
+                removeTasks(tasks);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupId);
         this.ref.removeValue();
     }
@@ -134,7 +162,6 @@ public class GroupService {
     private void removeTaskFromUser(Map<String, String> tasks) {
         if (tasks.size() > 0) {
             String userId = this.firebaseUser.getUid();
-            System.out.println("User tasks when leaving - " + tasks);
             for (String taskUUID : tasks.values()) {
                 this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations/"
                         + taskUUID);
