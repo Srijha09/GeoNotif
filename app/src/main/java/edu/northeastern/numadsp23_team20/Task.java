@@ -40,6 +40,16 @@ public class Task {
         this.isComplete = isComplete;
     }
 
+    public Task(String taskName, String description, LocationItem location, String uuid, boolean isComplete, String taskType, String taskTypeString) {
+        this.taskName = taskName;
+        this.description = description;
+        this.location = location;
+        this.uuid = uuid;
+        this.isComplete = isComplete;
+        this.taskType = taskType;
+        this.taskTypeString = taskTypeString;
+    }
+
     public String getTaskName() {
         return taskName;
     }
