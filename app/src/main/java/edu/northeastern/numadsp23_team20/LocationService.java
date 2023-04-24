@@ -102,10 +102,19 @@ public class LocationService extends Service {
                                     LocationItem locationItem = new LocationItem(key, lat, lon);
                                     task.setLocation(locationItem);
                                 }
+                            } else if (item.getKey().equals("taskType")) {
+                                System.out.println(item.getValue());
+                                task.setTaskType(item.getValue().toString());
+                            } else if (item.getKey().equals("taskTypeString")) {
+                                task.setTaskTypeString((item.getValue().toString()));
+                            } else if (item.getKey().equals("uuid")) {
+                                task.setUuid(item.getValue().toString());
                             }
                         }
-                        if (!task.getIsComplete())
+                        if (!task.getIsComplete()) {
+                            System.out.println("Before Notification - " + task.toString());
                             sendNotification(task);
+                        }
                     }
                 });
 
@@ -220,7 +229,6 @@ public class LocationService extends Service {
     }
 
     private void sendNotification(Task task) {
-
         Intent intent = new Intent(getApplicationContext(), TaskView.class);
         intent.putExtra("taskTitle", task.getTaskName());
         intent.putExtra("taskDescription", task.getDescription());

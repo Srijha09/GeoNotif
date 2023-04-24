@@ -146,7 +146,7 @@ public class TaskView extends AppCompatActivity implements Serializable {
                 returnIntent.putExtra("MarkCompleteTaskPosition", thisIntent.getExtras().getInt("position"));
                 if (task.getTaskType().equals(TaskType.FRIEND.toString())) {
                     FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                    FirebaseUser firebaseUser = mAuth.getCurrentUser();;
+                    FirebaseUser firebaseUser = mAuth.getCurrentUser();
                     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference(
                             "GeoNotif/Users/" + firebaseUser.getUid());
                     mDatabase.get().addOnSuccessListener(dataSnapshot -> {
