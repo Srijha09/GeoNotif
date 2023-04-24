@@ -134,6 +134,8 @@ public class AddTask extends AppCompatActivity {
         this.mapMarker = new Marker(this.map);
         this.customizeMapMarker();
         this.mapController = this.map.getController();
+        this.configureMap();
+        this.map.setExpectedCenter(new GeoPoint(42.3398, -71.0892));
         this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         this.getCurrentUserLocation();
         this.addTaskLocationValue = findViewById(R.id.AddTaskLocationValue);
@@ -202,7 +204,11 @@ public class AddTask extends AppCompatActivity {
         } else if (!validateTaskDescription(taskDescription)) {
             return;
         } else if (!validateTaskType()) {
-            Toast.makeText(this, "Group not selected!", Toast.LENGTH_SHORT).show();
+            if (taskType == TaskType.GROUP) {
+                Toast.makeText(this, "Group not selected!", Toast.LENGTH_SHORT).show();
+            } else if (taskType == TaskType.FRIEND) {
+                Toast.makeText(this, "Friend not selected!", Toast.LENGTH_SHORT).show();
+            }
             return;
         } else if (!validateLocation()) {
             Toast.makeText(this, "Please choose a location!", Toast.LENGTH_SHORT).show();
@@ -283,8 +289,11 @@ public class AddTask extends AppCompatActivity {
     }
 
     private boolean validateTaskType() {
-        if (this.taskType == TaskType.GROUP && this.nonPersonalTaskTypeAssignee.equals("")) {
+        if (this.taskType == TaskType.GROUP && this.nonPersonalTaskTypeAssignee == null) {
             ((TextView) findViewById(R.id.AddTaskTypeLabel)).setError("Group not selected!");
+            return false;
+        } else if (this.taskType == TaskType.FRIEND && this.friendTaskTypeAssignee == null) {
+            ((TextView) findViewById(R.id.AddTaskTypeLabel)).setError("Friend not selected!");
             return false;
         }
         return true;

@@ -174,6 +174,7 @@ public class TasksFragment extends Fragment implements OnTaskItemClickListener {
         this.mapController.setZoom(15);
         this.map.setMultiTouchControls(true);
         this.map.setClickable(true);
+        this.map.setExpectedCenter(new GeoPoint(42.3398, -71.0892));
 
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.getActivity());
 
