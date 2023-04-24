@@ -289,11 +289,6 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
         intent.putExtra("groupId", this.groupId);
         intent.putExtra("groupName", this.groupName);
         intent.putExtra("groupParticipants", this.groupParticipants);
-
-        System.out.println("On Item Click" + this.groupId);
-        System.out.println(this.groupName);
-        System.out.println(this.groupParticipants);
-
         intent.putExtra("position", position);
         intent.putExtra("taskTitle", task.getTaskName());
         intent.putExtra("taskDescription", task.getDescription());

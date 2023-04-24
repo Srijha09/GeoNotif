@@ -96,7 +96,7 @@ public class GroupSettingsView extends AppCompatActivity {
                 intent.putExtra("groupName", groupName);
                 intent.putExtra("groupParticipantsNo", groupParticipantsNo);
                 intent.putExtra("groupParticipants", groupParticipants);
-                addMembersActivityLauncher.launch(intent);
+                startActivity(intent);
             }
         });
         // this.leaveBttn = findViewById(R.id.leave_bttn);

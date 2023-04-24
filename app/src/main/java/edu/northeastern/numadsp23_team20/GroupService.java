@@ -6,18 +6,21 @@ import androidx.annotation.NonNull;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GroupService {
     private FirebaseUser firebaseUser;
@@ -84,58 +87,164 @@ public class GroupService {
         this.ref.child("groupName").setValue(updatedGroupName);
     }
 
-    public void leaveGroup(String groupID) {
-        String userId = this.firebaseUser.getUid();
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID);
-        this.ref.child("groupParticipants").addListenerForSingleValueEvent(new ValueEventListener() {
+    private void removeUserFromGroup(String groupId, List<String> groupParticipants) {
+        groupParticipants.remove(firebaseUser.getUid());
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupId + "/groupParticipants");
+        this.ref.setValue(groupParticipants);
+        this.ref.removeEventListener(this.valueEventListener);
+    }
+
+    private void removeGroupFromUser(String groupId, List<String> groups) {
+        groups.remove(groupId);
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + this.firebaseUser.getUid() + "/Groups");
+        this.ref.setValue(groups);
+        this.ref.removeEventListener(this.valueEventListener);
+    }
+
+    private void updateGroupParticipantsNo(String groupId) {
+        DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupId + "/groupParticipantsNo");
+        myRef.runTransaction(new Transaction.Handler() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Integer value = mutableData.getValue(Integer.class);
+                if (value == null || value == 1) {
+                    deleteGroup(groupId);
+                    return Transaction.success(mutableData);
+                } else {
+                    mutableData.setValue(value - 1);
+                }
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                if (databaseError != null) {
+                    Log.d("Firebase", "Transaction failed: " + databaseError.getMessage());
+                } else {
+                }
+            }
+        });
+    }
+
+    private void removeTasks(Map<String, String> tasks) {
+        if (tasks.size() > 0) {
+            for (String taskUUID : tasks.values()) {
+                this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Tasks/" + taskUUID);
+                this.ref.removeValue();
+            }
+        }
+    }
+
+    private void deleteGroup(String groupId) {
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupId + "/Tasks");
+
+        this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Map<String, String> tasks = new HashMap<>();
+                tasks = (Map<String, String>) snapshot.getValue();
+                if (tasks == null || tasks.isEmpty()) {
+                    tasks = new HashMap<>();
+                }
+                removeTasks(tasks);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupId);
+        this.ref.removeValue();
+    }
+
+    private void removeTaskFromUser(Map<String, String> tasks) {
+        if (tasks.size() > 0) {
+            String userId = this.firebaseUser.getUid();
+            for (String taskUUID : tasks.values()) {
+                this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Locations/"
+                        + taskUUID);
+                this.ref.removeValue();
+                this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Tasks");
+                this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        List<String> taskUUIDs = new ArrayList<>();
+                        taskUUIDs = (List<String>) snapshot.getValue();
+                        if (taskUUIDs == null || taskUUIDs.isEmpty()) {
+                            taskUUIDs = new ArrayList<>();
+                        }
+                        removeUserTaskList(taskUUIDs, taskUUID, userId);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        }
+    }
+
+    public void leaveGroup(String groupID) {
+        System.out.println(groupID);
+        String userId = this.firebaseUser.getUid();
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID + "/groupParticipants");
+
+        this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<String> groupParticipants = new ArrayList<>();
-                groupParticipants = (List<String>) dataSnapshot.getValue();
-                // Handle the case where there are no group participants
+                groupParticipants = (List<String>) snapshot.getValue();
                 if (groupParticipants == null || groupParticipants.isEmpty()) {
                     groupParticipants = new ArrayList<>();
                 }
-                // Find the index of the participant to remove
-                int indexToRemove = groupParticipants.indexOf(userId);
-                // Remove the participant from the list
-                if (indexToRemove >= 0) {
-                    groupParticipants.remove(indexToRemove);
-                }
-                // Update the group participants list in the database
-                ref.child("groupParticipants").setValue(groupParticipants);
+                removeUserFromGroup(groupID, groupParticipants);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle errors here
-            }
-        });
-        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId);
-        this.ref.child("Groups").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<String> groupUUIDs = new ArrayList<>();
-                groupUUIDs = (List<String>) dataSnapshot.getValue();
-                // Handle the case where there are no group participants
-                if (groupUUIDs == null || groupUUIDs.isEmpty()) {
-                    groupUUIDs = new ArrayList<>();
-                }
-                // Find the index of the participant to remove
-                int indexToRemove = groupUUIDs.indexOf(groupID);
-                // Remove the participant from the list
-                if (indexToRemove >= 0) {
-                    groupUUIDs.remove(indexToRemove);
-                }
-                // Update the group participants list in the database
-                ref.child("Groups").setValue(groupUUIDs);
-            }
+            public void onCancelled(@NonNull DatabaseError error) {
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
 
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Users/" + userId + "/Groups");
+        this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> userGroups = new ArrayList<>();
+                userGroups = (List<String>) snapshot.getValue();
+                if (userGroups == null || userGroups.isEmpty()) {
+                    userGroups = new ArrayList<>();
+                }
+                removeGroupFromUser(groupID, userGroups);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        this.ref = FirebaseDatabase.getInstance().getReference("GeoNotif/Groups/" + groupID + "/Tasks");
+
+        this.valueEventListener = this.ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Map<String, String> tasks = new HashMap<>();
+                tasks = (Map<String, String>) snapshot.getValue();
+                if (tasks == null || tasks.isEmpty()) {
+                    tasks = new HashMap<>();
+                }
+                removeTaskFromUser(tasks);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        updateGroupParticipantsNo(groupID);
     }
 
 
