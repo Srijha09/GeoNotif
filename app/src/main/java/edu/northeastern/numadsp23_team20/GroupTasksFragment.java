@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -63,6 +64,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
     private ArrayList<String> groupParticipants;
     private ArrayList<String> recyclerViewParticipantList;
     private ParticipantListAdapter participantListAdapter;
+    private ActivityResultLauncher<Intent> groupSettingsActivityLauncher;
 
     static FirebaseUser firebaseUser;
     FirebaseAuth mAuth;
@@ -192,6 +194,18 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                     }
                 });
 
+        this.groupSettingsActivityLauncher =
+                registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            Intent data = result.getData();
+                            Bundle intentExtras = data.getExtras();
+                            System.out.println(intentExtras.getString("GroupName"));
+                            groupNameTextView.setText(intentExtras.getString("GroupName"));
+                            recyclerViewParticipantList.clear();
+                            groupService.readParticipantsForGroup(groupId);
+                        }
+                    });
         settings = inflatedView.findViewById(R.id.GroupSettingsActionButton);
         settings.setOnClickListener(v -> {
             // create a new intent to open the new activity
@@ -200,7 +214,7 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
             intent.putExtra("groupName", groupName);
             intent.putExtra("groupParticipantsNo", groupParticipantsNo);
             intent.putExtra("groupParticipants", groupParticipants);
-            startActivity(intent);
+            this.groupSettingsActivityLauncher.launch(intent);
         });
         //query all the tasks
         //fetch the tasks where the group name is the current group name

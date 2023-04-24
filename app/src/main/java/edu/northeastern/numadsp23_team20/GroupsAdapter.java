@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.FragmentActivity;
@@ -50,26 +52,38 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                 holder.participants_no.setText(group.getGroupParticipantsNo() + " participants");
         }
         holder.itemView.setOnClickListener(view -> {
-            if (group.getGroupParticipantsNo() < 2) {
-                Intent intent = new Intent(context, AddNewMembersPage.class);
-                intent.putExtra("groupName", group.getGroupName());
-                intent.putExtra("groupUUID", group.getUuid());
-                intent.putExtra("groupParticipantsNo", group.getGroupParticipantsNo());
-                intent.putExtra("groupParticipants", group.getGroupParticipants());
-                context.startActivity(intent);
-            } else {
-                Bundle bundle = new Bundle();
-                bundle.putString("groupUUID", group.getUuid());
-                bundle.putString("groupName", group.getGroupName());
-                bundle.putStringArrayList("groupParticipants", group.getGroupParticipants());
-                bundle.putInt("groupParticipantsNo", group.getGroupParticipants().size());
-                GroupTasksFragment grouptasksFragment = new GroupTasksFragment();
-                grouptasksFragment.setArguments(bundle);
-                FragmentTransaction transaction = ((FragmentActivity) context).getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.FrameLayout, grouptasksFragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
-            }
+//            if (group.getGroupParticipantsNo() < 2) {
+//                Intent intent = new Intent(context, AddNewMembersPage.class);
+//                intent.putExtra("groupName", group.getGroupName());
+//                intent.putExtra("groupUUID", group.getUuid());
+//                intent.putExtra("groupParticipantsNo", group.getGroupParticipantsNo());
+//                intent.putExtra("groupParticipants", group.getGroupParticipants());
+//                context.startActivity(intent);
+//            } else {
+//                Bundle bundle = new Bundle();
+//                bundle.putString("groupUUID", group.getUuid());
+//                bundle.putString("groupName", group.getGroupName());
+//                bundle.putStringArrayList("groupParticipants", group.getGroupParticipants());
+//                bundle.putInt("groupParticipantsNo", group.getGroupParticipants().size());
+//                GroupTasksFragment grouptasksFragment = new GroupTasksFragment();
+//                grouptasksFragment.setArguments(bundle);
+//                FragmentTransaction transaction = ((FragmentActivity) context).getSupportFragmentManager().beginTransaction();
+//                transaction.replace(R.id.FrameLayout, grouptasksFragment);
+//                transaction.addToBackStack(null);
+//                transaction.commit();
+//            }
+
+            Bundle bundle = new Bundle();
+            bundle.putString("groupUUID", group.getUuid());
+            bundle.putString("groupName", group.getGroupName());
+            bundle.putStringArrayList("groupParticipants", group.getGroupParticipants());
+            bundle.putInt("groupParticipantsNo", group.getGroupParticipants().size());
+            GroupTasksFragment grouptasksFragment = new GroupTasksFragment();
+            grouptasksFragment.setArguments(bundle);
+            FragmentTransaction transaction = ((FragmentActivity) context).getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.FrameLayout, grouptasksFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
         });
     }
 
