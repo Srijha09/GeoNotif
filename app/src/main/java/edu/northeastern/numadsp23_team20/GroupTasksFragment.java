@@ -190,9 +190,9 @@ public class GroupTasksFragment extends Fragment implements OnTaskItemClickListe
                                 noTasksTextView.setVisibility(View.INVISIBLE);
                                 tasksScrollView.setVisibility(View.VISIBLE);
                             }
-                        } else if (intentExtras.getBoolean("EditedTask")) {
-                            grouptaskList.get(intentExtras.getInt("EditedTaskPosition")).setIsComplete(true);
-                            taskListAdapter.notifyItemChanged(intentExtras.getInt("EditedTaskPosition"));
+                        } else if (intentExtras.getBoolean("MarkCompleteGroupTask")) {
+                            grouptaskList.get(intentExtras.getInt("MarkCompleteGroupTaskPosition")).setIsComplete(true);
+                            taskListAdapter.notifyItemChanged(intentExtras.getInt("MarkCompleteGroupTaskPosition"));
                             loadingTasks = false;
                             tasksLoadingSpinner.setVisibility(View.INVISIBLE);
                             noTasksTextView.setVisibility(View.INVISIBLE);
