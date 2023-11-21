@@ -7,3 +7,14 @@ create groups for activities and manage task lists. It will handle the shared da
 these groups and distinguish between individual and group tasks. Finally, GeoNotif will reward
 users for items they check off their lists by providing the limited ability to assign tasks to other
 users in their network
+
+Login Page and Task Page:
+![image](https://github.com/Srijha09/GeoNotif/assets/50697493/efec96a9-c4ad-4f56-8d45-1e3db7b93f29)
+
+Friends Page
+![image](https://github.com/Srijha09/GeoNotif/assets/50697493/b56caf24-cbac-4add-af3e-fccdba5d994c)
+
+Groups Page
+![image](https://github.com/Srijha09/GeoNotif/assets/50697493/298c176a-d312-4598-9d41-a937302e7cc6)
+
+
